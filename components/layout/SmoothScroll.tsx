@@ -3,9 +3,8 @@ import { useEffect } from 'react'
 import Lenis from 'lenis'
 
 declare global {
-  interface Window {
-    lenis?: Lenis
-  }
+  // eslint-disable-next-line no-var
+  var lenis: InstanceType<typeof Lenis> | undefined
 }
 
 export default function SmoothScroll() {
@@ -19,7 +18,7 @@ export default function SmoothScroll() {
       orientation: 'vertical',
       gestureOrientation: 'vertical',
     })
-    window.lenis = lenis
+    globalThis.lenis = lenis
 
     let raf = 0
     const loop = (t: number) => {
@@ -31,7 +30,7 @@ export default function SmoothScroll() {
     return () => {
       cancelAnimationFrame(raf)
       lenis.destroy()
-      window.lenis = undefined
+      globalThis.lenis = undefined
     }
   }, [])
 

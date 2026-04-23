@@ -21,7 +21,7 @@ function scrollToWorks() {
   const target = document.getElementById('works')
   if (!target) return
   const offset = window.innerWidth < 1024 ? -56 : 0
-  const lenis = window.lenis
+  const lenis = globalThis.lenis
   if (lenis) {
     lenis.scrollTo(target, { offset, duration: 1.2, easing: easeOutCubic })
   } else {
@@ -30,7 +30,7 @@ function scrollToWorks() {
 }
 
 function scrollToTop() {
-  const lenis = window.lenis
+  const lenis = globalThis.lenis
   if (lenis) {
     lenis.scrollTo(0, { duration: 1.2, easing: easeOutCubic })
   } else {
