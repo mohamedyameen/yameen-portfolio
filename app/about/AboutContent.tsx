@@ -222,9 +222,9 @@ export default function AboutContent() {
               <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} ${game.image ? 'opacity-60' : 'opacity-90'}`} />
               <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.07),transparent_60%)]" />
               <div className="relative flex flex-col gap-2 p-5 min-h-[160px]">
-                <span className={`text-[10px] uppercase tracking-widest ${game.accent}`}>{game.tag}</span>
+                <span className={`text-[10px] uppercase tracking-widest font-bold ${game.accent}`}>{game.tag}</span>
                 <span className="text-xl font-semibold tracking-tight text-white">{game.name}</span>
-                <p className="text-xs text-white/65 leading-relaxed mt-auto font-bold">{game.detail}</p>
+                <p className="text-xs text-white/65 leading-relaxed mt-auto">{game.detail}</p>
               </div>
             </motion.div>
           ))}
