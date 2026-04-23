@@ -1,13 +1,21 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import { Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
-import Navbar from '@/components/layout/Navbar'
-import Footer from '@/components/layout/Footer'
+import Sidebar from '@/components/layout/Sidebar'
+import PageTransition from '@/components/layout/PageTransition'
+import SmoothScroll from '@/components/layout/SmoothScroll'
 import './globals.css'
 
 const geistSans = localFont({
   src: '../node_modules/geist/dist/fonts/geist-sans/Geist-Variable.woff2',
   variable: '--font-geist-sans',
+})
+
+const playfair = Playfair_Display({
+  subsets: ['latin'],
+  style: ['normal', 'italic'],
+  variable: '--font-playfair',
 })
 
 export const metadata: Metadata = {
@@ -19,20 +27,16 @@ export const metadata: Metadata = {
     'Lead Product Designer crafting AI-native products, B2B SaaS, and design systems.',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning className={geistSans.variable}>
-      <body>
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
-          <Navbar />
-          <main className="pt-16 min-h-screen">
-            {children}
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${geistSans.variable} ${playfair.variable}`}>
+      <body className="bg-background text-foreground">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme">
+          <SmoothScroll />
+          <Sidebar />
+          <main className="min-h-screen pt-14 lg:pt-0 lg:pl-60">
+            <PageTransition>{children}</PageTransition>
           </main>
-          <Footer />
         </ThemeProvider>
       </body>
     </html>

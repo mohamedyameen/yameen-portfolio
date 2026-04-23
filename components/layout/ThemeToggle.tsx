@@ -4,23 +4,30 @@ import { Moon, Sun } from 'lucide-react'
 import { useEffect, useState } from 'react'
 
 export default function ThemeToggle() {
-  const { theme, setTheme } = useTheme()
-  const [mounted, setMounted] = useState(false)
+  const { setTheme } = useTheme()
+  const [isDark, setIsDark] = useState<boolean | null>(null)
 
-  useEffect(() => setMounted(true), [])
-  if (!mounted) return <div className="w-9 h-9" />
+  // Read the actual applied theme from the <html> class so the icon
+  // never drifts from what's rendered on screen.
+  useEffect(() => {
+    const root = document.documentElement
+    const sync = () => setIsDark(root.classList.contains('dark'))
+    sync()
+
+    const obs = new MutationObserver(sync)
+    obs.observe(root, { attributes: true, attributeFilter: ['class'] })
+    return () => obs.disconnect()
+  }, [])
+
+  if (isDark === null) return <div className="h-4 w-4" />
 
   return (
     <button
-      onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-      className="w-9 h-9 flex items-center justify-center 
-        rounded-lg hover:bg-white/10 transition-colors"
-      aria-label="Toggle theme"
+      onClick={() => setTheme(isDark ? 'light' : 'dark')}
+      aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
+      className="text-muted-foreground hover:text-foreground transition-colors"
     >
-      {theme === 'dark'
-        ? <Sun size={17} className="text-foreground" />
-        : <Moon size={17} className="text-foreground" />
-      }
+      {isDark ? <Sun size={13} /> : <Moon size={13} />}
     </button>
   )
 }
