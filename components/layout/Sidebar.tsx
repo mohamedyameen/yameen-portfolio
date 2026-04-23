@@ -6,7 +6,6 @@ import { cn } from '@/lib/utils'
 import { Menu, X } from 'lucide-react'
 import LiveClock from './LiveClock'
 import ThemeToggle from './ThemeToggle'
-import { projects } from '@/content/projects'
 
 const navLinks = [
   { href: '/',      label: 'Home',     external: false },
@@ -50,32 +49,6 @@ function SidebarContent({ pathname, onClose }: { pathname: string; onClose?: () 
         })}
       </nav>
 
-      <div className="flex flex-col gap-0.5 overflow-y-auto overflow-x-hidden">
-        {projects.map(({ slug, name, category }) => {
-          const active = pathname === `/works/${slug}`
-          return (
-            <Link
-              key={slug}
-              href={`/works/${slug}`}
-              onClick={onClose}
-              className={cn(
-                'group flex flex-col gap-0.5 rounded-sm px-2 py-2 -mx-2 transition-colors',
-                active ? 'bg-secondary' : 'hover:bg-secondary/50'
-              )}
-            >
-              <span className={cn(
-                'text-xs font-medium transition-colors',
-                active ? 'text-foreground' : 'text-muted-foreground group-hover:text-foreground'
-              )}>
-                {name}
-              </span>
-              <span className="text-[11px] text-muted-foreground leading-tight">
-                {category}
-              </span>
-            </Link>
-          )
-        })}
-      </div>
     </div>
   )
 }
