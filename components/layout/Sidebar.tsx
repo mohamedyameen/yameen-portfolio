@@ -6,6 +6,8 @@ import { cn } from '@/lib/utils'
 import { Menu, X, ArrowUpRight } from 'lucide-react'
 import LiveClock from './LiveClock'
 import ThemeToggle from './ThemeToggle'
+import SoundToggle from './SoundToggle'
+import { useSound } from '@/hooks/useSound'
 
 const navLinks = [
   { href: '/',      label: 'Home',     external: false },
@@ -51,12 +53,16 @@ function SidebarContent({
   onNavigateToWorks: () => void
   onNavigateHome: () => void
 }) {
+  const { playHover, playClick } = useSound()
+
   return (
     <div className="flex flex-col gap-6 flex-1 min-h-0">
       <Link
         href="/"
+        onMouseEnter={playHover}
         onClick={(e) => {
           e.preventDefault()
+          playClick()
           onNavigateHome()
           onClose?.()
         }}
@@ -78,7 +84,9 @@ function SidebarContent({
             <Link
               key={label}
               href={href}
+              onMouseEnter={playHover}
               onClick={(e) => {
+                playClick()
                 if (isWorks) {
                   e.preventDefault()
                   onNavigateToWorks()
@@ -205,7 +213,10 @@ export default function Sidebar() {
         <SidebarContent pathname={pathname} activeSection={activeSection} onNavigateToWorks={handleNavigateToWorks} onNavigateHome={handleNavigateHome} />
         <div className="flex items-center justify-between shrink-0">
           <LiveClock />
-          <ThemeToggle />
+          <div className="flex items-center gap-3">
+            <SoundToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </aside>
 
@@ -228,6 +239,7 @@ export default function Sidebar() {
         </div>
         <div className="flex items-center gap-4">
           <LiveClock />
+          <SoundToggle />
           <ThemeToggle />
         </div>
       </header>

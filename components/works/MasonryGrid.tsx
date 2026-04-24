@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Badge } from '@/components/ui/badge'
 import type { Project, CoverHeight } from '@/content/projects'
+import { useSound } from '@/hooks/useSound'
 
 const coverHeightClass: Record<CoverHeight, string> = {
   sm: 'h-36',
@@ -53,15 +54,18 @@ const previewImages: Record<string, string[]> = {
 function ProjectCard({
   project,
   index,
+  hasHover,
   onEnter,
   onLeave,
 }: {
   project: Project
   index: number
+  hasHover: boolean
   onEnter: (slug: string) => void
   onLeave: () => void
 }) {
   const h = coverHeightClass[project.coverHeight ?? 'md']
+  const { playHover, playClick } = useSound()
 
   return (
     <motion.div
@@ -70,11 +74,15 @@ function ProjectCard({
       viewport={{ once: true, margin: '0px 0px -40px 0px' }}
       transition={{ duration: 0.4, delay: (index % 3) * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
       className="w-full break-inside-avoid mb-2"
-      onMouseEnter={() => onEnter(project.slug)}
-      onMouseLeave={onLeave}
+      onMouseEnter={hasHover ? () => {
+        playHover()
+        onEnter(project.slug)
+      } : undefined}
+      onMouseLeave={hasHover ? onLeave : undefined}
     >
       <Link
         href={`/works/${project.slug}`}
+        onClick={playClick}
         className="group block w-full overflow-hidden rounded-md border border-border bg-background hover:bg-card transition-colors"
       >
         <div className={`w-full bg-gradient-to-br ${project.accent} ${h}`} />
@@ -108,8 +116,18 @@ export function MasonryGrid({ projects }: { projects: Project[] }) {
   const [activeSlug, setActiveSlug]   = useState<string | null>(null)
   const [imgIndex, setImgIndex]       = useState(0)
   const [pos, setPos]                 = useState({ x: 0, y: 0 })
+  const [hasHover, setHasHover]       = useState(false)
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const slideTimer = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
+    setHasHover(mq.matches)
+    const update = (e: MediaQueryListEvent) => setHasHover(e.matches)
+    mq.addEventListener('change', update)
+    return () => mq.removeEventListener('change', update)
+  }, [])
 
   const handleEnter = useCallback((slug: string) => {
     if (leaveTimer.current) clearTimeout(leaveTimer.current)
@@ -151,26 +169,27 @@ export function MasonryGrid({ projects }: { projects: Project[] }) {
   return (
     <div
       className="p-2 columns-1 sm:columns-2 lg:columns-3 gap-2"
-      onMouseMove={handleMouseMove}
+      onMouseMove={hasHover ? handleMouseMove : undefined}
     >
       {projects.map((project, i) => (
         <ProjectCard
           key={project.slug}
           project={project}
           index={i}
+          hasHover={hasHover}
           onEnter={handleEnter}
           onLeave={handleLeave}
         />
       ))}
 
       <AnimatePresence>
-        {hoveredSlug && (
+        {hasHover && hoveredSlug && (
           <motion.div
             initial={{ opacity: 0, scale: 0.88, y: 14 }}
             animate={{ opacity: 1, scale: 1,    y: 0  }}
             exit={{    opacity: 0, scale: 0.88, y: 14 }}
             transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="fixed z-50 pointer-events-none w-72 h-48 rounded-lg overflow-hidden border border-border shadow-2xl"
+            className="fixed z-50 pointer-events-none w-72 h-48 rounded-2xl overflow-hidden border border-border shadow-2xl"
             style={{ left: pos.x, top: pos.y, translateX: '-50%', translateY: '-110%' }}
           >
             <AnimatePresence initial={false} mode="popLayout">
