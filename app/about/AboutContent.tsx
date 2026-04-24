@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { Marquee } from '@/components/ui/marquee'
 
 const interests = [
   'Design', 'Gaming', 'Football', 'Chai', 'Lofi', 'Cinema',
@@ -99,19 +100,18 @@ export default function AboutContent() {
       </section>
 
       {/* ── Marquee ── */}
-      <div className="border-b border-border py-4 overflow-hidden">
-        <motion.div
-          animate={{ x: ['0%', '-50%'] }}
-          transition={{ duration: 28, ease: 'linear', repeat: Infinity }}
-          className="flex whitespace-nowrap gap-8 text-xl md:text-2xl font-medium tracking-tight"
+      <div className="border-b border-border py-4">
+        <Marquee
+          className="[--duration:32s] [--gap:2rem] text-xl md:text-2xl font-medium tracking-tight"
+          repeat={3}
         >
-          {[...interests, ...interests].map((w, i) => (
-            <span key={i} className="flex items-center gap-8">
+          {interests.map((w, i) => (
+            <span key={w} className="flex items-center gap-8">
               <span className={i % 3 === 0 ? 'text-foreground' : 'text-foreground/40'}>{w}</span>
               <span className="text-foreground/25">·</span>
             </span>
           ))}
-        </motion.div>
+        </Marquee>
       </div>
 
       {/* ── About + Currently ── */}

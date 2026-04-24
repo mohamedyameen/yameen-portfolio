@@ -2,6 +2,7 @@ import { projects } from '@/content/projects'
 import { MasonryGrid } from '@/components/works/MasonryGrid'
 import { FadeUp } from '@/components/ui/FadeUp'
 import DotFieldWrapper from '@/components/home/DotFieldWrapper'
+import { BrandMarquee } from '@/components/home/BrandMarquee'
 
 export default function HomePage() {
   return (
@@ -51,6 +52,9 @@ export default function HomePage() {
           <DotFieldWrapper />
         </div>
       </section>
+
+      {/* Brand marquee */}
+      <BrandMarquee />
 
       {/* Grid */}
       <section id="works" className="scroll-mt-16">

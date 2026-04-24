@@ -31,6 +31,12 @@
   --radius-xl: calc(var(--radius) + 4px);
   --font-sans: var(--font-geist-sans), sans-serif;
   --font-serif: var(--font-playfair), Georgia, serif;
+  --animate-marquee: marquee var(--duration) infinite linear;
+
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(calc(-100% - var(--gap))); }
+  }
 }
 
 :root {

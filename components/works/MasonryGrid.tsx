@@ -150,7 +150,7 @@ export function MasonryGrid({ projects }: { projects: Project[] }) {
 
   return (
     <div
-      className="p-3 sm:p-4 columns-1 sm:columns-2 lg:columns-3 gap-2"
+      className="p-2 columns-1 sm:columns-2 lg:columns-3 gap-2"
       onMouseMove={handleMouseMove}
     >
       {projects.map((project, i) => (
