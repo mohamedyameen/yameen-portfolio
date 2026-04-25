@@ -7,8 +7,6 @@ export default function ThemeToggle() {
   const { setTheme } = useTheme()
   const [isDark, setIsDark] = useState<boolean | null>(null)
 
-  // Read the actual applied theme from the <html> class so the icon
-  // never drifts from what's rendered on screen.
   useEffect(() => {
     const root = document.documentElement
     const sync = () => setIsDark(root.classList.contains('dark'))
@@ -25,7 +23,7 @@ export default function ThemeToggle() {
     <button
       onClick={() => setTheme(isDark ? 'light' : 'dark')}
       aria-label={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
-      className="text-muted-foreground hover:text-foreground transition-colors"
+      className="inline-flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
     >
       {isDark ? <Sun size={13} /> : <Moon size={13} />}
     </button>

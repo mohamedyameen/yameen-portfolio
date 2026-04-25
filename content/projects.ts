@@ -8,15 +8,16 @@
  *      heading, text, image, or video in any order.
  *
  * `coverHeight` controls the card's cover area:
- *   'sm' → short  (~160px)
- *   'md' → medium (~220px)
- *   'lg' → tall   (~320px)
- *   'xl' → extra  (~420px)
+ *   'sm'  → short   (~160px)
+ *   'md'  → medium  (~220px)
+ *   'lg'  → tall    (~320px)
+ *   'xl'  → extra   (~420px)
+ *   '2xl' → huge    (~512px)
  *
  * Vary these across cards to get a natural Pinterest rhythm.
  */
 
-export type CoverHeight = 'sm' | 'md' | 'lg' | 'xl'
+export type CoverHeight = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
 export type Block =
   | { type: 'heading'; content: string }
@@ -61,7 +62,7 @@ export const projects: Project[] = [
     tags: ['AI', 'Platform'],
     category: 'AI · Platform',
     summary:
-      "Facilio's AI application platform for facilities and operations teams. Led design for the Service Desk Agent — omnichannel AI support — and the Dispatcher Agent, which auto-assigns field staff using plain-language dispatch policies.",
+      'AI agents for facilities teams — one handles support across channels, the other auto-assigns field staff.',
     year: '2025',
     role: 'Lead Product Designer',
     client: 'Facilio',
@@ -83,7 +84,7 @@ export const projects: Project[] = [
     tags: ['Systems', 'B2B'],
     category: 'Systems · B2B SaaS',
     summary:
-      '100+ components powering 10+ product teams across web and mobile. Reduced design-to-dev handoff time by 35% and design debt by 40%.',
+      '100+ components used by 10+ teams. Cut handoff time by 35% and design debt by 40%.',
     year: '2022 – present',
     role: 'Lead Product Designer',
     client: 'Facilio',
@@ -98,7 +99,7 @@ export const projects: Project[] = [
     tags: ['Operations', 'B2B'],
     category: 'Operations · B2B',
     summary:
-      'End-to-end FSM product — map-based dispatch console, Gantt scheduling, work orders, and resource management. Improved dispatcher efficiency by 25%.',
+      'Map-based dispatch, scheduling, and work orders for field teams. Made dispatchers 25% faster.',
     year: '2023',
     role: 'Lead Product Designer',
     client: 'Facilio',
@@ -113,7 +114,7 @@ export const projects: Project[] = [
     tags: ['IoT', 'Automation'],
     category: 'IoT · Automation',
     summary:
-      'Real-time device monitoring, remote control, and intelligent scheduling for 1000+ IoT endpoints. A visual rule-based flow editor cut configuration time by 50%.',
+      'Monitor and control 1000+ IoT devices. A visual rule builder cut setup time in half.',
     year: '2023',
     role: 'Lead Product Designer',
     client: 'Facilio',
@@ -128,7 +129,7 @@ export const projects: Project[] = [
     tags: ['AI', 'Productivity'],
     category: 'AI · Freelance',
     summary:
-      'Conversational AI project management tool — integrated chat, file collaboration, and the Mellow AI assistant for intelligent prioritisation. 40+ screens across dark and light modes.',
+      'A chat-first project tool with an AI assistant that prioritises your work. 40+ screens, dark and light.',
     year: 'Feb 2024',
     role: 'Product Designer',
     kind: 'freelance',
@@ -142,7 +143,7 @@ export const projects: Project[] = [
     tags: ['EdTech', 'UX'],
     category: 'EdTech · Freelance',
     summary:
-      'Parliamentary simulation platform for education — onboarding, debate flows, law proposals, and role-based interfaces for an end-to-end legislative simulation.',
+      'A learning platform where students simulate parliament — debates, law proposals, and role-based flows.',
     year: 'Nov 2023',
     role: 'Product Designer',
     kind: 'freelance',
@@ -156,7 +157,7 @@ export const projects: Project[] = [
     tags: ['Healthcare', 'Recruitment'],
     category: 'Healthcare · Freelance',
     summary:
-      'Healthcare job-finder portal connecting medical institutions, professionals, agencies, and support workers through a single recruitment platform.',
+      'A hiring portal that connects hospitals, medical staff, and agencies in one place.',
     year: 'Jul 2023',
     role: 'Product Designer',
     kind: 'freelance',

@@ -2,7 +2,6 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Badge } from '@/components/ui/badge'
 import type { Project, CoverHeight } from '@/content/projects'
 import { useSound } from '@/hooks/useSound'
 
@@ -11,6 +10,7 @@ const coverHeightClass: Record<CoverHeight, string> = {
   md: 'h-52',
   lg: 'h-72',
   xl: 'h-96',
+  '2xl': 'h-[32rem]',
 }
 
 const previewImages: Record<string, string[]> = {
@@ -86,32 +86,41 @@ function ProjectCard({
         className="group block w-full overflow-hidden rounded-md border border-border bg-background hover:bg-card transition-colors"
       >
         <div className={`w-full bg-gradient-to-br ${project.accent} ${h}`} />
-        <div className="flex flex-col gap-2 p-4">
-          <div className="flex items-start justify-between gap-2">
-            <span className="text-sm font-medium text-foreground leading-snug">
-              {project.name}
-            </span>
-            <div className="flex gap-1 flex-wrap justify-end shrink-0">
-              {project.tags.map((tag) => (
-                <Badge key={tag} variant="secondary" className="text-[10px]">
-                  {tag}
-                </Badge>
-              ))}
-            </div>
-          </div>
+        <div className="flex flex-col gap-1.5 p-4">
+          <span className="text-sm font-medium text-foreground leading-snug">
+            {project.name}
+          </span>
           {project.summary && (
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-4">
+            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
               {project.summary}
             </p>
           )}
-          <p className="text-[10px] text-muted-foreground/60 mt-1">{project.year}</p>
         </div>
       </Link>
     </motion.div>
   )
 }
 
+// Reorder so no two adjacent projects share the same coverHeight.
+// With CSS columns, adjacent items in the array tend to land in adjacent
+// columns, so this keeps same-size tiles from sitting side-by-side.
+function spreadBySize(arr: Project[]): Project[] {
+  const out = [...arr]
+  for (let i = 1; i < out.length; i++) {
+    const prev = out[i - 1].coverHeight ?? 'md'
+    const curr = out[i].coverHeight ?? 'md'
+    if (prev !== curr) continue
+    // Find a later item with a different size and swap it into place.
+    const swapIdx = out.findIndex((p, k) => k > i && (p.coverHeight ?? 'md') !== prev)
+    if (swapIdx !== -1) {
+      ;[out[i], out[swapIdx]] = [out[swapIdx], out[i]]
+    }
+  }
+  return out
+}
+
 export function MasonryGrid({ projects }: { projects: Project[] }) {
+  const orderedProjects = spreadBySize(projects)
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null)
   const [activeSlug, setActiveSlug]   = useState<string | null>(null)
   const [imgIndex, setImgIndex]       = useState(0)
@@ -171,7 +180,7 @@ export function MasonryGrid({ projects }: { projects: Project[] }) {
       className="p-2 columns-1 sm:columns-2 lg:columns-3 gap-2"
       onMouseMove={hasHover ? handleMouseMove : undefined}
     >
-      {projects.map((project, i) => (
+      {orderedProjects.map((project, i) => (
         <ProjectCard
           key={project.slug}
           project={project}

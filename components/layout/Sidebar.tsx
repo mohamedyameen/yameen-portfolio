@@ -1,19 +1,20 @@
 'use client'
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname, useRouter } from 'next/navigation'
 import { cn } from '@/lib/utils'
 import { Menu, X, ArrowUpRight } from 'lucide-react'
 import LiveClock from './LiveClock'
+import SidebarAmbient from './SidebarAmbient'
 import ThemeToggle from './ThemeToggle'
 import SoundToggle from './SoundToggle'
 import { useSound } from '@/hooks/useSound'
 
 const navLinks = [
-  { href: '/',      label: 'Home',     external: false },
+  { href: '/',       label: 'Home',     external: false },
   { href: '/#works', label: 'Work',     external: false },
-  { href: '/about', label: 'Info',     external: false },
-  { href: 'mailto:mohamedyameen1999@gmail.com',              label: 'Email',    external: true },
+  { href: '/about',  label: 'Info',     external: false },
+  { href: 'mailto:mohamedyameen1999@gmail.com',               label: 'Email',    external: true },
   { href: 'https://linkedin.com/in/mohamed-yameen-83681315a', label: 'LinkedIn', external: true },
 ]
 
@@ -46,32 +47,37 @@ function SidebarContent({
   onClose,
   onNavigateToWorks,
   onNavigateHome,
+  controls,
 }: {
   pathname: string
   activeSection: 'home' | 'works'
   onClose?: () => void
   onNavigateToWorks: () => void
   onNavigateHome: () => void
+  controls?: ReactNode
 }) {
   const { playHover, playClick } = useSound()
 
   return (
-    <div className="flex flex-col gap-6 flex-1 min-h-0">
-      <Link
-        href="/"
-        onMouseEnter={playHover}
-        onClick={(e) => {
-          e.preventDefault()
-          playClick()
-          onNavigateHome()
-          onClose?.()
-        }}
-        className="text-base font-medium text-foreground tracking-tight shrink-0"
-      >
-        Mohamed Yameen
-      </Link>
+    <div className="flex flex-col gap-6 shrink-0">
+      <div className="flex items-center justify-between">
+        <Link
+          href="/"
+          onMouseEnter={playHover}
+          onClick={(e) => {
+            e.preventDefault()
+            playClick()
+            onNavigateHome()
+            onClose?.()
+          }}
+          className="text-base font-medium text-foreground tracking-tight"
+        >
+          Mohamed Yameen
+        </Link>
+        {controls}
+      </div>
 
-      <nav className="flex flex-col shrink-0">
+      <nav className="flex flex-col">
         {navLinks.map(({ href, label, external }) => {
           const isWorks = href === '/#works'
           const isHome  = href === '/'
@@ -116,7 +122,6 @@ function SidebarContent({
           )
         })}
       </nav>
-
     </div>
   )
 }
@@ -136,8 +141,6 @@ export default function Sidebar() {
     const update = () => {
       const works = document.getElementById('works')
       if (!works) return
-      // "Works visible" = the works section occupies the top portion of viewport
-      // Trigger when works section has entered past ~40% of the viewport height
       const trigger = window.innerHeight * 0.4
       const rect = works.getBoundingClientRect()
       const next: 'home' | 'works' = rect.top <= trigger ? 'works' : 'home'
@@ -149,7 +152,6 @@ export default function Sidebar() {
 
     update()
 
-    // rAF loop — fires every frame, catches Lenis-driven scroll reliably
     let raf = 0
     let stopped = false
     const tick = () => {
@@ -158,7 +160,6 @@ export default function Sidebar() {
     }
     raf = requestAnimationFrame(tick)
 
-    // Also listen to native events for edge cases
     window.addEventListener('scroll', update, { passive: true })
     window.addEventListener('resize', update)
 
@@ -205,18 +206,28 @@ export default function Sidebar() {
 
   return (
     <>
-      {/* ── Desktop sidebar (fixed, always visible) ── */}
+      {/* ── Desktop sidebar ── */}
       <aside
-        className="hidden lg:flex flex-col justify-between fixed top-0 left-0 h-screen w-72 z-30 border-r border-border px-6 py-6"
+        className="hidden lg:flex flex-col fixed top-0 left-0 h-screen w-72 z-30 border-r border-border px-6 pt-6"
         style={{ backgroundColor: 'var(--background)' }}
       >
-        <SidebarContent pathname={pathname} activeSection={activeSection} onNavigateToWorks={handleNavigateToWorks} onNavigateHome={handleNavigateHome} />
-        <div className="flex items-center justify-between shrink-0">
-          <LiveClock />
-          <div className="flex items-center gap-3">
-            <SoundToggle />
-            <ThemeToggle />
-          </div>
+        {/* Name + controls row */}
+        <SidebarContent
+          pathname={pathname}
+          activeSection={activeSection}
+          onNavigateToWorks={handleNavigateToWorks}
+          onNavigateHome={handleNavigateHome}
+          controls={
+            <div className="flex items-center gap-3">
+              <SoundToggle />
+              <ThemeToggle />
+            </div>
+          }
+        />
+
+        {/* Ambient pushed to bottom — no gap below since pb is removed from aside */}
+        <div className="flex-1 flex flex-col justify-end min-h-0">
+          <SidebarAmbient footer={<LiveClock />} />
         </div>
       </aside>
 
@@ -260,7 +271,13 @@ export default function Sidebar() {
         )}
         style={{ backgroundColor: 'var(--background)' }}
       >
-        <SidebarContent pathname={pathname} onClose={() => setOpen(false)} activeSection={activeSection} onNavigateToWorks={handleNavigateToWorks} onNavigateHome={handleNavigateHome} />
+        <SidebarContent
+          pathname={pathname}
+          onClose={() => setOpen(false)}
+          activeSection={activeSection}
+          onNavigateToWorks={handleNavigateToWorks}
+          onNavigateHome={handleNavigateHome}
+        />
       </aside>
     </>
   )
