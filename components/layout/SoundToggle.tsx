@@ -8,10 +8,10 @@ export default function SoundToggle() {
     <button
       onClick={toggle}
       aria-label={enabled ? 'Mute UI sounds' : 'Unmute UI sounds'}
-      className="inline-flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors"
+      className="inline-flex items-center justify-center leading-none text-muted-foreground hover:text-foreground transition-colors"
       title={enabled ? 'Sound on' : 'Sound off'}
     >
-      {enabled ? <Volume2 size={14} /> : <VolumeX size={14} />}
+      {enabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
     </button>
   )
 }

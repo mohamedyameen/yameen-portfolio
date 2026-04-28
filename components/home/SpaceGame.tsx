@@ -130,11 +130,32 @@ export default function SpaceGame() {
       osc.stop(ac.currentTime + 0.5)
     }
 
+    function syncSize() {
+      const nextW = canvas.offsetWidth
+      const nextH = canvas.offsetHeight
+      if (nextW === W && nextH === H) return false
+      const prevW = W, prevH = H
+      const dpr = window.devicePixelRatio || 1
+      W = nextW
+      H = nextH
+      canvas.width  = Math.max(1, Math.floor(W * dpr))
+      canvas.height = Math.max(1, Math.floor(H * dpr))
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
+      // Keep player vertically proportional so they don't snap on resize
+      if (prevH > 0 && H > 0) py = (py / prevH) * H
+      else py = H / 2
+      // Rescale gates' x position so the field doesn't jump horizontally
+      if (prevW > 0 && W > 0 && prevW !== W) {
+        const sx = W / prevW
+        gates.forEach(g => { g.x *= sx })
+      }
+      // Rebuild stars to match the new dimensions
+      stars = makeStars(W, H)
+      return true
+    }
+
     function init() {
-      W = canvas.offsetWidth
-      H = canvas.offsetHeight
-      canvas.width  = W
-      canvas.height = H
+      syncSize()
       py = H / 2
       vy = 0
       gates  = []
@@ -268,8 +289,6 @@ export default function SpaceGame() {
 
     function tick() {
       raf = requestAnimationFrame(tick)
-      // resize
-      if (canvas.offsetWidth !== W || canvas.offsetHeight !== H) init()
 
       // background
       ctx.fillStyle = '#0a0a0f'
@@ -395,8 +414,16 @@ export default function SpaceGame() {
     init()
     raf = requestAnimationFrame(tick)
 
+    const ro = new ResizeObserver(() => { syncSize() })
+    ro.observe(canvas)
+
+    const onWindowResize = () => { syncSize() }
+    window.addEventListener('resize', onWindowResize)
+
     return () => {
       cancelAnimationFrame(raf)
+      ro.disconnect()
+      window.removeEventListener('resize', onWindowResize)
       window.removeEventListener('keydown', onKey)
       canvas.removeEventListener('click', onClick)
       audioCtx?.close()
@@ -411,7 +438,7 @@ export default function SpaceGame() {
   return (
     <canvas
       ref={canvasRef}
-      className="w-full h-full cursor-pointer"
+      className="absolute inset-0 w-full h-full cursor-pointer"
       style={{ display: 'block' }}
     />
   )

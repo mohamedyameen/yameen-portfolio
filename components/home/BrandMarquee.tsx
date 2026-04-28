@@ -16,7 +16,7 @@ export function BrandMarquee() {
               <span className="relative inline-block">
                 <span className="relative text-foreground">{brand}</span>
                 <span
-                  className="absolute -bottom-2.5 left-[45%] flex items-end gap-1 text-[11px] font-medium text-foreground whitespace-nowrap leading-none tracking-wide"
+                  className="absolute -bottom-2.5 left-[45%] flex items-end gap-1 text-xs font-medium text-foreground whitespace-nowrap leading-none tracking-wide"
                 >
                   <svg
                     width="14"

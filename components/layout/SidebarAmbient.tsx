@@ -453,7 +453,7 @@ export default function SidebarAmbient({ footer }: { footer?: ReactNode }) {
       {/* Clock + weather overlaid at the bottom of the dot field */}
       <div className="absolute bottom-5 left-6 right-6 flex flex-col gap-0.5 [&_span]:!text-foreground/75">
         {footer}
-        <div className="text-[11px] tracking-wide text-foreground/60">
+        <div className="text-xs tracking-wide text-foreground/60">
           {temperature !== null && condition
             ? <>Chennai · {Math.round(temperature)}° · {CONDITION_LABEL[condition]}</>
             : <span className="opacity-50">Loading weather…</span>}

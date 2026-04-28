@@ -8,6 +8,7 @@ import LiveClock from './LiveClock'
 import SidebarAmbient from './SidebarAmbient'
 import ThemeToggle from './ThemeToggle'
 import SoundToggle from './SoundToggle'
+import TypewriterName from './TypewriterName'
 import { useSound } from '@/hooks/useSound'
 
 const navLinks = [
@@ -48,6 +49,7 @@ function SidebarContent({
   onNavigateToWorks,
   onNavigateHome,
   controls,
+  hideName,
 }: {
   pathname: string
   activeSection: 'home' | 'works'
@@ -55,27 +57,30 @@ function SidebarContent({
   onNavigateToWorks: () => void
   onNavigateHome: () => void
   controls?: ReactNode
+  hideName?: boolean
 }) {
   const { playHover, playClick } = useSound()
 
   return (
     <div className="flex flex-col gap-6 shrink-0">
-      <div className="flex items-center justify-between">
-        <Link
-          href="/"
-          onMouseEnter={playHover}
-          onClick={(e) => {
-            e.preventDefault()
-            playClick()
-            onNavigateHome()
-            onClose?.()
-          }}
-          className="text-base font-medium text-foreground tracking-tight"
-        >
-          Mohamed Yameen
-        </Link>
-        {controls}
-      </div>
+      {!hideName && (
+        <div className="flex items-center gap-3 leading-none">
+          <Link
+            href="/"
+            onMouseEnter={playHover}
+            onClick={(e) => {
+              e.preventDefault()
+              playClick()
+              onNavigateHome()
+              onClose?.()
+            }}
+            className="flex-1 min-w-0 text-foreground tracking-tight"
+          >
+            <TypewriterName className="text-sm" />
+          </Link>
+          {controls}
+        </div>
+      )}
 
       <nav className="flex flex-col">
         {navLinks.map(({ href, label, external }) => {
@@ -110,7 +115,7 @@ function SidebarContent({
               target={external ? '_blank' : undefined}
               rel={external ? 'noopener noreferrer' : undefined}
               className={cn(
-                'text-[15px] py-1 transition-colors duration-150 flex items-center justify-between w-full',
+                'text-sm py-1 transition-colors duration-150 flex items-center justify-between w-full',
                 active
                   ? 'text-foreground font-semibold'
                   : 'text-foreground/65 hover:text-foreground'
@@ -134,6 +139,14 @@ export default function Sidebar() {
   const sectionRef = useRef<'home' | 'works'>('home')
 
   useEffect(() => setOpen(false), [pathname])
+
+  useEffect(() => {
+    const onResize = () => {
+      if (window.innerWidth >= 1024) setOpen(false)
+    }
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   useEffect(() => {
     if (pathname !== '/') return
@@ -233,10 +246,11 @@ export default function Sidebar() {
 
       {/* ── Mobile / tablet top header ── */}
       <header
-        className="lg:hidden fixed top-0 inset-x-0 h-14 z-50 border-b border-border flex items-center justify-between px-5"
+        className="lg:hidden fixed top-0 inset-x-0 z-50 border-b border-border"
         style={{ backgroundColor: 'var(--background)' }}
       >
-        <div className="flex items-center gap-3">
+        {/* Main row */}
+        <div className="h-14 flex items-center gap-3 px-5 leading-none">
           <button
             onClick={() => setOpen(v => !v)}
             aria-label={open ? 'Close menu' : 'Open menu'}
@@ -244,14 +258,19 @@ export default function Sidebar() {
           >
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <Link href="/" className="text-sm font-medium text-foreground tracking-tight">
-            Mohamed Yameen
+          <Link href="/" className="flex-1 min-w-0 text-foreground tracking-tight">
+            <TypewriterName className="text-sm" />
           </Link>
-        </div>
-        <div className="flex items-center gap-4">
-          <LiveClock />
+          {/* tablet only — keep clock inline */}
+          <span className="hidden md:inline [&>span]:!text-foreground/75">
+            <LiveClock />
+          </span>
           <SoundToggle />
           <ThemeToggle />
+        </div>
+        {/* Sub-header: clock — mobile only */}
+        <div className="md:hidden px-5 pb-1.5 -mt-2.5 [&>span]:!text-foreground/75">
+          <LiveClock />
         </div>
       </header>
 
@@ -266,7 +285,7 @@ export default function Sidebar() {
       {/* ── Mobile drawer ── */}
       <aside
         className={cn(
-          'lg:hidden fixed top-14 left-0 bottom-0 w-72 z-50 border-r border-border overflow-y-auto px-5 py-6 flex flex-col transition-transform duration-200',
+          'lg:hidden fixed top-20 md:top-14 left-0 bottom-0 w-72 z-50 border-r border-border overflow-y-auto px-5 py-6 flex flex-col transition-transform duration-200',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
         style={{ backgroundColor: 'var(--background)' }}
@@ -277,6 +296,7 @@ export default function Sidebar() {
           activeSection={activeSection}
           onNavigateToWorks={handleNavigateToWorks}
           onNavigateHome={handleNavigateHome}
+          hideName
         />
       </aside>
     </>

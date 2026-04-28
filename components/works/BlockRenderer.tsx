@@ -21,7 +21,7 @@ export function BlockRenderer({ block }: { block: Block }) {
 
     case 'text':
       return (
-        <p className="text-sm md:text-[15px] text-foreground/75 leading-relaxed max-w-[65ch]">
+        <p className="text-sm md:text-base text-foreground/75 leading-relaxed max-w-[65ch]">
           {block.content}
         </p>
       )

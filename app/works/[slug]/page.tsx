@@ -39,7 +39,7 @@ export default async function WorkPage({
       <header className="flex flex-col gap-4">
         <div className="flex items-center gap-2 flex-wrap">
           {project.tags.map(tag => (
-            <Badge key={tag} variant="secondary" className="text-[10px]">
+            <Badge key={tag} variant="secondary" className="text-xs">
               {tag}
             </Badge>
           ))}
