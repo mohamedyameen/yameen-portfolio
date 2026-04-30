@@ -90,14 +90,16 @@ export function WorkSheet({
                         </Badge>
                       ))}
                     </div>
-                    <h2 className="text-xl font-semibold tracking-tight text-foreground md:text-2xl">
-                      {work.name}
-                    </h2>
-                    {work.summary && (
-                      <p className="max-w-[65ch] text-sm leading-relaxed text-muted-foreground md:text-base">
-                        {work.summary}
-                      </p>
-                    )}
+                    <div className="flex flex-col gap-0.5">
+                      <h2 className="text-lg font-semibold tracking-tight text-foreground md:text-xl">
+                        {work.name}
+                      </h2>
+                      {work.summary && (
+                        <p className="max-w-[65ch] text-sm leading-relaxed text-muted-foreground md:text-base">
+                          {work.summary}
+                        </p>
+                      )}
+                    </div>
 
                     <dl className="grid grid-cols-2 gap-4 border-t border-border pt-4 text-xs sm:grid-cols-4">
                       {work.client && (
