@@ -1,47 +1,31 @@
 /**
- * Single source of truth for all projects.
+ * Pure-data registry of works. NEVER import React here.
  *
- * To add a new case study:
- *   1. Append an entry to the `projects` array below.
- *   2. Drop assets into public/works/<slug>/.
- *   3. Compose `blocks` using the Block union — any mix of
- *      heading, text, image, or video in any order.
+ * The masonry grid is a client component that imports this file —
+ * adding React/components to this module would bloat the home page bundle.
  *
- * `coverHeight` controls the card's cover area:
- *   'sm'  → short   (~160px)
- *   'md'  → medium  (~220px)
- *   'lg'  → tall    (~320px)
- *   'xl'  → extra   (~420px)
- *   '2xl' → huge    (~512px)
+ * To add a new work:
+ *   1. Append an entry to `works` below with the correct `type`.
+ *   2. (Optional) Drop assets in `public/works/<slug>/`.
+ *   3. For `case-study` or `component`: create `content/works/<slug>.tsx`
+ *      and register it in `content/works/bodies.ts`.
+ *      For `image` / `video`: set the `media` field — no body file needed.
  *
- * Vary these across cards to get a natural Pinterest rhythm.
+ * Open behavior is type-driven (see `MasonryGrid`):
+ *   - case-study → bottom sheet (long-form scrollable)
+ *   - component | image | video → centered modal
  */
 
 export type CoverHeight = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
-export type Block =
-  | { type: 'heading'; content: string }
-  | { type: 'text'; content: string }
-  | {
-      type: 'image'
-      src: string
-      alt?: string
-      caption?: string
-      aspect?: '16/9' | '4/3' | '1/1' | '9/16' | '21/9'
-    }
-  | {
-      type: 'video'
-      src: string
-      poster?: string
-      caption?: string
-      autoplay?: boolean
-      loop?: boolean
-      muted?: boolean
-    }
+export type WorkType = 'case-study' | 'component' | 'image' | 'video'
 
-export type Project = {
+export type MediaAspect = '16/9' | '4/3' | '1/1' | '9/16' | '21/9'
+
+export type Work = {
   slug: string
   name: string
+  type: WorkType
   tags: string[]
   category: string
   summary: string | null
@@ -52,13 +36,19 @@ export type Project = {
   accent: string
   coverHeight?: CoverHeight
   cover?: string
-  blocks?: Block[]
+  /** Required for type='image' or type='video'. Ignored otherwise. */
+  media?: {
+    src: string
+    aspect?: MediaAspect
+    poster?: string
+  }
 }
 
-export const projects: Project[] = [
+export const works: Work[] = [
   {
     slug: 'facilio-atom',
     name: 'Facilio Atom',
+    type: 'case-study',
     tags: ['AI', 'Platform'],
     category: 'AI · Platform',
     summary:
@@ -69,18 +59,11 @@ export const projects: Project[] = [
     kind: 'work',
     accent: 'from-indigo-950 via-indigo-900 to-slate-950',
     coverHeight: 'xl',
-    blocks: [
-      { type: 'heading', content: 'Overview' },
-      {
-        type: 'text',
-        content:
-          "Facilio Atom is the company's AI application platform for facilities and operations teams. I led design for two core AI agents running in live customer environments.",
-      },
-    ],
   },
   {
     slug: 'design-system',
     name: 'Enterprise Design System',
+    type: 'case-study',
     tags: ['Systems', 'B2B'],
     category: 'Systems · B2B SaaS',
     summary:
@@ -91,11 +74,11 @@ export const projects: Project[] = [
     kind: 'work',
     accent: 'from-stone-900 via-zinc-800 to-neutral-900',
     coverHeight: 'md',
-    blocks: [],
   },
   {
     slug: 'fsm',
     name: 'Field Service Management',
+    type: 'case-study',
     tags: ['Operations', 'B2B'],
     category: 'Operations · B2B',
     summary:
@@ -106,11 +89,11 @@ export const projects: Project[] = [
     kind: 'work',
     accent: 'from-emerald-950 via-teal-900 to-slate-900',
     coverHeight: 'lg',
-    blocks: [],
   },
   {
     slug: 'iot-automation',
     name: 'IoT Smart Control',
+    type: 'case-study',
     tags: ['IoT', 'Automation'],
     category: 'IoT · Automation',
     summary:
@@ -121,11 +104,11 @@ export const projects: Project[] = [
     kind: 'work',
     accent: 'from-cyan-950 via-sky-900 to-slate-900',
     coverHeight: 'sm',
-    blocks: [],
   },
   {
     slug: 'mellow',
     name: 'Mellow',
+    type: 'case-study',
     tags: ['AI', 'Productivity'],
     category: 'AI · Freelance',
     summary:
@@ -135,11 +118,11 @@ export const projects: Project[] = [
     kind: 'freelance',
     accent: 'from-violet-950 via-purple-900 to-slate-900',
     coverHeight: 'lg',
-    blocks: [],
   },
   {
     slug: 'blue-whistle',
     name: 'Blue Whistle',
+    type: 'case-study',
     tags: ['EdTech', 'UX'],
     category: 'EdTech · Freelance',
     summary:
@@ -149,11 +132,11 @@ export const projects: Project[] = [
     kind: 'freelance',
     accent: 'from-blue-950 via-slate-900 to-slate-950',
     coverHeight: 'md',
-    blocks: [],
   },
   {
     slug: 'blubees',
     name: 'Blubees',
+    type: 'case-study',
     tags: ['Healthcare', 'Recruitment'],
     category: 'Healthcare · Freelance',
     summary:
@@ -163,6 +146,49 @@ export const projects: Project[] = [
     kind: 'freelance',
     accent: 'from-rose-950 via-pink-900 to-slate-900',
     coverHeight: 'xl',
-    blocks: [],
+  },
+
+  // --- Sample non-case-study works (replace media URLs / body with your own) ---
+
+  {
+    slug: 'palette-shift',
+    name: 'Palette Shift',
+    type: 'component',
+    tags: ['Component', 'Color'],
+    category: 'Interactive · Component',
+    summary: 'A tiny interactive palette that re-rolls colour combinations on click.',
+    year: '2024',
+    accent: 'from-fuchsia-900 via-pink-900 to-rose-950',
+    coverHeight: 'md',
+  },
+  {
+    slug: 'still-life',
+    name: 'Still Life',
+    type: 'image',
+    tags: ['Photo'],
+    category: 'Image',
+    summary: 'A frame I keep coming back to.',
+    year: '2024',
+    accent: 'from-amber-900 via-orange-950 to-stone-950',
+    coverHeight: 'lg',
+    media: {
+      src: 'https://picsum.photos/seed/stilllife/1600/1000',
+      aspect: '16/9',
+    },
+  },
+  {
+    slug: 'colorful-animation',
+    name: 'Colorful Animation Diversity',
+    type: 'video',
+    tags: ['Animation'],
+    category: 'Video',
+    summary: 'A short colourful motion piece.',
+    year: '2024',
+    accent: 'from-fuchsia-900 via-purple-900 to-indigo-950',
+    coverHeight: 'md',
+    media: {
+      src: '/works/colorful-animation/clip.mp4',
+      aspect: '16/9',
+    },
   },
 ]

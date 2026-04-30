@@ -1,4 +1,4 @@
-import { projects } from '@/content/projects'
+import { works } from '@/content/works'
 import { MasonryGrid } from '@/components/works/MasonryGrid'
 import { FadeUp } from '@/components/ui/FadeUp'
 import DotFieldWrapper from '@/components/home/DotFieldWrapper'
@@ -52,7 +52,7 @@ export default function HomePage() {
 
       {/* Grid */}
       <section id="works" className="scroll-mt-16">
-        <MasonryGrid projects={projects} />
+        <MasonryGrid projects={works} />
       </section>
     </>
   )

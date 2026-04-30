@@ -2,8 +2,14 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { Project, CoverHeight } from '@/content/projects'
+import type { Work, CoverHeight } from '@/content/works'
 import { useSound } from '@/hooks/useSound'
+import { WorkModal } from '@/components/works/WorkModal'
+import { WorkSheet } from '@/components/works/WorkSheet'
+import { bodyLoaders } from '@/content/works/bodies'
+
+// Apple-ish smooth ease-out — used for card→overlay morph + backdrop fade.
+const OPEN_TRANSITION = { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }
 
 const coverHeightClass: Record<CoverHeight, string> = {
   sm: 'h-36',
@@ -49,6 +55,11 @@ const previewImages: Record<string, string[]> = {
     'https://picsum.photos/seed/bb2/480/320',
     'https://picsum.photos/seed/bb3/480/320',
   ],
+  'palette-shift':  [
+    'https://picsum.photos/seed/palette1/480/320',
+    'https://picsum.photos/seed/palette2/480/320',
+    'https://picsum.photos/seed/palette3/480/320',
+  ],
 }
 
 function ProjectCard({
@@ -57,12 +68,14 @@ function ProjectCard({
   hasHover,
   onEnter,
   onLeave,
+  onOpen,
 }: {
-  project: Project
+  project: Work
   index: number
   hasHover: boolean
   onEnter: (slug: string) => void
   onLeave: () => void
+  onOpen: (project: Work) => void
 }) {
   const h = coverHeightClass[project.coverHeight ?? 'md']
   const { playHover, playClick } = useSound()
@@ -77,26 +90,65 @@ function ProjectCard({
       onMouseEnter={hasHover ? () => {
         playHover()
         onEnter(project.slug)
+        // Warm the body chunk so the modal opens with content already there.
+        bodyLoaders[project.slug]?.()
       } : undefined}
       onMouseLeave={hasHover ? onLeave : undefined}
     >
-      <Link
-        href={`/works/${project.slug}`}
-        onClick={playClick}
-        className="group block w-full overflow-hidden rounded-md border border-border bg-background hover:bg-card transition-colors"
+      <motion.div
+        layoutId={`work-card-${project.slug}`}
+        transition={OPEN_TRANSITION}
+        className="group overflow-hidden rounded-md border border-border bg-background hover:bg-card transition-colors"
       >
-        <div className={`w-full bg-gradient-to-br ${project.accent} ${h}`} />
-        <div className="flex flex-col gap-1.5 p-4">
-          <span className="text-sm font-medium text-foreground leading-snug">
-            {project.name}
-          </span>
-          {project.summary && (
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">
-              {project.summary}
-            </p>
-          )}
-        </div>
-      </Link>
+        <Link
+          href={`/works/${project.slug}`}
+          onClick={(e) => {
+            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+            e.preventDefault()
+            playClick()
+            onOpen(project)
+          }}
+          className="block w-full"
+        >
+          <div className={`relative w-full overflow-hidden ${h}`}>
+            {project.type === 'image' && project.media?.src ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={project.media.src}
+                alt=""
+                className="absolute inset-0 size-full object-cover"
+              />
+            ) : project.type === 'video' && project.media?.src ? (
+              <video
+                src={project.media.src}
+                poster={project.media.poster}
+                autoPlay
+                loop
+                muted
+                playsInline
+                className="absolute inset-0 size-full object-cover"
+              />
+            ) : (
+              <div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />
+            )}
+            {(project.type === 'case-study' || project.type === 'component') && project.tags[0] && (
+              <span className="absolute right-2 top-2 rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/85 backdrop-blur-sm">
+                {project.tags[0]}
+              </span>
+            )}
+          </div>
+          <div className="flex flex-col gap-0.5 p-4">
+            <span className="text-[11px] font-medium text-foreground leading-snug">
+              {project.name}
+            </span>
+            {project.summary && (
+              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-3">
+                {project.summary}
+              </p>
+            )}
+          </div>
+        </Link>
+      </motion.div>
     </motion.div>
   )
 }
@@ -104,7 +156,7 @@ function ProjectCard({
 // Reorder so no two adjacent projects share the same coverHeight.
 // With CSS columns, adjacent items in the array tend to land in adjacent
 // columns, so this keeps same-size tiles from sitting side-by-side.
-function spreadBySize(arr: Project[]): Project[] {
+function spreadBySize(arr: Work[]): Work[] {
   const out = [...arr]
   for (let i = 1; i < out.length; i++) {
     const prev = out[i - 1].coverHeight ?? 'md'
@@ -119,13 +171,14 @@ function spreadBySize(arr: Project[]): Project[] {
   return out
 }
 
-export function MasonryGrid({ projects }: { projects: Project[] }) {
+export function MasonryGrid({ projects }: { projects: Work[] }) {
   const orderedProjects = spreadBySize(projects)
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null)
   const [activeSlug, setActiveSlug]   = useState<string | null>(null)
   const [imgIndex, setImgIndex]       = useState(0)
   const [pos, setPos]                 = useState({ x: 0, y: 0 })
   const [hasHover, setHasHover]       = useState(false)
+  const [openWork, setOpenWork]       = useState<Work | null>(null)
   const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const slideTimer = useRef<ReturnType<typeof setInterval> | null>(null)
 
@@ -175,9 +228,19 @@ export function MasonryGrid({ projects }: { projects: Project[] }) {
   const images = activeSlug ? (previewImages[activeSlug] ?? []) : []
   const currentSrc = images[imgIndex] ?? ''
 
+  const handleOpen = useCallback((project: Work) => {
+    if (slideTimer.current) clearInterval(slideTimer.current)
+    setHoveredSlug(null)
+    setOpenWork(project)
+  }, [])
+
+  const handleClose = useCallback(() => {
+    setOpenWork(null)
+  }, [])
+
   return (
     <div
-      className="p-2 columns-1 sm:columns-2 lg:columns-3 gap-2"
+      className="p-2 columns-2 lg:columns-3 gap-2"
       onMouseMove={hasHover ? handleMouseMove : undefined}
     >
       {orderedProjects.map((project, i) => (
@@ -188,11 +251,21 @@ export function MasonryGrid({ projects }: { projects: Project[] }) {
           hasHover={hasHover}
           onEnter={handleEnter}
           onLeave={handleLeave}
+          onOpen={handleOpen}
         />
       ))}
 
+      <WorkSheet
+        work={openWork?.type === 'case-study' ? openWork : null}
+        onClose={handleClose}
+      />
+      <WorkModal
+        work={openWork && openWork.type !== 'case-study' ? openWork : null}
+        onClose={handleClose}
+      />
+
       <AnimatePresence>
-        {hasHover && hoveredSlug && (
+        {hasHover && hoveredSlug && currentSrc && (
           <motion.div
             initial={{ opacity: 0, scale: 0.88, y: 14 }}
             animate={{ opacity: 1, scale: 1,    y: 0  }}
