@@ -285,7 +285,7 @@ export default function Sidebar() {
       {/* ── Mobile drawer ── */}
       <aside
         className={cn(
-          'lg:hidden fixed top-20 md:top-14 left-0 bottom-0 w-72 z-50 border-r border-border overflow-y-auto px-5 py-6 flex flex-col transition-transform duration-200',
+          'lg:hidden fixed top-[72px] md:top-14 left-0 bottom-0 w-72 z-50 border-r border-border overflow-y-auto px-5 py-6 flex flex-col transition-transform duration-200',
           open ? 'translate-x-0' : '-translate-x-full'
         )}
         style={{ backgroundColor: 'var(--background)' }}

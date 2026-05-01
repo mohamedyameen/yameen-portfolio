@@ -2,7 +2,7 @@
 import { Suspense, useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
-import type { Work, CoverHeight } from '@/content/works'
+import type { Work } from '@/content/works'
 import { useSound } from '@/hooks/useSound'
 import { WorkModal } from '@/components/works/WorkModal'
 import { WorkSheet } from '@/components/works/WorkSheet'
@@ -10,14 +10,6 @@ import { bodyLoaders, lazyBodies } from '@/content/works/bodies'
 
 // Apple-ish smooth ease-out — used for card→overlay morph + backdrop fade.
 const OPEN_TRANSITION = { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }
-
-const coverHeightClass: Record<CoverHeight, string> = {
-  sm: 'h-36',
-  md: 'h-52',
-  lg: 'h-72',
-  xl: 'h-96',
-  '2xl': 'h-[32rem]',
-}
 
 const previewImages: Record<string, string[]> = {
   'facilio-atom':   [
@@ -72,9 +64,9 @@ function ProjectCard({
   onLeave: () => void
   onOpen: (project: Work) => void
 }) {
-  const h = coverHeightClass[project.coverHeight ?? 'md']
   const { playHover, playClick } = useSound()
   const Body = project.type === 'component' ? lazyBodies[project.slug] ?? null : null
+  const aspect = project.aspect ?? '4/3'
 
   return (
     <motion.div
@@ -82,7 +74,7 @@ function ProjectCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '0px 0px -40px 0px' }}
       transition={{ duration: 0.4, delay: (index % 3) * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
-      className="w-full break-inside-avoid mb-5"
+      className="w-full"
       onMouseEnter={hasHover ? () => {
         playHover()
         onEnter(project.slug)
@@ -104,7 +96,8 @@ function ProjectCard({
         <motion.div
           layoutId={`work-card-${project.slug}`}
           transition={OPEN_TRANSITION}
-          className={`relative w-full overflow-hidden rounded-2xl ${h}`}
+          style={{ aspectRatio: aspect }}
+          className="relative w-full overflow-hidden rounded-2xl"
         >
             {project.type === 'image' && project.media?.src ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -153,26 +146,49 @@ function ProjectCard({
   )
 }
 
-// Reorder so no two adjacent projects share the same coverHeight.
-// With CSS columns, adjacent items in the array tend to land in adjacent
-// columns, so this keeps same-size tiles from sitting side-by-side.
-function spreadBySize(arr: Work[]): Work[] {
-  const out = [...arr]
-  for (let i = 1; i < out.length; i++) {
-    const prev = out[i - 1].coverHeight ?? 'md'
-    const curr = out[i].coverHeight ?? 'md'
-    if (prev !== curr) continue
-    // Find a later item with a different size and swap it into place.
-    const swapIdx = out.findIndex((p, k) => k > i && (p.coverHeight ?? 'md') !== prev)
-    if (swapIdx !== -1) {
-      ;[out[i], out[swapIdx]] = [out[swapIdx], out[i]]
+// Shortest-column distribution: place each item into the column with the
+// least accumulated height so far. Heights are aspect-ratio derived (since
+// every column is the same width). This guarantees columns end roughly even
+// — the standard Pinterest packing algorithm.
+function distributeIntoColumns(works: Work[], numCols: number): Work[][] {
+  const cols: Work[][] = Array.from({ length: numCols }, () => [])
+  const heights = new Array<number>(numCols).fill(0)
+
+  for (const work of works) {
+    const [w, h] = (work.aspect ?? '4/3').split('/').map(Number)
+    const heightUnit = h / w
+    let minIdx = 0
+    for (let i = 1; i < numCols; i++) {
+      if (heights[i] < heights[minIdx]) minIdx = i
     }
+    cols[minIdx].push(work)
+    heights[minIdx] += heightUnit
   }
-  return out
+  return cols
+}
+
+function useColumnCount() {
+  // SSR default matches the smallest viewport.
+  const [cols, setCols] = useState(2)
+  useEffect(() => {
+    if (typeof window === 'undefined' || !window.matchMedia) return
+    const sm = window.matchMedia('(min-width: 640px)')
+    const lg = window.matchMedia('(min-width: 1024px)')
+    const update = () => setCols(lg.matches ? 4 : sm.matches ? 3 : 2)
+    update()
+    sm.addEventListener('change', update)
+    lg.addEventListener('change', update)
+    return () => {
+      sm.removeEventListener('change', update)
+      lg.removeEventListener('change', update)
+    }
+  }, [])
+  return cols
 }
 
 export function MasonryGrid({ projects }: { projects: Work[] }) {
-  const orderedProjects = spreadBySize(projects)
+  const numCols = useColumnCount()
+  const columns = distributeIntoColumns(projects, numCols)
   const [hoveredSlug, setHoveredSlug] = useState<string | null>(null)
   const [activeSlug, setActiveSlug]   = useState<string | null>(null)
   const [imgIndex, setImgIndex]       = useState(0)
@@ -240,20 +256,26 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
 
   return (
     <div
-      className="p-3 md:p-5 columns-2 md:columns-3 lg:columns-4 gap-5"
+      className="p-3 md:p-5"
       onMouseMove={hasHover ? handleMouseMove : undefined}
     >
-      {orderedProjects.map((project, i) => (
-        <ProjectCard
-          key={project.slug}
-          project={project}
-          index={i}
-          hasHover={hasHover}
-          onEnter={handleEnter}
-          onLeave={handleLeave}
-          onOpen={handleOpen}
-        />
-      ))}
+      <div className="flex gap-5">
+        {columns.map((col, ci) => (
+          <div key={ci} className="flex-1 min-w-0 flex flex-col gap-5">
+            {col.map((project, i) => (
+              <ProjectCard
+                key={project.slug}
+                project={project}
+                index={ci * columns.length + i}
+                hasHover={hasHover}
+                onEnter={handleEnter}
+                onLeave={handleLeave}
+                onOpen={handleOpen}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
 
       <WorkSheet
         work={openWork?.type === 'case-study' ? openWork : null}

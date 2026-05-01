@@ -11,12 +11,14 @@
  *      and register it in `content/works/bodies.ts`.
  *      For `image` / `video`: set the `media` field — no body file needed.
  *
+ * Card height is Pinterest-style: each work declares an `aspect`
+ * (CSS aspect-ratio like '4/5', '1/1', '3/4', '16/9'). The cover fills
+ * the column width and the height follows from the ratio.
+ *
  * Open behavior is type-driven (see `MasonryGrid`):
  *   - case-study → bottom sheet (long-form scrollable)
  *   - component | image | video → centered modal
  */
-
-export type CoverHeight = 'sm' | 'md' | 'lg' | 'xl' | '2xl'
 
 export type WorkType = 'case-study' | 'component' | 'image' | 'video'
 
@@ -34,7 +36,8 @@ export type Work = {
   client?: string
   kind?: 'work' | 'freelance'
   accent: string
-  coverHeight?: CoverHeight
+  /** CSS aspect-ratio, e.g. '4/5', '1/1', '3/4', '16/9'. Defaults to '4/3'. */
+  aspect?: string
   cover?: string
   /** Required for type='image' or type='video'. Ignored otherwise. */
   media?: {
@@ -58,7 +61,7 @@ export const works: Work[] = [
     client: 'Facilio',
     kind: 'work',
     accent: 'from-indigo-950 via-indigo-900 to-slate-950',
-    coverHeight: 'xl',
+    aspect: '4/5',
   },
   {
     slug: 'design-system',
@@ -73,7 +76,7 @@ export const works: Work[] = [
     client: 'Facilio',
     kind: 'work',
     accent: 'from-stone-900 via-zinc-800 to-neutral-900',
-    coverHeight: 'md',
+    aspect: '4/3',
   },
   {
     slug: 'fsm',
@@ -88,7 +91,7 @@ export const works: Work[] = [
     client: 'Facilio',
     kind: 'work',
     accent: 'from-emerald-950 via-teal-900 to-slate-900',
-    coverHeight: 'lg',
+    aspect: '3/4',
   },
   {
     slug: 'iot-automation',
@@ -103,7 +106,7 @@ export const works: Work[] = [
     client: 'Facilio',
     kind: 'work',
     accent: 'from-cyan-950 via-sky-900 to-slate-900',
-    coverHeight: 'sm',
+    aspect: '16/9',
   },
   {
     slug: 'mellow',
@@ -117,7 +120,7 @@ export const works: Work[] = [
     role: 'Product Designer',
     kind: 'freelance',
     accent: 'from-violet-950 via-purple-900 to-slate-900',
-    coverHeight: 'lg',
+    aspect: '2/3',
   },
   {
     slug: 'blue-whistle',
@@ -131,7 +134,7 @@ export const works: Work[] = [
     role: 'Product Designer',
     kind: 'freelance',
     accent: 'from-blue-950 via-slate-900 to-slate-950',
-    coverHeight: 'md',
+    aspect: '1/1',
   },
   {
     slug: 'blubees',
@@ -145,7 +148,7 @@ export const works: Work[] = [
     role: 'Product Designer',
     kind: 'freelance',
     accent: 'from-rose-950 via-pink-900 to-slate-900',
-    coverHeight: 'xl',
+    aspect: '9/16',
   },
 
   // --- Sample non-case-study works (replace media URLs / body with your own) ---
@@ -159,7 +162,7 @@ export const works: Work[] = [
     summary: 'A tiny interactive palette that re-rolls colour combinations on click.',
     year: '2024',
     accent: 'from-fuchsia-900 via-pink-900 to-rose-950',
-    coverHeight: 'md',
+    aspect: '4/3',
   },
   {
     slug: 'still-life',
@@ -170,7 +173,7 @@ export const works: Work[] = [
     summary: 'A frame I keep coming back to.',
     year: '2024',
     accent: 'from-amber-900 via-orange-950 to-stone-950',
-    coverHeight: 'lg',
+    aspect: '16/9',
     media: {
       src: 'https://picsum.photos/seed/stilllife/1600/1000',
       aspect: '16/9',
@@ -185,7 +188,7 @@ export const works: Work[] = [
     summary: 'A short colourful motion piece.',
     year: '2024',
     accent: 'from-fuchsia-900 via-purple-900 to-indigo-950',
-    coverHeight: 'md',
+    aspect: '16/9',
     media: {
       src: '/works/colorful-animation/clip.mp4',
       aspect: '16/9',

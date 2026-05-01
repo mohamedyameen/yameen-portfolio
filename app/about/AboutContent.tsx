@@ -54,7 +54,7 @@ export default function AboutContent() {
     <div className="flex flex-col">
 
       {/* ── Hero ── */}
-      <section className="px-5 md:px-10 py-12 md:py-16 border-b border-border flex flex-col gap-5">
+      <section className="p-6 md:p-10 border-b border-border flex flex-col gap-5">
         <motion.p
           initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
