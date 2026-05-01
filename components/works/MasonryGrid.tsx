@@ -1,12 +1,12 @@
 'use client'
-import { useState, useCallback, useRef, useEffect } from 'react'
+import { Suspense, useState, useCallback, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Work, CoverHeight } from '@/content/works'
 import { useSound } from '@/hooks/useSound'
 import { WorkModal } from '@/components/works/WorkModal'
 import { WorkSheet } from '@/components/works/WorkSheet'
-import { bodyLoaders } from '@/content/works/bodies'
+import { bodyLoaders, lazyBodies } from '@/content/works/bodies'
 
 // Apple-ish smooth ease-out — used for card→overlay morph + backdrop fade.
 const OPEN_TRANSITION = { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }
@@ -55,11 +55,6 @@ const previewImages: Record<string, string[]> = {
     'https://picsum.photos/seed/bb2/480/320',
     'https://picsum.photos/seed/bb3/480/320',
   ],
-  'palette-shift':  [
-    'https://picsum.photos/seed/palette1/480/320',
-    'https://picsum.photos/seed/palette2/480/320',
-    'https://picsum.photos/seed/palette3/480/320',
-  ],
 }
 
 function ProjectCard({
@@ -79,6 +74,7 @@ function ProjectCard({
 }) {
   const h = coverHeightClass[project.coverHeight ?? 'md']
   const { playHover, playClick } = useSound()
+  const Body = project.type === 'component' ? lazyBodies[project.slug] ?? null : null
 
   return (
     <motion.div
@@ -98,7 +94,7 @@ function ProjectCard({
       <motion.div
         layoutId={`work-card-${project.slug}`}
         transition={OPEN_TRANSITION}
-        className="group overflow-hidden rounded-md border border-border bg-background hover:bg-card transition-colors"
+        className="group rounded-[20px] border border-border/80 bg-background p-3 hover:bg-card transition-colors"
       >
         <Link
           href={`/works/${project.slug}`}
@@ -110,7 +106,7 @@ function ProjectCard({
           }}
           className="block w-full"
         >
-          <div className={`relative w-full overflow-hidden ${h}`}>
+          <div className={`relative w-full overflow-hidden rounded-2xl ${h}`}>
             {project.type === 'image' && project.media?.src ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -128,6 +124,12 @@ function ProjectCard({
                 playsInline
                 className="absolute inset-0 size-full object-cover"
               />
+            ) : project.type === 'component' && Body ? (
+              <div className="absolute inset-0 pointer-events-none">
+                <Suspense fallback={<div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />}>
+                  <Body preview />
+                </Suspense>
+              </div>
             ) : (
               <div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />
             )}
@@ -137,12 +139,12 @@ function ProjectCard({
               </span>
             )}
           </div>
-          <div className="flex flex-col gap-0.5 p-4">
+          <div className="flex flex-col gap-0.5 px-1 pb-1 pt-3">
             <span className="text-xs font-medium text-foreground leading-snug">
               {project.name}
             </span>
             {project.summary && (
-              <p className="text-[11px] text-muted-foreground leading-relaxed line-clamp-3">
+              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">
                 {project.summary}
               </p>
             )}
@@ -240,7 +242,7 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
 
   return (
     <div
-      className="p-2 columns-2 lg:columns-3 gap-2"
+      className="p-2 columns-2 md:columns-3 lg:columns-4 gap-2"
       onMouseMove={hasHover ? handleMouseMove : undefined}
     >
       {orderedProjects.map((project, i) => (

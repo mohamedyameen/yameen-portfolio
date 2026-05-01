@@ -1,17 +1,10 @@
 'use client'
 
-import { lazy, Suspense, useEffect, type ComponentType } from 'react'
+import { Suspense, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Work } from '@/content/works'
-import { bodyLoaders } from '@/content/works/bodies'
+import { lazyBodies } from '@/content/works/bodies'
 import { cn } from '@/lib/utils'
-
-const lazyBodies: Record<string, ComponentType> = Object.fromEntries(
-  Object.entries(bodyLoaders).map(([slug, loader]) => [
-    slug,
-    lazy(loader) as unknown as ComponentType,
-  ]),
-)
 
 const aspectClass: Record<NonNullable<Work['media']>['aspect'] & string, string> = {
   '16/9': 'aspect-video',
@@ -66,7 +59,7 @@ export function WorkModal({
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.35, ease: 'easeOut' }}
           onClick={onClose}
         >
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />

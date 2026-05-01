@@ -10,9 +10,23 @@ const PALETTES = [
   ['#1c1917', '#7c2d12', '#f97316', '#fef3c7'],
 ]
 
-export default function PaletteShift() {
+export default function PaletteShift({ preview = false }: { preview?: boolean }) {
   const [i, setI] = useState(0)
   const palette = PALETTES[i]
+
+  if (preview) {
+    return (
+      <div className="flex size-full">
+        {palette.map((c) => (
+          <div
+            key={c}
+            className="flex-1 transition-all duration-300"
+            style={{ backgroundColor: c }}
+          />
+        ))}
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col items-stretch gap-4">
