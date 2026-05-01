@@ -82,7 +82,7 @@ function ProjectCard({
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '0px 0px -40px 0px' }}
       transition={{ duration: 0.4, delay: (index % 3) * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
-      className="w-full break-inside-avoid mb-2"
+      className="w-full break-inside-avoid mb-5"
       onMouseEnter={hasHover ? () => {
         playHover()
         onEnter(project.slug)
@@ -91,22 +91,21 @@ function ProjectCard({
       } : undefined}
       onMouseLeave={hasHover ? onLeave : undefined}
     >
-      <motion.div
-        layoutId={`work-card-${project.slug}`}
-        transition={OPEN_TRANSITION}
-        className="group rounded-[20px] border border-border/80 bg-background p-3 hover:bg-card transition-colors"
+      <Link
+        href={`/works/${project.slug}`}
+        onClick={(e) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
+          e.preventDefault()
+          playClick()
+          onOpen(project)
+        }}
+        className="group block w-full"
       >
-        <Link
-          href={`/works/${project.slug}`}
-          onClick={(e) => {
-            if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
-            e.preventDefault()
-            playClick()
-            onOpen(project)
-          }}
-          className="block w-full"
+        <motion.div
+          layoutId={`work-card-${project.slug}`}
+          transition={OPEN_TRANSITION}
+          className={`relative w-full overflow-hidden rounded-2xl ${h}`}
         >
-          <div className={`relative w-full overflow-hidden rounded-2xl ${h}`}>
             {project.type === 'image' && project.media?.src ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
@@ -138,19 +137,18 @@ function ProjectCard({
                 {project.tags[0]}
               </span>
             )}
-          </div>
-          <div className="flex flex-col gap-0.5 px-1 pb-1 pt-3">
-            <span className="text-xs font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
-              {project.name}
-            </span>
-            {project.summary && (
-              <p className="hidden sm:line-clamp-2 text-[10px] text-muted-foreground leading-relaxed">
-                {project.summary}
-              </p>
-            )}
-          </div>
-        </Link>
-      </motion.div>
+        </motion.div>
+        <div className="flex flex-col gap-0.5 px-1 pt-2">
+          <span className="text-xs font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
+            {project.name}
+          </span>
+          {project.summary && (
+            <p className="hidden sm:line-clamp-2 text-[10px] text-muted-foreground leading-relaxed">
+              {project.summary}
+            </p>
+          )}
+        </div>
+      </Link>
     </motion.div>
   )
 }
@@ -242,7 +240,7 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
 
   return (
     <div
-      className="p-2 columns-2 md:columns-3 lg:columns-4 gap-2"
+      className="p-5 columns-2 md:columns-3 lg:columns-4 gap-5"
       onMouseMove={hasHover ? handleMouseMove : undefined}
     >
       {orderedProjects.map((project, i) => (
