@@ -256,7 +256,7 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
 
   return (
     <div
-      className="p-3 md:p-5"
+      className="p-5"
       onMouseMove={hasHover ? handleMouseMove : undefined}
     >
       <div className="flex gap-5">
