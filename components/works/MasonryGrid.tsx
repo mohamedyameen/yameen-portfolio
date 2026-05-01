@@ -140,11 +140,11 @@ function ProjectCard({
             )}
           </div>
           <div className="flex flex-col gap-0.5 px-1 pb-1 pt-3">
-            <span className="text-xs font-medium text-foreground leading-snug">
+            <span className="text-xs font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
               {project.name}
             </span>
             {project.summary && (
-              <p className="text-[10px] text-muted-foreground leading-relaxed line-clamp-2">
+              <p className="hidden sm:line-clamp-2 text-[10px] text-muted-foreground leading-relaxed">
                 {project.summary}
               </p>
             )}
