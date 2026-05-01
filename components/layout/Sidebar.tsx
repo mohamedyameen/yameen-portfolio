@@ -269,7 +269,7 @@ export default function Sidebar() {
           <ThemeToggle />
         </div>
         {/* Sub-header: clock — mobile only */}
-        <div className="md:hidden px-5 pb-1.5 -mt-2.5 [&>span]:!text-foreground/75">
+        <div className="md:hidden h-6 px-5 -mt-2 flex items-center whitespace-nowrap overflow-hidden [&>span]:!text-foreground/75">
           <LiveClock />
         </div>
       </header>

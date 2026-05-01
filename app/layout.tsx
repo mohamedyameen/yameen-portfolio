@@ -34,7 +34,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme">
           <SmoothScroll />
           <Sidebar />
-          <main className="min-h-screen pt-14 lg:pt-0 lg:pl-72">
+          <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
             <PageTransition>{children}</PageTransition>
           </main>
         </ThemeProvider>

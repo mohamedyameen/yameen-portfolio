@@ -11,7 +11,7 @@ export default function HomePage() {
       <section className="grid grid-cols-1 md:grid-cols-2 border-b border-border">
 
         {/* Left — text */}
-        <div className="flex flex-col gap-5 px-5 md:px-10 py-12 md:py-16 border-b border-border md:border-b-0 md:border-r md:border-border">
+        <div className="flex flex-col gap-5 p-6 md:p-10 border-b border-border md:border-b-0 md:border-r md:border-border">
           <FadeUp delay={0.08}>
             <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground leading-[1.2] max-w-lg">
               Designing{' '}
