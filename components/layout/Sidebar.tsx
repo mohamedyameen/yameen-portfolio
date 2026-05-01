@@ -42,20 +42,26 @@ function scrollToTop() {
   }
 }
 
+type NavTarget = 'home' | 'works' | 'about'
+
+const TARGET_BY_HREF: Record<string, NavTarget> = {
+  '/':       'home',
+  '/#works': 'works',
+  '/about':  'about',
+}
+
 function SidebarContent({
   pathname,
   activeSection,
   onClose,
-  onNavigateToWorks,
-  onNavigateHome,
+  onNavigate,
   controls,
   hideName,
 }: {
   pathname: string
   activeSection: 'home' | 'works'
   onClose?: () => void
-  onNavigateToWorks: () => void
-  onNavigateHome: () => void
+  onNavigate: (target: NavTarget) => void
   controls?: ReactNode
   hideName?: boolean
 }) {
@@ -71,7 +77,7 @@ function SidebarContent({
             onClick={(e) => {
               e.preventDefault()
               playClick()
-              onNavigateHome()
+              onNavigate('home')
               onClose?.()
             }}
             className="flex-1 min-w-0 text-foreground tracking-tight"
@@ -84,13 +90,19 @@ function SidebarContent({
 
       <nav className="flex flex-col">
         {navLinks.map(({ href, label, external }) => {
-          const isWorks = href === '/#works'
-          const isHome  = href === '/'
-          let active = !external && !isWorks && !isHome && pathname === href
-          if (pathname === '/') {
-            if (isHome  && activeSection === 'home')  active = true
-            if (isWorks && activeSection === 'works') active = true
+          const target = TARGET_BY_HREF[href]
+          // Active state: on `/` we use the scroll-derived activeSection for
+          // home/works. Otherwise pathname match.
+          let active = false
+          if (target) {
+            if (pathname === '/') {
+              active = (target === 'home'  && activeSection === 'home') ||
+                       (target === 'works' && activeSection === 'works')
+            } else if (target === 'about') {
+              active = pathname === '/about'
+            }
           }
+
           return (
             <Link
               key={label}
@@ -98,15 +110,9 @@ function SidebarContent({
               onMouseEnter={playHover}
               onClick={(e) => {
                 playClick()
-                if (isWorks) {
+                if (target) {
                   e.preventDefault()
-                  onNavigateToWorks()
-                  onClose?.()
-                  return
-                }
-                if (isHome) {
-                  e.preventDefault()
-                  onNavigateHome()
+                  onNavigate(target)
                   onClose?.()
                   return
                 }
@@ -189,31 +195,30 @@ export default function Sidebar() {
     return () => { document.body.style.overflow = '' }
   }, [open])
 
-  const handleNavigateToWorks = () => {
-    setActiveSection('works')
-    if (pathname === '/') {
-      scrollToWorks()
-    } else {
-      router.push('/')
-      const tryScroll = (attempts = 0) => {
-        const el = document.getElementById('works')
-        if (el) {
-          scrollToWorks()
-        } else if (attempts < 20) {
-          setTimeout(() => tryScroll(attempts + 1), 50)
-        }
-      }
-      setTimeout(() => tryScroll(), 80)
-    }
-  }
+  const navigate = (target: NavTarget) => {
+    const path = target === 'about' ? '/about' : '/'
+    if (target === 'home')  setActiveSection('home')
+    if (target === 'works') setActiveSection('works')
 
-  const handleNavigateHome = () => {
-    setActiveSection('home')
-    if (pathname === '/') {
-      scrollToTop()
+    const onArrived = () => {
+      if (target === 'works') {
+        // Wait for the #works section to mount, then smooth-scroll to it.
+        const tryScroll = (attempts = 0) => {
+          const el = document.getElementById('works')
+          if (el) scrollToWorks()
+          else if (attempts < 20) setTimeout(() => tryScroll(attempts + 1), 50)
+        }
+        tryScroll()
+      } else {
+        scrollToTop()
+      }
+    }
+
+    if (pathname === path) {
+      onArrived()
     } else {
-      router.push('/')
-      setTimeout(() => scrollToTop(), 80)
+      router.push(path)
+      setTimeout(onArrived, 80)
     }
   }
 
@@ -228,8 +233,7 @@ export default function Sidebar() {
         <SidebarContent
           pathname={pathname}
           activeSection={activeSection}
-          onNavigateToWorks={handleNavigateToWorks}
-          onNavigateHome={handleNavigateHome}
+          onNavigate={navigate}
           controls={
             <div className="flex items-center gap-3">
               <SoundToggle />
@@ -258,7 +262,14 @@ export default function Sidebar() {
           >
             {open ? <X size={18} /> : <Menu size={18} />}
           </button>
-          <Link href="/" className="flex-1 min-w-0 text-foreground tracking-tight">
+          <Link
+            href="/"
+            onClick={(e) => {
+              e.preventDefault()
+              navigate('home')
+            }}
+            className="flex-1 min-w-0 text-foreground tracking-tight"
+          >
             <TypewriterName className="text-sm" />
           </Link>
           {/* tablet only — keep clock inline */}
@@ -294,8 +305,7 @@ export default function Sidebar() {
           pathname={pathname}
           onClose={() => setOpen(false)}
           activeSection={activeSection}
-          onNavigateToWorks={handleNavigateToWorks}
-          onNavigateHome={handleNavigateHome}
+          onNavigate={navigate}
           hideName
         />
       </aside>
