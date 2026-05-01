@@ -1,9 +1,19 @@
 'use client'
+import { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { usePathname } from 'next/navigation'
 
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
+
+  // Lightweight defensive cleanup on every route change — clears any stuck
+  // body overflow (from a modal/sheet/drawer that didn't tear down cleanly)
+  // and re-starts Lenis. Doesn't touch scroll position, so no visible lag.
+  useEffect(() => {
+    document.body.style.overflow = ''
+    globalThis.lenis?.start()
+  }, [pathname])
+
   return (
     <AnimatePresence mode="wait">
       <motion.div
