@@ -1,9 +1,10 @@
 'use client'
 
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight, Pause, Play } from 'lucide-react'
+import { ArrowUpRight } from 'lucide-react'
 import { Marquee } from '@/components/ui/marquee'
+import { InlineMusicPlayer } from '@/components/music/MusicPlayer'
 
 const livingWords = [
   { text: 'living', shine: 'shine-emerald', emoji: '🌿', tilt: 14 },
@@ -47,78 +48,6 @@ const games = [
     video: '/fifa.mp4',
   },
 ]
-
-function MinimalMusicPlayer({
-  src,
-  art,
-  title,
-  artist,
-  onPlayingChange,
-}: {
-  src: string
-  art: string
-  title: string
-  artist: string
-  onPlayingChange: (playing: boolean) => void
-}) {
-  const audioRef = useRef<HTMLAudioElement>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-
-  useEffect(() => {
-    const audio = audioRef.current
-    if (!audio) return
-    const onPlay = () => { setIsPlaying(true); onPlayingChange(true) }
-    const onPause = () => { setIsPlaying(false); onPlayingChange(false) }
-    audio.addEventListener('play', onPlay)
-    audio.addEventListener('pause', onPause)
-    return () => {
-      audio.removeEventListener('play', onPlay)
-      audio.removeEventListener('pause', onPause)
-      audio.pause()
-    }
-  }, [onPlayingChange])
-
-  const toggle = () => {
-    const audio = audioRef.current
-    if (!audio) return
-    if (audio.paused) audio.play().catch(() => {})
-    else audio.pause()
-  }
-
-  return (
-    <div className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3">
-      <audio ref={audioRef} src={src} preload="metadata" loop />
-
-      {/* Very subtle album-art tint */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-[0.12] dark:opacity-[0.18]"
-        style={{ backgroundImage: `url(${art})`, filter: 'blur(40px)' }}
-      />
-
-      <div className="relative size-7 flex-shrink-0 grid place-items-center rounded-full bg-background border border-border text-sm">
-        <span aria-hidden>🍁</span>
-      </div>
-
-      <div className="relative flex min-w-0 flex-1 items-baseline gap-1.5">
-        <span className="truncate text-sm font-medium text-foreground">{title}</span>
-        <span className="truncate text-xs text-muted-foreground">· {artist}</span>
-      </div>
-
-      <button
-        onClick={toggle}
-        aria-label={isPlaying ? 'Pause' : 'Play'}
-        className="relative grid size-8 flex-shrink-0 place-items-center rounded-full text-foreground hover:bg-accent transition-colors"
-      >
-        {isPlaying ? (
-          <Pause size={14} fill="currentColor" />
-        ) : (
-          <Play size={14} fill="currentColor" className="translate-x-[1px]" />
-        )}
-      </button>
-    </div>
-  )
-}
 
 const photos = [
   { src: '/valorant.jpg',     caption: 'Ranked queue' },
@@ -193,61 +122,6 @@ function PhotoStack() {
         )
       })}
     </div>
-  )
-}
-
-function FallingLeaves() {
-  const leaves = useMemo(
-    () =>
-      Array.from({ length: 22 }).map((_, i) => ({
-        id: i,
-        left: Math.random() * 100,
-        delay: Math.random() * 6,
-        duration: 7 + Math.random() * 7,
-        size: 16 + Math.random() * 18,
-        rotateStart: Math.random() * 360,
-        rotateEnd: Math.random() * 720 - 360,
-        drift: (Math.random() - 0.5) * 30,
-        emoji: ['🍁', '🍂'][Math.floor(Math.random() * 2)],
-      })),
-    [],
-  )
-
-  return (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      exit={{ opacity: 0 }}
-      transition={{ duration: 1.1, ease: 'easeInOut' }}
-      className="pointer-events-none fixed inset-0 z-[60] overflow-hidden"
-    >
-      {leaves.map((leaf) => (
-        <motion.span
-          key={leaf.id}
-          initial={{ y: '-12vh', x: 0, opacity: 0, rotate: leaf.rotateStart }}
-          animate={{
-            y: '112vh',
-            x: `${leaf.drift}vw`,
-            opacity: [0, 1, 1, 0],
-            rotate: leaf.rotateEnd,
-          }}
-          transition={{
-            duration: leaf.duration,
-            delay: leaf.delay,
-            repeat: Infinity,
-            ease: 'linear',
-            opacity: { times: [0, 0.1, 0.9, 1], duration: leaf.duration, repeat: Infinity, delay: leaf.delay, ease: 'linear' },
-          }}
-          style={{
-            position: 'absolute',
-            left: `${leaf.left}%`,
-            fontSize: `${leaf.size}px`,
-          }}
-        >
-          {leaf.emoji}
-        </motion.span>
-      ))}
-    </motion.div>
   )
 }
 
@@ -348,7 +222,6 @@ function GameCard({ game, index }: { game: (typeof games)[number]; index: number
 
 export default function AboutContent() {
   const [wordIdx, setWordIdx] = useState(0)
-  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -359,8 +232,6 @@ export default function AboutContent() {
 
   return (
     <div className="flex flex-col">
-
-      <AnimatePresence>{isPlaying && <FallingLeaves />}</AnimatePresence>
 
       {/* ── Hero ── */}
       <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-6 md:gap-16">
@@ -495,7 +366,7 @@ export default function AboutContent() {
 
       {/* ── Connect ── */}
       <section className="p-6 md:p-10 flex flex-col gap-4">
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
+        <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6">
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -516,13 +387,7 @@ export default function AboutContent() {
             transition={{ duration: 0.45, delay: 0.18 }}
             className="w-full md:max-w-[320px] md:flex-shrink-0"
           >
-            <MinimalMusicPlayer
-              src="/golden-brown.mp3"
-              art="/golden-brown.png"
-              title="Golden Brown"
-              artist="The Stranglers"
-              onPlayingChange={setIsPlaying}
-            />
+            <InlineMusicPlayer />
           </motion.div>
         </div>
 

@@ -2,10 +2,14 @@ import type { Metadata } from 'next'
 import localFont from 'next/font/local'
 import { Playfair_Display, Caveat } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
+import { LayoutGroup } from 'framer-motion'
 import Sidebar from '@/components/layout/Sidebar'
 import PageTransition from '@/components/layout/PageTransition'
 import SmoothScroll from '@/components/layout/SmoothScroll'
 import { TooltipProvider } from '@/components/ui/tooltip'
+import { MusicPlayerProvider } from '@/components/music/MusicPlayerProvider'
+import { FloatingMusicPlayer } from '@/components/music/MusicPlayer'
+import { GlobalFallingLeaves } from '@/components/music/FallingLeaves'
 import './globals.css'
 
 const geistSans = localFont({
@@ -40,11 +44,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme">
           <TooltipProvider delayDuration={150}>
-            <SmoothScroll />
-            <Sidebar />
-            <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
-              <PageTransition>{children}</PageTransition>
-            </main>
+            <MusicPlayerProvider>
+              <GlobalFallingLeaves />
+              <LayoutGroup>
+                <SmoothScroll />
+                <Sidebar />
+                <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
+                  <PageTransition>{children}</PageTransition>
+                </main>
+                <FloatingMusicPlayer />
+              </LayoutGroup>
+            </MusicPlayerProvider>
           </TooltipProvider>
         </ThemeProvider>
       </body>
