@@ -9,6 +9,13 @@ declare global {
 
 export default function SmoothScroll() {
   useEffect(() => {
+    // Skip Lenis on touch devices — iOS Safari has good native smooth scroll
+    // and Lenis interferes with state restoration on route transitions there.
+    const isTouchDevice =
+      typeof window !== 'undefined' &&
+      window.matchMedia('(hover: none) and (pointer: coarse)').matches
+    if (isTouchDevice) return
+
     const lenis = new Lenis({
       lerp: 0.12,
       wheelMultiplier: 1.5,
