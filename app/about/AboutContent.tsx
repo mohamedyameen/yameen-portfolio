@@ -1,12 +1,21 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useEffect, useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { Marquee } from '@/components/ui/marquee'
 
+const livingWords = [
+  { text: 'living', gradient: 'from-emerald-200 via-emerald-300 to-emerald-400', emoji: '🌿', tilt: 14 },
+  { text: 'reason', gradient: 'from-sky-200 via-sky-300 to-sky-400',             emoji: '💡', tilt: -12 },
+  { text: 'kick',   gradient: 'from-orange-200 via-orange-300 to-orange-400',    emoji: '⚽', tilt: 18 },
+  { text: 'laugh',  gradient: 'from-pink-200 via-pink-300 to-pink-400',          emoji: '😆', tilt: -16 },
+  { text: 'vibe',   gradient: 'from-violet-200 via-violet-300 to-violet-400',    emoji: '✨', tilt: 12 },
+]
+
 const interests = [
-  'Design', 'Gaming', 'Football', 'Chai', 'Lofi', 'Cinema',
-  'Running', 'AI tinkering', 'Typography', 'Photography', 'Late-night builds',
+  'Design', 'Gaming', 'Football', 'Chai', 'Lofi',
+  'AI tinkering', 'Vibe coding', 'Late-night builds',
 ]
 
 const games = [
@@ -36,67 +45,125 @@ const games = [
   },
 ]
 
-const currently = [
-  { label: 'Reading',   value: 'Hooked — Nir Eyal' },
-  { label: 'Listening', value: 'Fred again.. — Ten Days' },
-  { label: 'Watching',  value: 'Severance, S2' },
-  { label: 'Building',  value: 'AI-native dispatch flows at Facilio' },
-]
-
 const timeline = [
   { year: '2022 — now',  title: 'Lead Product Designer',  org: 'Facilio',   note: 'AI agents, design systems, complex B2B workflows.' },
   { year: '2023 — now',  title: 'Freelance Designer',      org: 'Various',   note: 'Mellow, Blue Whistle, Blubees.' },
-  { year: '2017 – 2021', title: 'B.E. Computer Science',   org: 'Aalim Muhammed Salegh College', note: 'Stumbled into design, never looked back.' },
+  { year: '2017 – 2021', title: 'B.E. Computer Science',   org: '', note: 'Stumbled into design, never looked back.' },
 ]
 
 export default function AboutContent() {
+  const [wordIdx, setWordIdx] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setWordIdx((i) => (i + 1) % livingWords.length)
+    }, 2200)
+    return () => clearInterval(id)
+  }, [])
+
   return (
     <div className="flex flex-col">
 
       {/* ── Hero ── */}
-      <section className="p-6 md:p-10 border-b border-border flex flex-col gap-5">
-        <motion.p
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.4 }}
-          className="text-xs tracking-widest uppercase text-muted-foreground"
-        >
-          The human side
-        </motion.p>
-
-        <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-lg">
-          {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
+      <section className="px-6 md:px-10 py-10 md:py-16 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-20 md:items-start">
+        <div className="flex flex-col gap-6">
+          <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-2xl">
+            {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
+              <motion.span
+                key={i}
+                initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.08 + i * 0.06 }}
+                className="inline-block mr-[0.25em]"
+              >
+                {word}
+              </motion.span>
+            ))}
+            <br />
             <motion.span
-              key={i}
               initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.08 + i * 0.06 }}
-              className="inline-block mr-[0.25em]"
+              transition={{ duration: 0.45, delay: 0.28 }}
+              className="inline-block text-muted-foreground"
             >
-              {word}
+              I{' '}
+              <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground">
+                design
+              </em>{' '}
+              things for a{' '}
+              <span
+                className="relative inline-block"
+                style={{ marginLeft: '0.15em' }}
+              >
+                <span
+                  className="inline-block"
+                  style={{ clipPath: 'inset(0)', lineHeight: 1.2 }}
+                >
+                  <AnimatePresence mode="wait" initial={false}>
+                    <motion.span
+                      key={livingWords[wordIdx].text}
+                      initial={{ y: '100%', opacity: 0 }}
+                      animate={{ y: 0, opacity: 1 }}
+                      exit={{ y: '-100%', opacity: 0 }}
+                      transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
+                      className={`inline-block whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-r ${livingWords[wordIdx].gradient}`}
+                    >
+                      {livingWords[wordIdx].text}.
+                    </motion.span>
+                  </AnimatePresence>
+                </span>
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={livingWords[wordIdx].text + '-emoji'}
+                    initial={{ y: 14, x: -10, rotate: -30, scale: 0.4, opacity: 0 }}
+                    animate={{ y: 0, x: 0, rotate: livingWords[wordIdx].tilt, scale: 1, opacity: 1 }}
+                    exit={{ y: -18, x: 14, rotate: 40, scale: 0.5, opacity: 0 }}
+                    transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+                    className="pointer-events-none select-none absolute -top-3 -right-7 text-2xl md:text-[1.5rem]"
+                    aria-hidden
+                  >
+                    {livingWords[wordIdx].emoji}
+                  </motion.span>
+                </AnimatePresence>
+              </span>
             </motion.span>
-          ))}
-          <br />
-          <motion.span
-            initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.28 }}
-            className="inline-block text-muted-foreground"
-          >
-            I{' '}
-            <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground">
-              design
-            </em>{' '}
-            things for a living.
-          </motion.span>
-        </h1>
+          </h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.45, delay: 0.42 }}
-          className="max-w-sm text-sm text-foreground/50 leading-relaxed"
-        >
-          Lead Product Designer based in Chennai — 4+ years turning complex B2B
-          problems into experiences that feel obvious in hindsight. Off the clock,
-          I'm either in ranked queue or watching football.
-        </motion.p>
+          <motion.p
+            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.42 }}
+            className="max-w-2xl text-sm text-foreground/60 leading-relaxed"
+          >
+            I'm a Lead Product Designer based in Chennai. As a kid I took apart
+            remotes and broke OS installs — turns out I just liked figuring out
+            how things work. Design is where I do that for a living. These days
+            I lead design at Facilio, building AI-native tools for facilities
+            teams, turning messy B2B problems into things that feel obvious. I
+            care about craft, not about taking myself too seriously. Off the
+            clock, you'll find me in ranked queue or watching football.
+          </motion.p>
+        </div>
+
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col">
+            {timeline.map((item, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, x: -12 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.4, delay: 0.55 + i * 0.07 }}
+                className="grid grid-cols-[100px_1fr] gap-4 py-4 border-t border-border first:border-t-0"
+              >
+                <span className="text-xs text-muted-foreground pt-0.5">{item.year}</span>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-sm font-medium text-foreground">
+                    {item.title}
+                    {item.org && <span className="text-muted-foreground/60"> · {item.org}</span>}
+                  </span>
+                  <span className="text-xs text-foreground/50 leading-relaxed">{item.note}</span>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </section>
 
       {/* ── Marquee ── */}
@@ -113,66 +180,6 @@ export default function AboutContent() {
           ))}
         </Marquee>
       </div>
-
-      {/* ── About + Currently ── */}
-      <section className="px-5 md:px-10 py-12 md:py-16 border-b border-border grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
-        {/* Story */}
-        <div className="flex flex-col gap-4">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xs tracking-widest uppercase text-muted-foreground"
-          >
-            Who I am
-          </motion.p>
-          {[
-            "Grew up curious — taking apart remotes, breaking OS installs, falling into design because it's where logic and feeling live together.",
-            "I lead design at Facilio on AI-native tools for facilities teams. I've built design systems, shipped AI agents, and mentored designers across 4+ years of B2B SaaS.",
-            "I care a lot about craft. Also about not taking myself too seriously.",
-          ].map((p, i) => (
-            <motion.p
-              key={i}
-              initial={{ opacity: 0, y: 12 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.08 }}
-              className="text-sm text-foreground/70 leading-relaxed"
-            >
-              {p}
-            </motion.p>
-          ))}
-        </div>
-
-        {/* Currently */}
-        <div className="flex flex-col gap-4">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xs tracking-widest uppercase text-muted-foreground"
-          >
-            Currently
-          </motion.p>
-          <div className="flex flex-col gap-4">
-            {currently.map((item, i) => (
-              <motion.div
-                key={item.label}
-                initial={{ opacity: 0, y: 10 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.06 }}
-                className="border-t border-border pt-3 flex flex-col gap-0.5"
-              >
-                <span className="text-xs tracking-widest uppercase text-muted-foreground">{item.label}</span>
-                <span className="text-sm text-foreground">{item.value}</span>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── Off the clock ── */}
       <section className="px-5 md:px-10 py-12 md:py-16 border-b border-border flex flex-col gap-6">
@@ -209,7 +216,7 @@ export default function AboutContent() {
               viewport={{ once: true }}
               transition={{ duration: 0.4, delay: i * 0.07 }}
               whileHover={{ y: -4 }}
-              className="group relative overflow-hidden rounded-lg border border-border cursor-default"
+              className="group relative overflow-hidden rounded-2xl border border-border cursor-default"
             >
               {game.image ? (
                 <img
@@ -231,43 +238,9 @@ export default function AboutContent() {
         </div>
       </section>
 
-      {/* ── Timeline + Connect ── */}
-      <section className="px-5 md:px-10 py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-10 md:gap-14">
-        {/* Timeline */}
+      {/* ── Connect ── */}
+      <section className="px-5 md:px-10 py-12 md:py-16">
         <div className="flex flex-col gap-4">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xs tracking-widest uppercase text-muted-foreground"
-          >
-            The road
-          </motion.p>
-          <div className="flex flex-col">
-            {timeline.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -12 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: i * 0.07 }}
-                className="grid grid-cols-[100px_1fr] gap-4 py-4 border-t border-border first:border-t-0"
-              >
-                <span className="text-xs text-muted-foreground pt-0.5">{item.year}</span>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm font-medium text-foreground">
-                    {item.title} <span className="text-muted-foreground/60">· {item.org}</span>
-                  </span>
-                  <span className="text-xs text-foreground/50 leading-relaxed">{item.note}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-
-        {/* Connect */}
-        <div className="flex flex-col gap-4 justify-start md:justify-center">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
             whileInView={{ opacity: 1, y: 0 }}

@@ -5,6 +5,7 @@ import { ThemeProvider } from 'next-themes'
 import Sidebar from '@/components/layout/Sidebar'
 import PageTransition from '@/components/layout/PageTransition'
 import SmoothScroll from '@/components/layout/SmoothScroll'
+import { TooltipProvider } from '@/components/ui/tooltip'
 import './globals.css'
 
 const geistSans = localFont({
@@ -32,11 +33,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${geistSans.variable} ${playfair.variable}`}>
       <body className="bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme">
-          <SmoothScroll />
-          <Sidebar />
-          <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
-            <PageTransition>{children}</PageTransition>
-          </main>
+          <TooltipProvider delayDuration={150}>
+            <SmoothScroll />
+            <Sidebar />
+            <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
+              <PageTransition>{children}</PageTransition>
+            </main>
+          </TooltipProvider>
         </ThemeProvider>
       </body>
     </html>

@@ -172,16 +172,23 @@ function useColumnCount() {
   const [cols, setCols] = useState(2)
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
-    const sm = window.matchMedia('(min-width: 640px)')
-    const lg = window.matchMedia('(min-width: 1024px)')
-    const update = () => setCols(lg.matches ? 4 : sm.matches ? 3 : 2)
+    const sm   = window.matchMedia('(min-width: 640px)')
+    const lg   = window.matchMedia('(min-width: 1024px)')
+    const xxl  = window.matchMedia('(min-width: 1920px)')
+    const qhd  = window.matchMedia('(min-width: 2560px)')
+    const uhd  = window.matchMedia('(min-width: 3440px)')
+    const update = () =>
+      setCols(
+        uhd.matches ? 7 :
+        qhd.matches ? 6 :
+        xxl.matches ? 5 :
+        lg.matches  ? 4 :
+        sm.matches  ? 3 : 2
+      )
     update()
-    sm.addEventListener('change', update)
-    lg.addEventListener('change', update)
-    return () => {
-      sm.removeEventListener('change', update)
-      lg.removeEventListener('change', update)
-    }
+    const queries = [sm, lg, xxl, qhd, uhd]
+    queries.forEach(q => q.addEventListener('change', update))
+    return () => queries.forEach(q => q.removeEventListener('change', update))
   }, [])
   return cols
 }

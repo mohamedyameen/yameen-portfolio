@@ -8,7 +8,7 @@ export function BrandMarquee() {
     <div className="border-b border-border py-4">
       <Marquee
         className="[--duration:16s] [--gap:2rem] text-xl md:text-2xl font-medium tracking-tight"
-        repeat={3}
+        repeat={8}
       >
         {brands.map((brand) => (
           <span key={brand} className="flex items-center gap-8">
