@@ -74,6 +74,7 @@ function MinimalMusicPlayer({
     return () => {
       audio.removeEventListener('play', onPlay)
       audio.removeEventListener('pause', onPause)
+      audio.pause()
     }
   }, [onPlayingChange])
 
@@ -135,13 +136,26 @@ const stackPositions = [
 
 function PhotoStack() {
   const [topIdx, setTopIdx] = useState(0)
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    const id = setInterval(() => {
+  const startTimer = () => {
+    if (intervalRef.current) clearInterval(intervalRef.current)
+    intervalRef.current = setInterval(() => {
       setTopIdx((i) => (i + 1) % photos.length)
     }, 3500)
-    return () => clearInterval(id)
+  }
+
+  useEffect(() => {
+    startTimer()
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current)
+    }
   }, [])
+
+  const advance = () => {
+    setTopIdx((i) => (i + 1) % photos.length)
+    startTimer()
+  }
 
   return (
     <div className="relative h-[200px] md:h-[220px] w-full">
@@ -160,6 +174,7 @@ function PhotoStack() {
             }}
             transition={{ duration: 0.7, ease: [0.34, 1.2, 0.64, 1] }}
             whileHover={{ scale: 1.04, y: pos.y - 4 }}
+            onClick={advance}
             className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border p-2 pb-7 rounded-xl shadow-md cursor-pointer"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -238,41 +253,51 @@ function FallingLeaves() {
 
 function GameCard({ game, index }: { game: (typeof games)[number]; index: number }) {
   const videoRef = useRef<HTMLVideoElement>(null)
+  const [isActive, setIsActive] = useState(false)
 
-  const handleEnter = () => {
+  const startVideo = () => {
     const v = videoRef.current
     if (!v) return
     v.currentTime = 0
     v.muted = false
     v.volume = 0.5
     v.play().catch(() => {
-      // some browsers block audio autoplay; fall back to muted
       v.muted = true
       v.play().catch(() => {})
     })
+    setIsActive(true)
   }
 
-  const handleLeave = () => {
+  const stopVideo = () => {
     const v = videoRef.current
     if (!v) return
     v.pause()
     v.currentTime = 0
+    setIsActive(false)
+  }
+
+  const toggle = () => {
+    if (isActive) stopVideo()
+    else startVideo()
   }
 
   return (
-    <div className="group relative">
+    <div
+      className="group relative"
+      data-active={isActive ? 'true' : undefined}
+    >
       {game.name === 'FIFA' ? (
         <div
           className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap text-center"
           style={{ fontFamily: 'var(--font-caveat)' }}
         >
           <span
-            className="block text-base text-muted-foreground opacity-0 [transform:translateY(8px)_rotate(-6deg)] group-hover:opacity-100 group-hover:[transform:translateY(0)_rotate(-3deg)] transition-all duration-[450ms] ease-out"
+            className="block text-base text-muted-foreground opacity-0 [transform:translateY(8px)_rotate(-6deg)] group-hover:opacity-100 group-hover:[transform:translateY(0)_rotate(-3deg)] group-data-[active=true]:opacity-100 group-data-[active=true]:[transform:translateY(0)_rotate(-3deg)] transition-all duration-[450ms] ease-out"
           >
             Ronaldo or Messi — they're better,
           </span>
           <span
-            className="block text-xl font-bold text-foreground opacity-0 [transform:translateY(10px)_rotate(6deg)] group-hover:opacity-100 group-hover:[transform:translateY(-2px)_rotate(-4deg)] transition-all duration-[550ms] delay-150 ease-out"
+            className="block text-xl font-bold text-foreground opacity-0 [transform:translateY(10px)_rotate(6deg)] group-hover:opacity-100 group-hover:[transform:translateY(-2px)_rotate(-4deg)] group-data-[active=true]:opacity-100 group-data-[active=true]:[transform:translateY(-2px)_rotate(-4deg)] transition-all duration-[550ms] delay-150 ease-out"
           >
             but for me, it's always <span className="underline decoration-wavy decoration-amber-500 dark:decoration-yellow-300 underline-offset-4">Neymar</span>.
           </span>
@@ -285,15 +310,16 @@ function GameCard({ game, index }: { game: (typeof games)[number]; index: number
       viewport={{ once: true }}
       transition={{ duration: 0.4, delay: index * 0.07 }}
       whileHover={{ y: -4 }}
-      onMouseEnter={handleEnter}
-      onMouseLeave={handleLeave}
-      className="relative overflow-hidden rounded-2xl border border-border cursor-default"
+      onMouseEnter={startVideo}
+      onMouseLeave={stopVideo}
+      onClick={toggle}
+      className="relative overflow-hidden rounded-2xl border border-border cursor-pointer"
     >
       {game.image ? (
         <img
           src={game.image}
           alt={game.name}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0"
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0 group-data-[active=true]:opacity-0"
           style={{ objectPosition: game.name === 'Valorant' ? '75% 20%' : 'center center' }}
         />
       ) : null}
@@ -304,12 +330,12 @@ function GameCard({ game, index }: { game: (typeof games)[number]; index: number
           playsInline
           loop
           preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-data-[active=true]:opacity-100"
         />
       ) : null}
-      <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} ${game.image ? 'opacity-60' : 'opacity-90'} transition-opacity duration-300 group-hover:opacity-30`} />
+      <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} ${game.image ? 'opacity-60' : 'opacity-90'} transition-opacity duration-300 group-hover:opacity-30 group-data-[active=true]:opacity-30`} />
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.07),transparent_60%)]" />
-      <div className="relative flex flex-col gap-2 p-5 min-h-[160px] transition-opacity duration-300 group-hover:opacity-0">
+      <div className="relative flex flex-col gap-2 p-5 min-h-[160px] transition-opacity duration-300 group-hover:opacity-0 group-data-[active=true]:opacity-0">
         <span className={`text-xs uppercase tracking-widest font-medium ${game.accent}`}>{game.tag}</span>
         <span className="text-xl font-semibold tracking-tight text-white">{game.name}</span>
         <p className="text-xs text-white/65 leading-relaxed mt-auto">{game.detail}</p>
