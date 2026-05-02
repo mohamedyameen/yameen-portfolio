@@ -144,7 +144,7 @@ function PhotoStack() {
   }, [])
 
   return (
-    <div className="relative h-[260px] md:h-[290px] w-full">
+    <div className="relative h-[200px] md:h-[220px] w-full">
       {photos.map((photo, i) => {
         const offset = (i - topIdx + photos.length) % photos.length
         const pos = stackPositions[offset]
@@ -337,7 +337,7 @@ export default function AboutContent() {
       <AnimatePresence>{isPlaying && <FallingLeaves />}</AnimatePresence>
 
       {/* ── Hero ── */}
-      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-16 md:items-center">
+      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-16">
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-2xl">
             {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
