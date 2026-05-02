@@ -1,20 +1,20 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
 import { Marquee } from '@/components/ui/marquee'
 
 const livingWords = [
-  { text: 'living', gradient: 'from-emerald-500 via-emerald-600 to-emerald-700 dark:from-emerald-200 dark:via-emerald-300 dark:to-emerald-400', emoji: '🌿', tilt: 14 },
-  { text: 'spark',  gradient: 'from-sky-500 via-sky-600 to-sky-700 dark:from-sky-200 dark:via-sky-300 dark:to-sky-400',                         emoji: '💡', tilt: -12 },
-  { text: 'kick',   gradient: 'from-orange-500 via-orange-600 to-orange-700 dark:from-orange-200 dark:via-orange-300 dark:to-orange-400',       emoji: '⚽', tilt: 18 },
-  { text: 'laugh',  gradient: 'from-pink-500 via-pink-600 to-pink-700 dark:from-pink-200 dark:via-pink-300 dark:to-pink-400',                   emoji: '😆', tilt: -16 },
-  { text: 'vibe',   gradient: 'from-violet-500 via-violet-600 to-violet-700 dark:from-violet-200 dark:via-violet-300 dark:to-violet-400',       emoji: '✨', tilt: 12 },
+  { text: 'living', shine: 'shine-emerald', emoji: '🌿', tilt: 14 },
+  { text: 'spark',  shine: 'shine-sky',     emoji: '💡', tilt: -12 },
+  { text: 'kick',   shine: 'shine-orange',  emoji: '⚽', tilt: 18 },
+  { text: 'laugh',  shine: 'shine-pink',    emoji: '😆', tilt: -16 },
+  { text: 'vibe',   shine: 'shine-violet',  emoji: '✨', tilt: 12 },
 ]
 
 const interests = [
-  'Design', 'Gaming', 'Football', 'Chai', 'Lofi',
+  'Design', 'Gaming', 'Football', 'Coffee', 'Lofi',
   'AI tinkering', 'Vibe coding', 'Late-night builds',
 ]
 
@@ -26,14 +26,16 @@ const games = [
     gradient: 'from-rose-900 via-red-950 to-black',
     accent: 'text-rose-300',
     image: '/valorant.jpg',
+    video: '/valorant.mp4',
   },
   {
     name: 'Apex Legends',
     tag: 'Battle Royale',
-    detail: 'Trios with friends. Wraith main — I take fights I shouldn\'t.',
+    detail: 'Trios with friends. Ash main — dash in, regret later.',
     gradient: 'from-orange-800 via-amber-950 to-neutral-950',
     accent: 'text-orange-300',
-    image: '/apex.jpg',
+    image: '/apex.avif',
+    video: '/apex.mp4',
   },
   {
     name: 'FIFA',
@@ -42,6 +44,7 @@ const games = [
     gradient: 'from-emerald-800 via-teal-950 to-neutral-950',
     accent: 'text-emerald-300',
     image: '/fifa.jpg',
+    video: '/fifa.mp4',
   },
 ]
 
@@ -50,6 +53,90 @@ const timeline = [
   { year: '2023 — now',  title: 'Freelance Designer',      org: 'Various',   note: 'Mellow, Blue Whistle, Blubees.' },
   { year: '2017 – 2021', title: 'B.E. Computer Science',   org: '', note: 'Stumbled into design, never looked back.' },
 ]
+
+function GameCard({ game, index }: { game: (typeof games)[number]; index: number }) {
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  const handleEnter = () => {
+    const v = videoRef.current
+    if (!v) return
+    v.currentTime = 0
+    v.muted = false
+    v.volume = 0.5
+    v.play().catch(() => {
+      // some browsers block audio autoplay; fall back to muted
+      v.muted = true
+      v.play().catch(() => {})
+    })
+  }
+
+  const handleLeave = () => {
+    const v = videoRef.current
+    if (!v) return
+    v.pause()
+    v.currentTime = 0
+  }
+
+  return (
+    <div className="group relative">
+      {game.name === 'FIFA' ? (
+        <div
+          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap text-center"
+          style={{ fontFamily: 'var(--font-caveat)' }}
+        >
+          <span
+            className="block text-base text-white/70 opacity-0 [transform:translateY(8px)_rotate(-6deg)] group-hover:opacity-100 group-hover:[transform:translateY(0)_rotate(-3deg)] transition-all duration-[450ms] ease-out drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]"
+          >
+            Ronaldo or Messi — they're better,
+          </span>
+          <span
+            className="block text-xl font-bold text-white opacity-0 [transform:translateY(10px)_rotate(6deg)] group-hover:opacity-100 group-hover:[transform:translateY(-2px)_rotate(-4deg)] transition-all duration-[550ms] delay-150 ease-out drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
+          >
+            but for me, it's always <span className="underline decoration-wavy decoration-yellow-300 underline-offset-4">Neymar</span>.
+          </span>
+        </div>
+      ) : null}
+
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ duration: 0.4, delay: index * 0.07 }}
+      whileHover={{ y: -4 }}
+      onMouseEnter={handleEnter}
+      onMouseLeave={handleLeave}
+      className="relative overflow-hidden rounded-2xl border border-border cursor-default"
+    >
+      {game.image ? (
+        <img
+          src={game.image}
+          alt={game.name}
+          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0"
+          style={{ objectPosition: game.name === 'Valorant' ? '75% 20%' : 'center center' }}
+        />
+      ) : null}
+      {game.video ? (
+        <video
+          ref={videoRef}
+          src={game.video}
+          playsInline
+          loop
+          preload="metadata"
+          className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        />
+      ) : null}
+      <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} ${game.image ? 'opacity-60' : 'opacity-90'} transition-opacity duration-300 group-hover:opacity-30`} />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.07),transparent_60%)]" />
+      <div className="relative flex flex-col gap-2 p-5 min-h-[160px] transition-opacity duration-300 group-hover:opacity-0">
+        <span className={`text-xs uppercase tracking-widest font-medium ${game.accent}`}>{game.tag}</span>
+        <span className="text-xl font-semibold tracking-tight text-white">{game.name}</span>
+        <p className="text-xs text-white/65 leading-relaxed mt-auto">{game.detail}</p>
+      </div>
+
+    </motion.div>
+    </div>
+  )
+}
 
 export default function AboutContent() {
   const [wordIdx, setWordIdx] = useState(0)
@@ -65,7 +152,7 @@ export default function AboutContent() {
     <div className="flex flex-col">
 
       {/* ── Hero ── */}
-      <section className="px-6 md:px-10 py-10 md:py-16 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-20 md:items-start">
+      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-20">
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-2xl">
             {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
@@ -104,7 +191,7 @@ export default function AboutContent() {
                       animate={{ y: 0, opacity: 1 }}
                       exit={{ y: '-100%', opacity: 0 }}
                       transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
-                      className={`inline-block whitespace-nowrap bg-clip-text text-transparent bg-gradient-to-r ${livingWords[wordIdx].gradient}`}
+                      className={`inline-block whitespace-nowrap text-shine ${livingWords[wordIdx].shine}`}
                     >
                       {livingWords[wordIdx].text}.
                     </motion.span>
@@ -132,17 +219,17 @@ export default function AboutContent() {
             transition={{ duration: 0.45, delay: 0.42 }}
             className="max-w-2xl text-sm text-foreground/60 leading-relaxed"
           >
-            I'm a Lead Product Designer based in Chennai. As a kid I took apart
-            remotes and broke OS installs — turns out I just liked figuring out
-            how things work. Design is where I do that for a living. These days
-            I lead design at Facilio, building AI-native tools for facilities
-            teams, turning messy B2B problems into things that feel obvious. I
-            care about craft, not about taking myself too seriously. Off the
-            clock, you'll find me in ranked queue or watching football.
+            As a kid I took apart remotes and broke OS installs — turns out I
+            just liked figuring out how things work. Design is where I do that
+            for a living. These days I lead design at Facilio, building AI-native
+            tools for facilities teams, turning messy B2B problems into things
+            that feel obvious. I care about craft, not about taking myself too
+            seriously. Off the clock, you'll find me in ranked queue or watching
+            football.
           </motion.p>
         </div>
 
-        <div className="flex flex-col gap-4">
+        <div className="flex flex-col gap-4 md:justify-end">
           <div className="flex flex-col">
             {timeline.map((item, i) => (
               <motion.div
@@ -182,7 +269,7 @@ export default function AboutContent() {
       </div>
 
       {/* ── Off the clock ── */}
-      <section className="px-5 md:px-10 py-12 md:py-16 border-b border-border flex flex-col gap-6">
+      <section className="p-6 md:p-10 border-b border-border flex flex-col gap-6">
         <div className="flex flex-col gap-2">
           <motion.p
             initial={{ opacity: 0, y: 8 }}
@@ -209,57 +296,24 @@ export default function AboutContent() {
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
           {games.map((game, i) => (
-            <motion.div
-              key={game.name}
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.4, delay: i * 0.07 }}
-              whileHover={{ y: -4 }}
-              className="group relative overflow-hidden rounded-2xl border border-border cursor-default"
-            >
-              {game.image ? (
-                <img
-                  src={game.image}
-                  alt={game.name}
-                  className="absolute inset-0 w-full h-full object-cover"
-                  style={{ objectPosition: game.name === 'Valorant' ? '75% 20%' : 'center center' }}
-                />
-              ) : null}
-              <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} ${game.image ? 'opacity-60' : 'opacity-90'}`} />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.07),transparent_60%)]" />
-              <div className="relative flex flex-col gap-2 p-5 min-h-[160px]">
-                <span className={`text-xs uppercase tracking-widest font-medium ${game.accent}`}>{game.tag}</span>
-                <span className="text-xl font-semibold tracking-tight text-white">{game.name}</span>
-                <p className="text-xs text-white/65 leading-relaxed mt-auto">{game.detail}</p>
-              </div>
-            </motion.div>
+            <GameCard key={game.name} game={game} index={i} />
           ))}
         </div>
       </section>
 
       {/* ── Connect ── */}
-      <section className="px-5 md:px-10 py-12 md:py-16">
+      <section className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-10 md:gap-20 md:items-center">
         <div className="flex flex-col gap-4">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xs tracking-widest uppercase text-muted-foreground"
-          >
-            Say hi
-          </motion.p>
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.4, delay: 0.06 }}
-            className="text-2xl md:text-3xl font-medium tracking-tight leading-[1.2]"
+            className="text-2xl md:text-3xl font-medium tracking-tight leading-[1.2] max-w-2xl"
           >
-            Let's build something{' '}
+            You made it this far.{' '}
             <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground/60">
-              together.
+              Reach out — say hi.
             </em>
           </motion.h2>
           <motion.div
@@ -283,6 +337,28 @@ export default function AboutContent() {
             </a>
           </motion.div>
         </div>
+
+        {/* Now-playing — Spotify */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.45, delay: 0.18 }}
+          className="flex flex-col gap-3 w-full md:max-w-sm md:ml-auto"
+        >
+          <iframe
+            data-testid="embed-iframe"
+            style={{ borderRadius: 12 }}
+            src="https://open.spotify.com/embed/track/612bl0KHzyyxEhPzuMqM6e?utm_source=generator"
+            width="100%"
+            height="152"
+            frameBorder={0}
+            allowFullScreen
+            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+            loading="lazy"
+            title="Golden Brown — The Stranglers"
+          />
+        </motion.div>
       </section>
 
     </div>

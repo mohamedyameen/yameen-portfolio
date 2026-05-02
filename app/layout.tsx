@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
-import { Playfair_Display } from 'next/font/google'
+import { Playfair_Display, Caveat } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import Sidebar from '@/components/layout/Sidebar'
 import PageTransition from '@/components/layout/PageTransition'
@@ -19,6 +19,12 @@ const playfair = Playfair_Display({
   variable: '--font-playfair',
 })
 
+const caveat = Caveat({
+  subsets: ['latin'],
+  weight: ['400', '600', '700'],
+  variable: '--font-caveat',
+})
+
 export const metadata: Metadata = {
   title: {
     default: 'Yameen · Lead Product Designer',
@@ -30,7 +36,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${geistSans.variable} ${playfair.variable}`}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${geistSans.variable} ${playfair.variable} ${caveat.variable}`}>
       <body className="bg-background text-foreground">
         <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme">
           <TooltipProvider delayDuration={150}>
