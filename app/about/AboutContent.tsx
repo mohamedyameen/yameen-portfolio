@@ -127,10 +127,10 @@ const photos = [
 ]
 
 const stackPositions = [
-  { rotate: -3, x: 0,   y: 0 },
-  { rotate: 6,  x: 8,   y: 6 },
-  { rotate: -8, x: -10, y: 10 },
-  { rotate: 9,  x: 6,   y: 14 },
+  { rotate: -3, x: 0,   y: -7 },
+  { rotate: 6,  x: 8,   y: -1 },
+  { rotate: -8, x: -10, y: 3 },
+  { rotate: 9,  x: 6,   y: 7 },
 ]
 
 function PhotoStack() {
@@ -337,7 +337,7 @@ export default function AboutContent() {
       <AnimatePresence>{isPlaying && <FallingLeaves />}</AnimatePresence>
 
       {/* ── Hero ── */}
-      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-16">
+      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-6 md:gap-16">
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-2xl">
             {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
