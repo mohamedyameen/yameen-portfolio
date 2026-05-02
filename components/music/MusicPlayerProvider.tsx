@@ -20,6 +20,8 @@ type MusicPlayerContextValue = {
   isPlaying: boolean
   hasStarted: boolean
   dismissed: boolean
+  inlineInView: boolean
+  setInlineInView: (v: boolean) => void
   toggle: () => void
   play: () => void
   pause: () => void
@@ -39,6 +41,7 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
   const [isPlaying, setIsPlaying] = useState(false)
   const [hasStarted, setHasStarted] = useState(false)
   const [dismissed, setDismissed] = useState(false)
+  const [inlineInView, setInlineInView] = useState(true)
 
   useEffect(() => {
     const audio = audioRef.current
@@ -79,7 +82,17 @@ export function MusicPlayerProvider({ children }: { children: React.ReactNode })
 
   return (
     <MusicPlayerContext.Provider
-      value={{ isPlaying, hasStarted, dismissed, toggle, play, pause, close }}
+      value={{
+        isPlaying,
+        hasStarted,
+        dismissed,
+        inlineInView,
+        setInlineInView,
+        toggle,
+        play,
+        pause,
+        close,
+      }}
     >
       <audio ref={audioRef} src={TRACK.src} preload="metadata" loop />
       {children}

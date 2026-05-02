@@ -3,6 +3,7 @@
 import { motion, AnimatePresence } from 'framer-motion'
 import { Pause, Play, X } from 'lucide-react'
 import { usePathname } from 'next/navigation'
+import { useEffect, useRef } from 'react'
 import { TRACK, useMusicPlayer } from './MusicPlayerProvider'
 
 const MORPH = {
@@ -66,9 +67,29 @@ function PlayerBody({ withClose = false }: { withClose?: boolean }) {
 }
 
 export function InlineMusicPlayer() {
+  const { setInlineInView, inlineInView } = useMusicPlayer()
+  const ref = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setInlineInView(entry.isIntersecting),
+      { rootMargin: '-40px 0px 0px 0px', threshold: 0 },
+    )
+    observer.observe(el)
+    return () => {
+      observer.disconnect()
+      setInlineInView(true)
+    }
+  }, [setInlineInView])
+
   return (
     <motion.div
-      layoutId="music-player"
+      ref={ref}
+      // Only own the shared layoutId while in view; releases ownership when scrolled
+      // off so the floating sheet can claim it without conflict.
+      layoutId={inlineInView ? 'music-player' : undefined}
       transition={MORPH}
       className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3"
     >
@@ -79,19 +100,24 @@ export function InlineMusicPlayer() {
 
 export function FloatingMusicPlayer() {
   const pathname = usePathname()
-  const { hasStarted, dismissed } = useMusicPlayer()
-  const visible = hasStarted && !dismissed && pathname !== '/about'
+  const { hasStarted, dismissed, inlineInView } = useMusicPlayer()
+  const visible =
+    hasStarted && !dismissed && (pathname !== '/about' || !inlineInView)
+  const onAbout = pathname === '/about'
 
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
           key="floating-player"
-          layoutId="music-player"
+          // Only share the morph id off-/about. On /about the trigger is scroll,
+          // not a route change — slide it up from the bottom instead of morphing
+          // from the inline pill's offscreen rect.
+          layoutId={onAbout ? undefined : 'music-player'}
           transition={MORPH}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0, transition: { duration: 0.22, ease: 'easeOut' } }}
+          initial={onAbout ? { opacity: 0, y: 24 } : false}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: 24, transition: { duration: 0.22, ease: 'easeOut' } }}
           // Centering via motion x so it doesn't conflict with framer's transform during layoutId animations.
           style={{ x: '-50%', paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
           className="fixed bottom-4 left-1/2 z-40 flex w-[min(360px,calc(100vw-2rem))] items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card/90 p-3 shadow-xl backdrop-blur-md lg:left-[calc(50%+9rem)]"
