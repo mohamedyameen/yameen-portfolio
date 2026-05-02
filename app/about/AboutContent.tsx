@@ -6,11 +6,11 @@ import { ArrowUpRight } from 'lucide-react'
 import { Marquee } from '@/components/ui/marquee'
 
 const livingWords = [
-  { text: 'living', gradient: 'from-emerald-200 via-emerald-300 to-emerald-400', emoji: '🌿', tilt: 14 },
-  { text: 'reason', gradient: 'from-sky-200 via-sky-300 to-sky-400',             emoji: '💡', tilt: -12 },
-  { text: 'kick',   gradient: 'from-orange-200 via-orange-300 to-orange-400',    emoji: '⚽', tilt: 18 },
-  { text: 'laugh',  gradient: 'from-pink-200 via-pink-300 to-pink-400',          emoji: '😆', tilt: -16 },
-  { text: 'vibe',   gradient: 'from-violet-200 via-violet-300 to-violet-400',    emoji: '✨', tilt: 12 },
+  { text: 'living', gradient: 'from-emerald-500 via-emerald-600 to-emerald-700 dark:from-emerald-200 dark:via-emerald-300 dark:to-emerald-400', emoji: '🌿', tilt: 14 },
+  { text: 'spark',  gradient: 'from-sky-500 via-sky-600 to-sky-700 dark:from-sky-200 dark:via-sky-300 dark:to-sky-400',                         emoji: '💡', tilt: -12 },
+  { text: 'kick',   gradient: 'from-orange-500 via-orange-600 to-orange-700 dark:from-orange-200 dark:via-orange-300 dark:to-orange-400',       emoji: '⚽', tilt: 18 },
+  { text: 'laugh',  gradient: 'from-pink-500 via-pink-600 to-pink-700 dark:from-pink-200 dark:via-pink-300 dark:to-pink-400',                   emoji: '😆', tilt: -16 },
+  { text: 'vibe',   gradient: 'from-violet-500 via-violet-600 to-violet-700 dark:from-violet-200 dark:via-violet-300 dark:to-violet-400',       emoji: '✨', tilt: 12 },
 ]
 
 const interests = [
@@ -117,7 +117,7 @@ export default function AboutContent() {
                     animate={{ y: 0, x: 0, rotate: livingWords[wordIdx].tilt, scale: 1, opacity: 1 }}
                     exit={{ y: -18, x: 14, rotate: 40, scale: 0.5, opacity: 0 }}
                     transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-                    className="pointer-events-none select-none absolute -top-3 -right-7 text-2xl md:text-[1.5rem]"
+                    className="pointer-events-none select-none absolute -top-3 -right-4 text-2xl md:text-[1.5rem]"
                     aria-hidden
                   >
                     {livingWords[wordIdx].emoji}
