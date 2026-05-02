@@ -1,8 +1,8 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRight, Pause, Play } from 'lucide-react'
 import { Marquee } from '@/components/ui/marquee'
 
 const livingWords = [
@@ -48,11 +48,193 @@ const games = [
   },
 ]
 
-const timeline = [
-  { year: '2022 — now',  title: 'Lead Product Designer',  org: 'Facilio',   note: 'AI agents, design systems, complex B2B workflows.' },
-  { year: '2023 — now',  title: 'Freelance Designer',      org: 'Various',   note: 'Mellow, Blue Whistle, Blubees.' },
-  { year: '2017 – 2021', title: 'B.E. Computer Science',   org: '', note: 'Stumbled into design, never looked back.' },
+function MinimalMusicPlayer({
+  src,
+  art,
+  title,
+  artist,
+  onPlayingChange,
+}: {
+  src: string
+  art: string
+  title: string
+  artist: string
+  onPlayingChange: (playing: boolean) => void
+}) {
+  const audioRef = useRef<HTMLAudioElement>(null)
+  const [isPlaying, setIsPlaying] = useState(false)
+
+  useEffect(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    const onPlay = () => { setIsPlaying(true); onPlayingChange(true) }
+    const onPause = () => { setIsPlaying(false); onPlayingChange(false) }
+    audio.addEventListener('play', onPlay)
+    audio.addEventListener('pause', onPause)
+    return () => {
+      audio.removeEventListener('play', onPlay)
+      audio.removeEventListener('pause', onPause)
+    }
+  }, [onPlayingChange])
+
+  const toggle = () => {
+    const audio = audioRef.current
+    if (!audio) return
+    if (audio.paused) audio.play().catch(() => {})
+    else audio.pause()
+  }
+
+  return (
+    <div className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3">
+      <audio ref={audioRef} src={src} preload="metadata" loop />
+
+      {/* Very subtle album-art tint */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-[0.12] dark:opacity-[0.18]"
+        style={{ backgroundImage: `url(${art})`, filter: 'blur(40px)' }}
+      />
+
+      <div className="relative size-7 flex-shrink-0 grid place-items-center rounded-full bg-background border border-border text-sm">
+        <span aria-hidden>🍁</span>
+      </div>
+
+      <div className="relative flex min-w-0 flex-1 items-baseline gap-1.5">
+        <span className="truncate text-sm font-medium text-foreground">{title}</span>
+        <span className="truncate text-xs text-muted-foreground">· {artist}</span>
+      </div>
+
+      <button
+        onClick={toggle}
+        aria-label={isPlaying ? 'Pause' : 'Play'}
+        className="relative grid size-8 flex-shrink-0 place-items-center rounded-full text-foreground hover:bg-accent transition-colors"
+      >
+        {isPlaying ? (
+          <Pause size={14} fill="currentColor" />
+        ) : (
+          <Play size={14} fill="currentColor" className="translate-x-[1px]" />
+        )}
+      </button>
+    </div>
+  )
+}
+
+const photos = [
+  { src: '/valorant.jpg',     caption: 'Ranked queue' },
+  { src: '/apex.avif',        caption: 'Trios night' },
+  { src: '/fifa.jpg',         caption: 'FUT Saturday' },
+  { src: '/golden-brown.png', caption: 'On loop' },
 ]
+
+const stackPositions = [
+  { rotate: -3, x: 0,   y: 0 },
+  { rotate: 6,  x: 8,   y: 6 },
+  { rotate: -8, x: -10, y: 10 },
+  { rotate: 9,  x: 6,   y: 14 },
+]
+
+function PhotoStack() {
+  const [topIdx, setTopIdx] = useState(0)
+
+  useEffect(() => {
+    const id = setInterval(() => {
+      setTopIdx((i) => (i + 1) % photos.length)
+    }, 3500)
+    return () => clearInterval(id)
+  }, [])
+
+  return (
+    <div className="relative h-[260px] md:h-[290px] w-full">
+      {photos.map((photo, i) => {
+        const offset = (i - topIdx + photos.length) % photos.length
+        const pos = stackPositions[offset]
+        return (
+          <motion.div
+            key={photo.src}
+            initial={false}
+            animate={{
+              rotate: pos.rotate,
+              x: pos.x,
+              y: pos.y,
+              zIndex: photos.length - offset,
+            }}
+            transition={{ duration: 0.7, ease: [0.34, 1.2, 0.64, 1] }}
+            whileHover={{ scale: 1.04, y: pos.y - 4 }}
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border p-2 pb-7 rounded-xl shadow-md cursor-pointer"
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={photo.src}
+              alt={photo.caption}
+              className="block w-36 h-36 md:w-40 md:h-40 object-cover bg-muted rounded-lg"
+            />
+            <span
+              className="absolute bottom-1 left-2 right-2 text-center text-sm text-muted-foreground"
+              style={{ fontFamily: 'var(--font-caveat)' }}
+            >
+              {photo.caption}
+            </span>
+          </motion.div>
+        )
+      })}
+    </div>
+  )
+}
+
+function FallingLeaves() {
+  const leaves = useMemo(
+    () =>
+      Array.from({ length: 22 }).map((_, i) => ({
+        id: i,
+        left: Math.random() * 100,
+        delay: Math.random() * 6,
+        duration: 7 + Math.random() * 7,
+        size: 16 + Math.random() * 18,
+        rotateStart: Math.random() * 360,
+        rotateEnd: Math.random() * 720 - 360,
+        drift: (Math.random() - 0.5) * 30,
+        emoji: ['🍁', '🍂'][Math.floor(Math.random() * 2)],
+      })),
+    [],
+  )
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      transition={{ duration: 1.1, ease: 'easeInOut' }}
+      className="pointer-events-none fixed inset-0 z-[60] overflow-hidden"
+    >
+      {leaves.map((leaf) => (
+        <motion.span
+          key={leaf.id}
+          initial={{ y: '-12vh', x: 0, opacity: 0, rotate: leaf.rotateStart }}
+          animate={{
+            y: '112vh',
+            x: `${leaf.drift}vw`,
+            opacity: [0, 1, 1, 0],
+            rotate: leaf.rotateEnd,
+          }}
+          transition={{
+            duration: leaf.duration,
+            delay: leaf.delay,
+            repeat: Infinity,
+            ease: 'linear',
+            opacity: { times: [0, 0.1, 0.9, 1], duration: leaf.duration, repeat: Infinity, delay: leaf.delay, ease: 'linear' },
+          }}
+          style={{
+            position: 'absolute',
+            left: `${leaf.left}%`,
+            fontSize: `${leaf.size}px`,
+          }}
+        >
+          {leaf.emoji}
+        </motion.span>
+      ))}
+    </motion.div>
+  )
+}
 
 function GameCard({ game, index }: { game: (typeof games)[number]; index: number }) {
   const videoRef = useRef<HTMLVideoElement>(null)
@@ -85,14 +267,14 @@ function GameCard({ game, index }: { game: (typeof games)[number]; index: number
           style={{ fontFamily: 'var(--font-caveat)' }}
         >
           <span
-            className="block text-base text-white/70 opacity-0 [transform:translateY(8px)_rotate(-6deg)] group-hover:opacity-100 group-hover:[transform:translateY(0)_rotate(-3deg)] transition-all duration-[450ms] ease-out drop-shadow-[0_1px_8px_rgba(0,0,0,0.5)]"
+            className="block text-base text-muted-foreground opacity-0 [transform:translateY(8px)_rotate(-6deg)] group-hover:opacity-100 group-hover:[transform:translateY(0)_rotate(-3deg)] transition-all duration-[450ms] ease-out"
           >
             Ronaldo or Messi — they're better,
           </span>
           <span
-            className="block text-xl font-bold text-white opacity-0 [transform:translateY(10px)_rotate(6deg)] group-hover:opacity-100 group-hover:[transform:translateY(-2px)_rotate(-4deg)] transition-all duration-[550ms] delay-150 ease-out drop-shadow-[0_2px_10px_rgba(0,0,0,0.6)]"
+            className="block text-xl font-bold text-foreground opacity-0 [transform:translateY(10px)_rotate(6deg)] group-hover:opacity-100 group-hover:[transform:translateY(-2px)_rotate(-4deg)] transition-all duration-[550ms] delay-150 ease-out"
           >
-            but for me, it's always <span className="underline decoration-wavy decoration-yellow-300 underline-offset-4">Neymar</span>.
+            but for me, it's always <span className="underline decoration-wavy decoration-amber-500 dark:decoration-yellow-300 underline-offset-4">Neymar</span>.
           </span>
         </div>
       ) : null}
@@ -140,6 +322,7 @@ function GameCard({ game, index }: { game: (typeof games)[number]; index: number
 
 export default function AboutContent() {
   const [wordIdx, setWordIdx] = useState(0)
+  const [isPlaying, setIsPlaying] = useState(false)
 
   useEffect(() => {
     const id = setInterval(() => {
@@ -151,8 +334,10 @@ export default function AboutContent() {
   return (
     <div className="flex flex-col">
 
+      <AnimatePresence>{isPlaying && <FallingLeaves />}</AnimatePresence>
+
       {/* ── Hero ── */}
-      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-20">
+      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-12 md:gap-16 md:items-center">
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-2xl">
             {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
@@ -220,37 +405,18 @@ export default function AboutContent() {
             className="max-w-2xl text-sm text-foreground/60 leading-relaxed"
           >
             As a kid I took apart remotes and broke OS installs — turns out I
-            just liked figuring out how things work. Design is where I do that
-            for a living. These days I lead design at Facilio, building AI-native
-            tools for facilities teams, turning messy B2B problems into things
-            that feel obvious. I care about craft, not about taking myself too
+            just liked figuring out how things work. Did a computer science
+            engineering degree, then drifted into design — where logic and feel
+            finally clicked. These days I'm at Facilio, building AI-native tools
+            for facilities teams, turning messy B2B problems into things that
+            feel obvious. I care about craft, not about taking myself too
             seriously. Off the clock, you'll find me in ranked queue or watching
             football.
           </motion.p>
         </div>
 
-        <div className="flex flex-col gap-4 md:justify-end">
-          <div className="flex flex-col">
-            {timeline.map((item, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: -12 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: 0.55 + i * 0.07 }}
-                className="grid grid-cols-[100px_1fr] gap-4 py-4 border-t border-border first:border-t-0"
-              >
-                <span className="text-xs text-muted-foreground pt-0.5">{item.year}</span>
-                <div className="flex flex-col gap-0.5">
-                  <span className="text-sm font-medium text-foreground">
-                    {item.title}
-                    {item.org && <span className="text-muted-foreground/60"> · {item.org}</span>}
-                  </span>
-                  <span className="text-xs text-foreground/50 leading-relaxed">{item.note}</span>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
+        <PhotoStack />
+
       </section>
 
       {/* ── Marquee ── */}
@@ -302,8 +468,8 @@ export default function AboutContent() {
       </section>
 
       {/* ── Connect ── */}
-      <section className="p-6 md:p-10 grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-10 md:gap-20 md:items-center">
-        <div className="flex flex-col gap-4">
+      <section className="p-6 md:p-10 flex flex-col gap-4">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <motion.h2
             initial={{ opacity: 0, y: 12 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -316,48 +482,43 @@ export default function AboutContent() {
               Reach out — say hi.
             </em>
           </motion.h2>
+
           <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
+            initial={{ opacity: 0, y: 12 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.12 }}
-            className="flex flex-col gap-2 text-sm"
+            transition={{ duration: 0.45, delay: 0.18 }}
+            className="w-full md:max-w-[320px] md:flex-shrink-0"
           >
-            <a href="mailto:mohamedyameen1999@gmail.com" className="group flex items-center gap-1.5 text-foreground hover:text-foreground/60 transition-colors w-fit">
-              mohamedyameen1999@gmail.com
-              <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
-            <a href="https://linkedin.com/in/mohamed-yameen-83681315a" target="_blank" rel="noopener noreferrer"
-              className="group flex items-center gap-1.5 text-foreground hover:text-foreground/60 transition-colors w-fit">
-              LinkedIn
-              <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-            </a>
-            <a href="tel:+919940677476" className="text-foreground hover:text-foreground/60 transition-colors w-fit">
-              +91 99406 77476
-            </a>
+            <MinimalMusicPlayer
+              src="/golden-brown.mp3"
+              art="/golden-brown.png"
+              title="Golden Brown"
+              artist="The Stranglers"
+              onPlayingChange={setIsPlaying}
+            />
           </motion.div>
         </div>
 
-        {/* Now-playing — Spotify */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          whileInView={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.45, delay: 0.18 }}
-          className="flex flex-col gap-3 w-full md:max-w-sm md:ml-auto"
+          transition={{ duration: 0.4, delay: 0.12 }}
+          className="flex flex-col gap-2 text-sm"
         >
-          <iframe
-            data-testid="embed-iframe"
-            style={{ borderRadius: 12 }}
-            src="https://open.spotify.com/embed/track/612bl0KHzyyxEhPzuMqM6e?utm_source=generator"
-            width="100%"
-            height="152"
-            frameBorder={0}
-            allowFullScreen
-            allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
-            loading="lazy"
-            title="Golden Brown — The Stranglers"
-          />
+          <a href="mailto:mohamedyameen1999@gmail.com" className="group flex items-center gap-1.5 text-foreground hover:text-foreground/60 transition-colors w-fit">
+            mohamedyameen1999@gmail.com
+            <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
+          <a href="https://linkedin.com/in/mohamed-yameen-83681315a" target="_blank" rel="noopener noreferrer"
+            className="group flex items-center gap-1.5 text-foreground hover:text-foreground/60 transition-colors w-fit">
+            LinkedIn
+            <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
+          </a>
+          <a href="tel:+919940677476" className="text-foreground hover:text-foreground/60 transition-colors w-fit">
+            +91 99406 77476
+          </a>
         </motion.div>
       </section>
 
