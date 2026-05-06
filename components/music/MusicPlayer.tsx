@@ -67,8 +67,8 @@ function PlayerBody({ withClose = false }: { withClose?: boolean }) {
 }
 
 export function InlineMusicPlayer() {
-  const { setInlineInView, inlineInView } = useMusicPlayer()
-  const ref = useRef<HTMLDivElement>(null)
+  const { setInlineInView, isPlaying, toggle } = useMusicPlayer()
+  const ref = useRef<HTMLSpanElement>(null)
 
   useEffect(() => {
     const el = ref.current
@@ -85,16 +85,28 @@ export function InlineMusicPlayer() {
   }, [setInlineInView])
 
   return (
-    <motion.div
+    <span
       ref={ref}
-      // Only own the shared layoutId while in view; releases ownership when scrolled
-      // off so the floating sheet can claim it without conflict.
-      layoutId={inlineInView ? 'music-player' : undefined}
-      transition={MORPH}
-      className="relative flex items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card p-3"
+      className="chip-shine relative inline-flex items-center gap-1.5 rounded-full border border-amber-500/40 bg-amber-500/[0.08] py-0.5 pl-1 pr-0.5 align-middle select-none shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_6px_20px_-6px_rgba(245,158,11,0.35)] hover:bg-amber-500/[0.12] hover:border-amber-500/60 transition-colors"
     >
-      <PlayerBody />
-    </motion.div>
+      <span aria-hidden className="text-sm leading-none flex-shrink-0 pl-0.5">
+        🍁
+      </span>
+      <span className="text-[13px] font-semibold text-foreground leading-none tracking-tight">
+        {TRACK.title}
+      </span>
+      <button
+        onClick={toggle}
+        aria-label={isPlaying ? 'Pause' : 'Play'}
+        className="grid size-5 place-items-center rounded-full bg-foreground text-background hover:bg-amber-500 hover:text-white transition-colors"
+      >
+        {isPlaying ? (
+          <Pause size={9} fill="currentColor" />
+        ) : (
+          <Play size={9} fill="currentColor" className="translate-x-[0.5px]" />
+        )}
+      </button>
+    </span>
   )
 }
 
@@ -120,7 +132,7 @@ export function FloatingMusicPlayer() {
           exit={{ opacity: 0, y: 24, transition: { duration: 0.22, ease: 'easeOut' } }}
           // Centering via motion x so it doesn't conflict with framer's transform during layoutId animations.
           style={{ x: '-50%', paddingBottom: 'calc(0.75rem + env(safe-area-inset-bottom))' }}
-          className="fixed bottom-4 left-1/2 z-40 flex w-[min(360px,calc(100vw-2rem))] items-center gap-3 overflow-hidden rounded-2xl border border-border bg-card/90 p-3 shadow-xl backdrop-blur-md lg:left-[calc(50%+9rem)]"
+          className="chip-shine fixed bottom-4 left-1/2 z-40 flex w-[min(360px,calc(100vw-2rem))] items-center gap-3 overflow-hidden rounded-2xl border border-amber-500/40 bg-card/90 p-3 shadow-xl backdrop-blur-md shadow-[0_0_0_1px_rgba(245,158,11,0.06),0_8px_32px_-8px_rgba(245,158,11,0.4)] lg:left-[calc(50%+9rem)]"
         >
           <PlayerBody withClose />
         </motion.div>

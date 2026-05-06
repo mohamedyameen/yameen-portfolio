@@ -164,3 +164,59 @@
 .dark .shine-orange  { --shine-base: #fb923c; --shine-light: #ffedd5; }
 .dark .shine-pink    { --shine-base: #f472b6; --shine-light: #fce7f3; }
 .dark .shine-violet  { --shine-base: #a78bfa; --shine-light: #ede9fe; }
+
+/* Intermittent golden sparkle around the inline music chip — idle most of
+   the time, then a quick conic sweep like an easter egg. */
+@property --chip-shine-angle {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+
+@keyframes chip-shine-rotate {
+  to { --chip-shine-angle: 360deg; }
+}
+
+@keyframes chip-shine-pulse {
+  0%, 70%, 100% { opacity: 0; }
+  78%, 94%      { opacity: 1; }
+}
+
+.chip-shine {
+  position: relative;
+  isolation: isolate;
+}
+
+.chip-shine::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: conic-gradient(
+    from var(--chip-shine-angle),
+    rgba(245, 158, 11, 0) 0deg,
+    rgba(245, 158, 11, 0) 270deg,
+    rgba(252, 211, 77, 0.7) 320deg,
+    rgba(252, 211, 77, 0.95) 340deg,
+    rgba(252, 211, 77, 0.7) 355deg,
+    rgba(245, 158, 11, 0) 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+          mask:
+    linear-gradient(#000 0 0) content-box,
+    linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+          mask-composite: exclude;
+  animation:
+    chip-shine-rotate 1.8s linear infinite,
+    chip-shine-pulse 9s ease-in-out infinite;
+  opacity: 0;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .chip-shine::before { animation: none; }
+}

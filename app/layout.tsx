@@ -8,7 +8,6 @@ import PageTransition from '@/components/layout/PageTransition'
 import SmoothScroll from '@/components/layout/SmoothScroll'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MusicPlayerProvider } from '@/components/music/MusicPlayerProvider'
-import { FloatingMusicPlayer } from '@/components/music/MusicPlayer'
 import { GlobalFallingLeaves } from '@/components/music/FallingLeaves'
 import './globals.css'
 
@@ -52,7 +51,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
                   <PageTransition>{children}</PageTransition>
                 </main>
-                <FloatingMusicPlayer />
               </LayoutGroup>
             </MusicPlayerProvider>
           </TooltipProvider>

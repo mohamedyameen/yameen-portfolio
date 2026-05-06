@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { ArrowUpRight } from 'lucide-react'
 import { Marquee } from '@/components/ui/marquee'
 import { InlineMusicPlayer } from '@/components/music/MusicPlayer'
 
+// ── Data ─────────────────────────────────────────────────────────
 const livingWords = [
   { text: 'living', shine: 'shine-emerald', emoji: '🌿', tilt: 14 },
   { text: 'spark',  shine: 'shine-sky',     emoji: '💡', tilt: -12 },
@@ -22,30 +22,24 @@ const interests = [
 const games = [
   {
     name: 'Valorant',
-    tag: 'Tactical FPS',
     detail: 'Ranked grinder. Duelist main, South Asia servers.',
-    gradient: 'from-rose-900 via-red-950 to-black',
-    accent: 'text-rose-300',
     image: '/valorant.jpg',
     video: '/valorant.mp4',
+    objectPosition: '75% 20%',
   },
   {
     name: 'Apex Legends',
-    tag: 'Battle Royale',
     detail: 'Trios with friends. Ash main — dash in, regret later.',
-    gradient: 'from-orange-800 via-amber-950 to-neutral-950',
-    accent: 'text-orange-300',
     image: '/apex.avif',
     video: '/apex.mp4',
+    objectPosition: 'center',
   },
   {
     name: 'FIFA',
-    tag: 'Football',
-    detail: 'Weekend League on FUT. It\'s basically a second job.',
-    gradient: 'from-emerald-800 via-teal-950 to-neutral-950',
-    accent: 'text-emerald-300',
+    detail: "Weekend League on FUT. Basically a second job.",
     image: '/fifa.jpg',
     video: '/fifa.mp4',
+    objectPosition: 'center',
   },
 ]
 
@@ -63,6 +57,7 @@ const stackPositions = [
   { rotate: 9,  x: 6,   y: 7 },
 ]
 
+// ── PhotoStack ───────────────────────────────────────────────────
 function PhotoStack() {
   const [topIdx, setTopIdx] = useState(0)
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
@@ -87,7 +82,7 @@ function PhotoStack() {
   }
 
   return (
-    <div className="relative h-[200px] md:h-[220px] w-full">
+    <div className="relative aspect-square w-full">
       {photos.map((photo, i) => {
         const offset = (i - topIdx + photos.length) % photos.length
         const pos = stackPositions[offset]
@@ -104,16 +99,18 @@ function PhotoStack() {
             transition={{ duration: 0.7, ease: [0.34, 1.2, 0.64, 1] }}
             whileHover={{ scale: 1.04, y: pos.y - 4 }}
             onClick={advance}
-            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 bg-card border border-border p-2 pb-7 rounded-xl shadow-md cursor-pointer"
+            className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[82%] aspect-square bg-card border border-border p-2 rounded-xl shadow-md cursor-pointer flex flex-col gap-1.5"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={photo.src}
-              alt={photo.caption}
-              className="block w-36 h-36 md:w-40 md:h-40 object-cover bg-muted rounded-lg"
-            />
+            <div className="flex-1 overflow-hidden rounded-lg bg-muted">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={photo.src}
+                alt={photo.caption}
+                className="block w-full h-full object-cover"
+              />
+            </div>
             <span
-              className="absolute bottom-1 left-2 right-2 text-center text-sm text-muted-foreground"
+              className="text-center text-[14px] text-muted-foreground leading-none pb-1"
               style={{ fontFamily: 'var(--font-caveat)' }}
             >
               {photo.caption}
@@ -125,102 +122,153 @@ function PhotoStack() {
   )
 }
 
-function GameCard({ game, index }: { game: (typeof games)[number]; index: number }) {
-  const videoRef = useRef<HTMLVideoElement>(null)
-  const [isActive, setIsActive] = useState(false)
+// ── GameVideo ────────────────────────────────────────────────────
+// Imperatively plays with audio; falls back to muted if the browser
+// blocks autoplay-with-sound for the current user-gesture context.
+function GameVideo({ src }: { src: string }) {
+  const ref = useRef<HTMLVideoElement>(null)
 
-  const startVideo = () => {
-    const v = videoRef.current
+  useEffect(() => {
+    const v = ref.current
     if (!v) return
     v.currentTime = 0
-    v.muted = false
     v.volume = 0.5
+    v.muted = false
     v.play().catch(() => {
       v.muted = true
       v.play().catch(() => {})
     })
-    setIsActive(true)
-  }
-
-  const stopVideo = () => {
-    const v = videoRef.current
-    if (!v) return
-    v.pause()
-    v.currentTime = 0
-    setIsActive(false)
-  }
-
-  const toggle = () => {
-    if (isActive) stopVideo()
-    else startVideo()
-  }
+  }, [src])
 
   return (
-    <div
-      className="group relative"
-      data-active={isActive ? 'true' : undefined}
-    >
-      {game.name === 'FIFA' ? (
-        <div
-          className="pointer-events-none absolute bottom-full left-1/2 z-20 mb-3 -translate-x-1/2 whitespace-nowrap text-center"
-          style={{ fontFamily: 'var(--font-caveat)' }}
-        >
-          <span
-            className="block text-base text-muted-foreground opacity-0 [transform:translateY(8px)_rotate(-6deg)] group-hover:opacity-100 group-hover:[transform:translateY(0)_rotate(-3deg)] group-data-[active=true]:opacity-100 group-data-[active=true]:[transform:translateY(0)_rotate(-3deg)] transition-all duration-[450ms] ease-out"
-          >
-            Ronaldo or Messi — they're better,
-          </span>
-          <span
-            className="block text-xl font-bold text-foreground opacity-0 [transform:translateY(10px)_rotate(6deg)] group-hover:opacity-100 group-hover:[transform:translateY(-2px)_rotate(-4deg)] group-data-[active=true]:opacity-100 group-data-[active=true]:[transform:translateY(-2px)_rotate(-4deg)] transition-all duration-[550ms] delay-150 ease-out"
-          >
-            but for me, it's always <span className="underline decoration-wavy decoration-amber-500 dark:decoration-yellow-300 underline-offset-4">Neymar</span>.
-          </span>
-        </div>
-      ) : null}
-
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.4, delay: index * 0.07 }}
-      whileHover={{ y: -4 }}
-      onMouseEnter={startVideo}
-      onMouseLeave={stopVideo}
-      onClick={toggle}
-      className="relative overflow-hidden rounded-2xl border border-border cursor-pointer"
-    >
-      {game.image ? (
-        <img
-          src={game.image}
-          alt={game.name}
-          className="absolute inset-0 w-full h-full object-cover transition-opacity duration-300 group-hover:opacity-0 group-data-[active=true]:opacity-0"
-          style={{ objectPosition: game.name === 'Valorant' ? '75% 20%' : 'center center' }}
-        />
-      ) : null}
-      {game.video ? (
-        <video
-          ref={videoRef}
-          src={game.video}
-          playsInline
-          loop
-          preload="metadata"
-          className="absolute inset-0 w-full h-full object-cover opacity-0 transition-opacity duration-300 group-hover:opacity-100 group-data-[active=true]:opacity-100"
-        />
-      ) : null}
-      <div className={`absolute inset-0 bg-gradient-to-br ${game.gradient} ${game.image ? 'opacity-60' : 'opacity-90'} transition-opacity duration-300 group-hover:opacity-30 group-data-[active=true]:opacity-30`} />
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_20%,rgba(255,255,255,0.07),transparent_60%)]" />
-      <div className="relative flex flex-col gap-2 p-5 min-h-[160px] transition-opacity duration-300 group-hover:opacity-0 group-data-[active=true]:opacity-0">
-        <span className={`text-xs uppercase tracking-widest font-medium ${game.accent}`}>{game.tag}</span>
-        <span className="text-xl font-semibold tracking-tight text-white">{game.name}</span>
-        <p className="text-xs text-white/65 leading-relaxed mt-auto">{game.detail}</p>
-      </div>
-
-    </motion.div>
-    </div>
+    <video
+      ref={ref}
+      src={src}
+      loop
+      playsInline
+      preload="metadata"
+      className="absolute inset-0 h-full w-full object-cover"
+    />
   )
 }
 
-export default function AboutContent() {
+// ── OffTheClock with single shared preview that travels between rows
+function OffTheClock() {
+  const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
+  const [lastIdx, setLastIdx] = useState(0)
+  const rowRefs = useRef<(HTMLLIElement | null)[]>([])
+
+  useEffect(() => {
+    if (hoveredIdx !== null) setLastIdx(hoveredIdx)
+  }, [hoveredIdx])
+
+  const targetIdx = hoveredIdx ?? lastIdx
+  const targetRow = rowRefs.current[targetIdx]
+  const previewY = targetRow
+    ? targetRow.offsetTop + targetRow.offsetHeight / 2
+    : 0
+  const tilt = targetIdx % 2 === 0 ? -4 : 4
+  const visible = hoveredIdx !== null
+  const activeGame = hoveredIdx !== null ? games[hoveredIdx] : null
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.45, delay: 0.74 }}
+      className="flex flex-col gap-4"
+    >
+      <p className="text-[15px] sm:text-base md:text-[17px] leading-relaxed text-foreground/75">
+        Most{' '}
+        <em
+          style={{ fontFamily: 'var(--font-playfair)' }}
+          className="italic font-bold text-foreground/85"
+        >
+          nights and weekends
+        </em>
+        , you&apos;ll find me deep in one of these —
+      </p>
+
+      <div className="relative">
+        <ul className="flex flex-col">
+          {games.map((g, i) => (
+            <li
+              key={g.name}
+              ref={(el) => { rowRefs.current[i] = el }}
+              onMouseEnter={() => setHoveredIdx(i)}
+              onMouseLeave={() => setHoveredIdx(null)}
+              onTouchStart={() => setHoveredIdx(i)}
+              onTouchEnd={() => setHoveredIdx(null)}
+              onTouchCancel={() => setHoveredIdx(null)}
+              className="group cursor-pointer border-b border-border/40 last:border-b-0 select-none"
+              data-active={hoveredIdx === i ? 'true' : undefined}
+            >
+              <div className="flex items-center gap-4 py-3">
+                <div className="relative h-16 w-24 flex-shrink-0 overflow-hidden rounded-[14px] border border-border">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={g.image}
+                    alt={g.name}
+                    className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+                    style={{ objectPosition: g.objectPosition }}
+                  />
+                </div>
+                <div className="flex flex-col gap-1 min-w-0 flex-1">
+                  <span className="text-[15px] sm:text-base font-medium text-foreground transition-colors">
+                    {g.name}
+                  </span>
+                  <span className="text-[13px] sm:text-sm text-foreground/55 leading-snug">
+                    {g.detail}
+                  </span>
+                </div>
+              </div>
+            </li>
+          ))}
+        </ul>
+
+        {/* Single shared preview — slides between rows, tilt alternates */}
+        <motion.div
+          aria-hidden
+          initial={false}
+          animate={{
+            opacity: visible ? 1 : 0,
+            scale: visible ? 1 : 0.92,
+            rotate: tilt,
+            y: previewY,
+          }}
+          transition={{
+            opacity: { duration: 0.22, ease: 'easeOut' },
+            scale: { duration: 0.4, ease: [0.22, 1, 0.36, 1] },
+            rotate: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+            y: { duration: 0.5, ease: [0.22, 1, 0.36, 1] },
+          }}
+          className="pointer-events-none absolute right-2 sm:right-4 top-0 z-10"
+        >
+          <div className="-translate-y-1/2 w-44 sm:w-72 aspect-[4/3] overflow-hidden rounded-2xl sm:rounded-3xl border border-border bg-card shadow-2xl shadow-black/40 relative">
+            <AnimatePresence mode="wait">
+              {activeGame && (
+                <motion.div
+                  key={activeGame.name}
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="absolute inset-0"
+                >
+                  <GameVideo src={activeGame.video} />
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
+      </div>
+    </motion.div>
+  )
+}
+
+
+// ── Animated headline ────────────────────────────────────────────
+function AnimatedHeadline() {
   const [wordIdx, setWordIdx] = useState(0)
 
   useEffect(() => {
@@ -231,188 +279,178 @@ export default function AboutContent() {
   }, [])
 
   return (
-    <div className="flex flex-col">
-
-      {/* ── Hero ── */}
-      <section className="p-6 md:p-10 border-b border-border grid grid-cols-1 md:grid-cols-[1.3fr_0.9fr] gap-6 md:gap-16">
-        <div className="flex flex-col gap-6">
-          <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] max-w-2xl">
-            {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
+    <h1 className="text-3xl md:text-4xl font-medium tracking-tight leading-[1.2] w-full text-balance">
+      <span className="block">
+        {['Hey,', "I'm", 'Yameen.'].map((word, i) => (
+          <motion.span
+            key={i}
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.45, delay: 0.08 + i * 0.06 }}
+            className="inline-block mr-[0.25em]"
+          >
+            {word}
+          </motion.span>
+        ))}
+      </span>
+      <motion.span
+        initial={{ opacity: 0, y: 14 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.45, delay: 0.28 }}
+        className="block text-muted-foreground"
+      >
+        I{' '}
+        <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground">
+          design
+        </em>{' '}
+        things for a{' '}
+        <span
+          className="relative inline-block"
+          style={{ marginLeft: '0.15em' }}
+        >
+          <span className="inline-block" style={{ clipPath: 'inset(0)', lineHeight: 1.2 }}>
+            <AnimatePresence mode="wait" initial={false}>
               <motion.span
-                key={i}
-                initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.45, delay: 0.08 + i * 0.06 }}
-                className="inline-block mr-[0.25em]"
+                key={livingWords[wordIdx].text}
+                initial={{ y: '100%', opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                exit={{ y: '-100%', opacity: 0 }}
+                transition={{ duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
+                className={`inline-block whitespace-nowrap text-shine ${livingWords[wordIdx].shine}`}
               >
-                {word}
+                {livingWords[wordIdx].text}.
               </motion.span>
-            ))}
-            <br />
+            </AnimatePresence>
+          </span>
+          <AnimatePresence mode="wait" initial={false}>
             <motion.span
-              initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.45, delay: 0.28 }}
-              className="inline-block text-muted-foreground"
+              key={livingWords[wordIdx].text + '-emoji'}
+              initial={{ y: 14, x: -10, rotate: -30, scale: 0.4, opacity: 0 }}
+              animate={{ y: 0, x: 0, rotate: livingWords[wordIdx].tilt, scale: 1, opacity: 1 }}
+              exit={{ y: -18, x: 14, rotate: 40, scale: 0.5, opacity: 0 }}
+              transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
+              className="pointer-events-none select-none absolute -top-3 -right-3 sm:-right-4 text-xl sm:text-2xl md:text-[1.5rem]"
+              aria-hidden
             >
-              I{' '}
-              <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground">
-                design
-              </em>{' '}
-              things for a{' '}
-              <span
-                className="relative inline-block"
-                style={{ marginLeft: '0.15em' }}
-              >
-                <span
-                  className="inline-block"
-                  style={{ clipPath: 'inset(0)', lineHeight: 1.2 }}
-                >
-                  <AnimatePresence mode="wait" initial={false}>
-                    <motion.span
-                      key={livingWords[wordIdx].text}
-                      initial={{ y: '100%', opacity: 0 }}
-                      animate={{ y: 0, opacity: 1 }}
-                      exit={{ y: '-100%', opacity: 0 }}
-                      transition={{ duration: 0.45, ease: [0.65, 0, 0.35, 1] }}
-                      className={`inline-block whitespace-nowrap text-shine ${livingWords[wordIdx].shine}`}
-                    >
-                      {livingWords[wordIdx].text}.
-                    </motion.span>
-                  </AnimatePresence>
-                </span>
-                <AnimatePresence mode="wait" initial={false}>
-                  <motion.span
-                    key={livingWords[wordIdx].text + '-emoji'}
-                    initial={{ y: 14, x: -10, rotate: -30, scale: 0.4, opacity: 0 }}
-                    animate={{ y: 0, x: 0, rotate: livingWords[wordIdx].tilt, scale: 1, opacity: 1 }}
-                    exit={{ y: -18, x: 14, rotate: 40, scale: 0.5, opacity: 0 }}
-                    transition={{ duration: 0.5, ease: [0.34, 1.56, 0.64, 1] }}
-                    className="pointer-events-none select-none absolute -top-3 -right-4 text-2xl md:text-[1.5rem]"
-                    aria-hidden
-                  >
-                    {livingWords[wordIdx].emoji}
-                  </motion.span>
-                </AnimatePresence>
-              </span>
+              {livingWords[wordIdx].emoji}
             </motion.span>
-          </h1>
+          </AnimatePresence>
+        </span>
+      </motion.span>
+    </h1>
+  )
+}
 
-          <motion.p
-            initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.45, delay: 0.42 }}
-            className="max-w-2xl text-sm text-foreground/60 leading-relaxed"
-          >
-            As a kid I took apart remotes and broke OS installs — turns out I
-            just liked figuring out how things work. Did a computer science
-            engineering degree, then drifted into design — where logic and feel
-            finally clicked. These days I'm at Facilio, building AI-native tools
-            for facilities teams, turning messy B2B problems into things that
-            feel obvious. I care about craft, not about taking myself too
-            seriously. Off the clock, you'll find me in ranked queue or watching
-            football.
-          </motion.p>
+// ── Page ─────────────────────────────────────────────────────────
+export default function AboutContent() {
+  return (
+    <div className="flex flex-col">
+      {/* ── Info ── */}
+      <section className="px-5 sm:px-6 md:px-10 py-10 sm:py-12 md:py-16 w-full">
+        <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)] gap-10 sm:gap-12 lg:gap-14">
+          {/* ── Photo: sidebar at lg+, inline next to headline below ── */}
+          <aside className="hidden lg:block lg:order-1">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="w-full"
+            >
+              <PhotoStack />
+            </motion.div>
+          </aside>
+
+          {/* ── Headline + bio ── */}
+          <div className="lg:order-2 flex flex-col gap-8 sm:gap-10">
+            <div className="flex flex-col gap-6 sm:gap-8">
+              <AnimatedHeadline />
+              {/* Inline photo stack — mobile/tablet only, below the title */}
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="w-56 sm:w-60 md:w-64 lg:hidden"
+              >
+                <PhotoStack />
+              </motion.div>
+            </div>
+
+            <div className="flex flex-col gap-5 sm:gap-6 w-full">
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.42 }}
+                className="text-[15px] sm:text-base md:text-[17px] leading-relaxed text-foreground/85"
+              >
+                Product Designer focused on AI-native B2B tools — workflow
+                surfaces, data-dense dashboards, and copilots that hold up in
+                production. I lead design at Facilio, where I spend most days
+                turning messy facilities-management problems into interfaces
+                that feel obvious.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.5 }}
+                className="text-[15px] sm:text-base md:text-[17px] leading-relaxed text-foreground/75"
+              >
+                I came up through computer science engineering, expecting to
+                ship systems and write features. Somewhere along the way I
+                noticed I cared less about how cleanly things compiled and more
+                about how they felt to use — the small frictions, the tiny
+                delights, the way a button can feel honest or sneaky. So I
+                drifted, slowly, into design, and never really came back.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.58 }}
+                className="text-[15px] sm:text-base md:text-[17px] leading-relaxed text-foreground/65"
+              >
+                These days I obsess over craft — shipping things that earn
+                their weight, keeping the design language tight, chasing the
+                version that <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground/80">feels right</em> over the one that&apos;s just done.
+                It&apos;s slow work, but slow work is how the good stuff gets
+                made.
+              </motion.p>
+
+              <motion.p
+                initial={{ opacity: 0, y: 8 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.45, delay: 0.66 }}
+                className="text-[15px] sm:text-base md:text-[17px] leading-relaxed text-foreground/65"
+              >
+                Most evenings, headphones in and{' '}
+                <InlineMusicPlayer />
+                {' '}on loop, you&apos;ll find me deep in a Figma file or
+                sneaking in a Valorant queue between iterations — coffee within
+                reach, the usual late-night build energy. If any of this
+                resonates, say hi at{' '}
+                <a
+                  href="mailto:mohamedyameen1999@gmail.com"
+                  className="text-foreground underline decoration-foreground/30 hover:decoration-foreground underline-offset-[3px] transition-colors break-all"
+                >
+                  mohamedyameen1999@gmail.com
+                </a>{' '}
+                or find me on{' '}
+                <a
+                  href="https://linkedin.com/in/mohamed-yameen-83681315a"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-foreground underline decoration-foreground/30 hover:decoration-foreground underline-offset-[3px] transition-colors"
+                >
+                  LinkedIn
+                </a>
+                . I&apos;m easy to reach.
+              </motion.p>
+
+              <OffTheClock />
+            </div>
+          </div>
         </div>
-
-        <PhotoStack />
-
       </section>
-
-      {/* ── Marquee ── */}
-      <div className="border-b border-border py-4">
-        <Marquee
-          className="[--duration:32s] [--gap:2rem] text-xl md:text-2xl font-medium tracking-tight"
-          repeat={3}
-        >
-          {interests.map((w, i) => (
-            <span key={w} className="flex items-center gap-8">
-              <span className={i % 3 === 0 ? 'text-foreground' : 'text-foreground/40'}>{w}</span>
-              <span className="text-foreground/25">·</span>
-            </span>
-          ))}
-        </Marquee>
-      </div>
-
-      {/* ── Off the clock ── */}
-      <section className="p-6 md:p-10 border-b border-border flex flex-col gap-6">
-        <div className="flex flex-col gap-2">
-          <motion.p
-            initial={{ opacity: 0, y: 8 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="text-xs tracking-widest uppercase text-muted-foreground"
-          >
-            Off the clock
-          </motion.p>
-          <motion.h2
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.06 }}
-            className="text-2xl md:text-3xl font-medium tracking-tight leading-[1.2]"
-          >
-            When I'm not designing,{' '}
-            <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground/60">
-              I'm playing.
-            </em>
-          </motion.h2>
-        </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-          {games.map((game, i) => (
-            <GameCard key={game.name} game={game} index={i} />
-          ))}
-        </div>
-      </section>
-
-      {/* ── Connect ── */}
-      <section className="p-6 md:p-10 flex flex-col gap-4">
-        <div className="flex flex-col-reverse md:flex-row md:items-center md:justify-between gap-6">
-          <motion.h2
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.06 }}
-            className="text-2xl md:text-3xl font-medium tracking-tight leading-[1.2] max-w-2xl"
-          >
-            You made it this far.{' '}
-            <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground/60">
-              Reach out — say hi.
-            </em>
-          </motion.h2>
-
-          <motion.div
-            initial={{ opacity: 0, y: 12 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.45, delay: 0.18 }}
-            className="w-full md:max-w-[320px] md:flex-shrink-0"
-          >
-            <InlineMusicPlayer />
-          </motion.div>
-        </div>
-
-        <motion.div
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.4, delay: 0.12 }}
-          className="flex flex-col gap-2 text-sm"
-        >
-          <a href="mailto:mohamedyameen1999@gmail.com" className="group flex items-center gap-1.5 text-foreground hover:text-foreground/60 transition-colors w-fit">
-            mohamedyameen1999@gmail.com
-            <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
-          <a href="https://linkedin.com/in/mohamed-yameen-83681315a" target="_blank" rel="noopener noreferrer"
-            className="group flex items-center gap-1.5 text-foreground hover:text-foreground/60 transition-colors w-fit">
-            LinkedIn
-            <ArrowUpRight size={13} className="group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
-          </a>
-          <a href="tel:+919940677476" className="text-foreground hover:text-foreground/60 transition-colors w-fit">
-            +91 99406 77476
-          </a>
-        </motion.div>
-      </section>
-
     </div>
   )
 }
