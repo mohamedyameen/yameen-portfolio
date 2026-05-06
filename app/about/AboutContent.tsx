@@ -346,7 +346,7 @@ export default function AboutContent() {
   return (
     <div className="flex flex-col">
       {/* ── Info ── */}
-      <section className="px-5 sm:px-6 md:px-10 py-10 sm:py-12 md:py-16 w-full">
+      <section className="p-6 md:p-10 w-full">
         <div className="grid grid-cols-1 lg:grid-cols-[minmax(0,260px)_minmax(0,1fr)] xl:grid-cols-[minmax(0,280px)_minmax(0,1fr)] gap-10 sm:gap-12 lg:gap-14">
           {/* ── Photo: sidebar at lg+, inline next to headline below ── */}
           <aside className="hidden lg:block lg:order-1">
