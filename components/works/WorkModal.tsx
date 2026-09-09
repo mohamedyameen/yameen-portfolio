@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect } from 'react'
 import { createPortal } from 'react-dom'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Work } from '@/content/works'
 import { lazyBodies } from '@/content/works/bodies'
@@ -104,11 +105,12 @@ export function WorkModal({
             </button>
 
             {work.type === 'image' && work.media && (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={work.media.src}
                 alt={work.name}
-                className="absolute inset-0 size-full object-contain"
+                fill
+                sizes="100vw"
+                className="object-contain"
               />
             )}
 

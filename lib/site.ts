@@ -1,6 +1,6 @@
 export const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, '') ||
-  'https://yameen-portfolio-nu.vercel.app'
+  'https://yameen.design'
 
 export const siteName = 'Yameen'
 export const siteAuthor = 'Mohamed Yameen'

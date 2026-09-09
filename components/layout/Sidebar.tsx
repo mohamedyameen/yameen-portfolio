@@ -1,6 +1,7 @@
 'use client'
 import { useState, useEffect, type ReactNode } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
@@ -367,11 +368,12 @@ export default function Sidebar() {
         {/* Ambient sky — fades into the panel background so it blends
             seamlessly in both light and dark (gradient ends on --background). */}
         <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
+          <Image
             src="/works/mellow/bg-sky.jpg"
             alt=""
-            className="size-full object-cover opacity-80 dark:opacity-55"
+            fill
+            sizes="416px"
+            className="object-cover opacity-80 dark:opacity-55"
             draggable={false}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background/0 via-background/40 to-background" />

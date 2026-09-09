@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { getImageProps } from 'next/image'
 import { cn } from '@/lib/utils'
 import { Lightbox } from '@/components/works/SceneShot'
 import { Iphone17Pro } from '@/components/ui/iphone-17-pro'
@@ -61,23 +62,32 @@ function Backdrop({ bg }: { bg?: string }) {
 /**
  * iPhone 17 Pro mockup (Eldora UI). The screenshot rides inside the SVG,
  * clipped to the rounded screen, with the pill notch drawn on top like the
- * real device. `sizes`/`priority` are accepted for call-site compatibility but
- * unused — the SVG embeds the image directly rather than going through
- * next/image. `alt` becomes the accessible label on the frame.
+ * real device. `alt` becomes the accessible label on the frame.
+ *
+ * SVG `<image>` can't take a srcset, so the screenshot is resolved to a single
+ * optimizer URL sized at 2× `imgWidth` (the widest the frame renders on screen)
+ * instead of shipping the full-resolution source file. `sizes`/`priority` are
+ * accepted for call-site compatibility but unused.
  */
 export function PhoneFrame({
   src,
   alt,
+  imgWidth = 320,
 }: {
   src: string
   alt: string
+  /** On-screen CSS width the frame renders at; the image is fetched at 2×. */
+  imgWidth?: number
   sizes?: string
   priority?: boolean
 }) {
+  const {
+    props: { src: optimizedSrc },
+  } = getImageProps({ src, alt, width: imgWidth, height: imgWidth * 2 })
   return (
     <div className="relative w-full" style={{ aspectRatio: '200 / 400' }}>
       <Iphone17Pro
-        src={src}
+        src={optimizedSrc}
         role="img"
         aria-label={alt || undefined}
         className="absolute inset-0 size-full text-black"

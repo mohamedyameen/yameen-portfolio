@@ -1,6 +1,7 @@
 'use client'
 import { Suspense, useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
+import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { Work } from '@/content/works'
 import { useSound } from '@/hooks/useSound'
@@ -12,16 +13,24 @@ import { PhoneFrame } from '@/components/works/PhoneScene'
 
 /** Card-size iPhone frame used by the heroScene preview. */
 function ScenePhone({ src }: { src: string }) {
-  return <PhoneFrame src={src} alt="" sizes="(max-width: 768px) 40vw, 220px" />
+  return <PhoneFrame src={src} alt="" imgWidth={240} />
 }
+
+// Rendered card width per column count (see useColumnCount). Lets next/image
+// pick a candidate close to the real card size instead of the full source.
+const CARD_SIZES =
+  '(min-width: 3440px) 20vw, (min-width: 2560px) 25vw, (min-width: 1920px) 33vw, 50vw'
 
 function ProjectCard({
   project,
   index,
+  priority = false,
   onOpen,
 }: {
   project: Work
   index: number
+  /** Eager-load the image — set for the first card of each column (above the fold). */
+  priority?: boolean
   onOpen: (project: Work) => void
 }) {
   const { playHover, playClick } = useSound()
@@ -60,12 +69,14 @@ function ProjectCard({
               // Multi-phone preview: app screens in device frames floating
               // over a backdrop — the card-size echo of the PhoneScene look.
               <div className="absolute inset-0">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
+                <Image
                   src={project.heroScene.bg}
                   alt=""
+                  fill
+                  sizes={CARD_SIZES}
+                  priority={priority}
                   className={cn(
-                    'absolute inset-0 size-full object-cover',
+                    'object-cover',
                     // Soften only IoT's busy photographic thumbnail; Blubees
                     // stays crisp.
                     project.slug === 'iot-automation' && 'scale-105 blur-[2px]',
@@ -106,11 +117,13 @@ function ProjectCard({
               <div className="absolute inset-0 bg-white">
                 {project.heroPreview.bg && (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={project.heroPreview.bg}
                       alt=""
-                      className="absolute inset-0 size-full object-cover"
+                      fill
+                      sizes={CARD_SIZES}
+                      priority={priority}
+                      className="object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/5" />
                   </>
@@ -125,21 +138,25 @@ function ProjectCard({
                       : 'inset-0',
                   )}
                 >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                  <Image
                     src={project.heroPreview.src}
                     alt=""
+                    fill
+                    sizes={CARD_SIZES}
+                    priority={priority}
                     style={{ objectPosition: project.heroPreview.focus ?? 'left top' }}
-                    className="absolute inset-0 size-full object-cover"
+                    className="object-cover"
                   />
                 </div>
               </div>
             ) : project.type === 'image' && project.media?.src ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={project.media.src}
                 alt=""
-                className="absolute inset-0 size-full object-cover"
+                fill
+                sizes={CARD_SIZES}
+                priority={priority}
+                className="object-cover"
               />
             ) : project.type === 'video' && project.media?.src ? (
               <video
@@ -158,12 +175,14 @@ function ProjectCard({
                 </Suspense>
               </div>
             ) : project.cover ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Image
                 src={project.cover}
                 alt=""
+                fill
+                sizes={CARD_SIZES}
+                priority={priority}
                 style={{ objectPosition: project.coverPosition }}
-                className="absolute inset-0 size-full object-cover"
+                className="object-cover"
               />
             ) : (
               <div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />
@@ -264,6 +283,7 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
                 key={project.slug}
                 project={project}
                 index={ci * columns.length + i}
+                priority={i === 0}
                 onOpen={handleOpen}
               />
             ))}
