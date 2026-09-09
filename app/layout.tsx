@@ -1,14 +1,23 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
-import { Playfair_Display, Caveat } from 'next/font/google'
+import { Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { LayoutGroup } from 'framer-motion'
 import Sidebar from '@/components/layout/Sidebar'
 import PageTransition from '@/components/layout/PageTransition'
 import SmoothScroll from '@/components/layout/SmoothScroll'
+import ScrollbarOverlay from '@/components/layout/ScrollbarOverlay'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MusicPlayerProvider } from '@/components/music/MusicPlayerProvider'
 import { GlobalFallingLeaves } from '@/components/music/FallingLeaves'
+import {
+  siteUrl,
+  siteName,
+  siteAuthor,
+  siteTitle,
+  siteDescription,
+  siteTwitter,
+} from '@/lib/site'
 import './globals.css'
 
 const geistSans = localFont({
@@ -22,33 +31,83 @@ const playfair = Playfair_Display({
   variable: '--font-playfair',
 })
 
-const caveat = Caveat({
-  subsets: ['latin'],
-  weight: ['400', '600', '700'],
-  variable: '--font-caveat',
-})
 
 export const metadata: Metadata = {
+  metadataBase: new URL(siteUrl),
   title: {
-    default: 'Yameen · Lead Product Designer',
+    default: siteTitle,
     template: '%s · Yameen',
   },
-  description:
-    'Lead Product Designer crafting AI-native products, B2B SaaS, and design systems.',
+  description: siteDescription,
+  applicationName: siteName,
+  authors: [{ name: siteAuthor, url: siteUrl }],
+  creator: siteAuthor,
+  keywords: [
+    'Yameen',
+    'Mohamed Yameen',
+    'Product Designer',
+    'Lead Product Designer',
+    'UX Designer',
+    'UI Designer',
+    'AI Product Design',
+    'B2B SaaS Design',
+    'Design Systems',
+    'Facilio',
+    'Portfolio',
+  ],
+  alternates: {
+    canonical: '/',
+  },
+  openGraph: {
+    type: 'website',
+    siteName,
+    title: siteTitle,
+    description: siteDescription,
+    url: siteUrl,
+    locale: 'en_US',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
+    creator: siteTwitter,
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      'max-image-preview': 'large',
+      'max-snippet': -1,
+      'max-video-preview': -1,
+    },
+  },
+  category: 'design',
+  formatDetection: { telephone: false, email: false, address: false },
+}
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: '(prefers-color-scheme: dark)', color: '#0a0a0a' },
+    { media: '(prefers-color-scheme: light)', color: '#fafafa' },
+  ],
+  colorScheme: 'dark',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${geistSans.variable} ${playfair.variable} ${caveat.variable}`}>
+    <html lang="en" suppressHydrationWarning data-scroll-behavior="smooth" className={`${geistSans.variable} ${playfair.variable}`}>
       <body className="bg-background text-foreground">
-        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme">
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false} storageKey="yameen-theme" disableTransitionOnChange>
           <TooltipProvider delayDuration={150}>
             <MusicPlayerProvider>
               <GlobalFallingLeaves />
               <LayoutGroup>
                 <SmoothScroll />
+                <ScrollbarOverlay />
                 <Sidebar />
-                <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-72">
+                <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-[26rem]">
                   <PageTransition>{children}</PageTransition>
                 </main>
               </LayoutGroup>

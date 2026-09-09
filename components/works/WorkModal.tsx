@@ -1,10 +1,12 @@
 'use client'
 
 import { Suspense, useEffect } from 'react'
+import { createPortal } from 'react-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import type { Work } from '@/content/works'
 import { lazyBodies } from '@/content/works/bodies'
 import { cn } from '@/lib/utils'
+import { lockScroll } from '@/lib/scrollLock'
 
 const aspectClass: Record<NonNullable<Work['media']>['aspect'] & string, string> = {
   '16/9': 'aspect-video',
@@ -35,13 +37,10 @@ export function WorkModal({
       if (e.key === 'Escape') onClose()
     }
     document.addEventListener('keydown', onKey)
-    const prev = document.body.style.overflow
-    document.body.style.overflow = 'hidden'
-    globalThis.lenis?.stop()
+    const unlock = lockScroll()
     return () => {
       document.removeEventListener('keydown', onKey)
-      document.body.style.overflow = prev
-      globalThis.lenis?.start()
+      unlock()
     }
   }, [work, onClose])
 
@@ -51,11 +50,16 @@ export function WorkModal({
       ? aspectClass[work.media?.aspect ?? '16/9']
       : null
 
-  return (
+  // Portal to <body> so the overlay escapes any ancestor stacking/transform
+  // context and always paints above global chrome (e.g. the fixed sidebar).
+  // Only overlays after a client click, so no SSR content to reconcile.
+  if (typeof document === 'undefined') return null
+
+  return createPortal(
     <AnimatePresence>
       {work && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center p-4 md:p-8"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 pr-[calc(1rem+var(--sb,0px))] md:p-8 md:pr-[calc(2rem+var(--sb,0px))]"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -65,11 +69,13 @@ export function WorkModal({
           <div className="absolute inset-0 bg-black/80 backdrop-blur-md" />
 
           <motion.div
-            layoutId={`work-card-${work.slug}`}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+            initial={{ opacity: 0, scale: 0.96, y: 8 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.98, y: 8 }}
+            transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
             onClick={(e) => e.stopPropagation()}
             className={cn(
-              'relative max-h-[92vh] w-full overflow-hidden rounded-2xl border border-border bg-background shadow-2xl',
+              'relative max-h-[92vh] w-full overflow-hidden rounded-2xl border border-white/25 bg-background shadow-2xl',
               work.type === 'image' && 'max-w-5xl',
               work.type === 'video' && 'max-w-4xl',
               work.type === 'component' && 'max-w-2xl',
@@ -118,17 +124,7 @@ export function WorkModal({
             )}
 
             {work.type === 'component' && (
-              <div className="flex flex-col gap-4 p-6 md:p-8">
-                <header className="flex flex-col gap-1">
-                  <h2 className="text-sm font-semibold text-foreground md:text-base">
-                    {work.name}
-                  </h2>
-                  {work.summary && (
-                    <p className="max-w-[60ch] text-xs text-muted-foreground md:text-sm">
-                      {work.summary}
-                    </p>
-                  )}
-                </header>
+              <div className="flex flex-col gap-3 sm:gap-4 p-4 sm:p-6 md:p-8">
                 {Body && (
                   <Suspense fallback={null}>
                     <Body />
@@ -139,6 +135,7 @@ export function WorkModal({
           </motion.div>
         </motion.div>
       )}
-    </AnimatePresence>
+    </AnimatePresence>,
+    document.body,
   )
 }

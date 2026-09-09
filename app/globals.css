@@ -119,6 +119,13 @@
     pointer-events: none;
   }
 
+  /* The page scrollbar never takes layout space: the native one is hidden and
+     ScrollbarOverlay draws a floating thumb that fades in while scrolling.
+     This means locking body scroll for a modal can't reflow the page. Inner
+     scroll containers (e.g. the case-study sheet) keep the 4px bar below. */
+  html { scrollbar-width: none; }
+  html::-webkit-scrollbar { display: none; }
+
   ::-webkit-scrollbar { width: 4px; height: 0; }
   ::-webkit-scrollbar-track { background: transparent; }
   ::-webkit-scrollbar-thumb {
@@ -126,6 +133,22 @@
     border-radius: 999px;
   }
   ::-webkit-scrollbar:horizontal { display: none; }
+}
+
+/* Theme switch: smooth fade via the View Transitions API (driven from
+   ThemeToggle). The new theme fades in over the old snapshot, so cancel the
+   browser's default old/new crossfade to avoid a double animation — and keep
+   the old snapshot pinned underneath while the new one fades in on top. */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+::view-transition-old(root) {
+  z-index: 1;
+}
+::view-transition-new(root) {
+  z-index: 2;
 }
 
 /* Diagonal shine sweep across gradient text */

@@ -1,59 +1,48 @@
 import { works } from '@/content/works'
 import { MasonryGrid } from '@/components/works/MasonryGrid'
-import { FadeUp } from '@/components/ui/FadeUp'
-import DotFieldWrapper from '@/components/home/DotFieldWrapper'
-import { BrandMarquee } from '@/components/home/BrandMarquee'
+import {
+  siteUrl,
+  siteName,
+  siteAuthor,
+  siteDescription,
+} from '@/lib/site'
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: siteAuthor,
+  alternateName: 'Yameen',
+  url: siteUrl,
+  jobTitle: 'Lead Product Designer',
+  worksFor: { '@type': 'Organization', name: 'Facilio' },
+  description: siteDescription,
+  image: `${siteUrl}/opengraph-image`,
+}
+
+const websiteLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  name: siteName,
+  url: siteUrl,
+  inLanguage: 'en',
+  publisher: {
+    '@type': 'Person',
+    name: siteAuthor,
+  },
+}
 
 export default function HomePage() {
   return (
     <>
-      {/* Hero */}
-      <section className="grid grid-cols-1 md:grid-cols-2 border-b border-border">
-
-        {/* Left — text */}
-        <div className="flex flex-col gap-5 p-6 md:p-10 md:border-r md:border-border">
-          <FadeUp delay={0.08}>
-            <h1 className="text-3xl md:text-4xl font-medium tracking-tight text-foreground leading-[1.2] max-w-lg">
-              Designing{' '}
-              <em style={{ fontFamily: 'var(--font-playfair)' }} className="font-bold not-italic text-gray-400 hover:text-rose-400 transition-colors duration-300 cursor-default">
-                complex
-              </em>{' '}
-              products,
-              <br />
-              crafting{' '}
-              <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-gray-400 hover:text-emerald-400 transition-colors duration-300 cursor-default">
-                intuitive
-              </em>{' '}
-              experiences,
-              <br />
-              building{' '}
-              <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-gray-400 hover:text-blue-400 transition-colors duration-300 cursor-default">
-                systems
-              </em>{' '}
-              that scale.
-            </h1>
-          </FadeUp>
-
-          <FadeUp delay={0.16}>
-            <p className="text-sm text-foreground/50 max-w-sm leading-relaxed">
-              Think of this as my desk — products I&apos;ve shipped, prototypes I&apos;ve kept, and the experiments I started just to see what would happen. Some intentional, some impulsive, all worth keeping around.
-            </p>
-          </FadeUp>
-        </div>
-
-        {/* Right — game */}
-        <div className="relative hidden md:block">
-          <DotFieldWrapper />
-        </div>
-      </section>
-
-      {/* Brand marquee */}
-      <BrandMarquee />
-
-      {/* Grid */}
-      <section id="works" className="scroll-mt-16">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify([personLd, websiteLd]),
+        }}
+      />
+      <div className="relative min-h-dvh">
         <MasonryGrid projects={works} />
-      </section>
+      </div>
     </>
   )
 }

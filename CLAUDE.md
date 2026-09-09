@@ -33,17 +33,17 @@ Bodies are wired via `content/works/bodies.ts`, a `Record<slug, () => import(...
 `app/works/[slug]/page.tsx` calls `generateStaticParams` over the `works` registry, so every entry becomes a statically generated route. The home grid (`MasonryGrid`) is driven by the same registry.
 
 **Directory conventions.**
-- `app/` — routes only (`/`, `/about`, `/works/[slug]`, `/api/weather`)
-- `components/ui/` — shadcn-style primitives (`button`, `card`, `dialog`, `sheet`, `tabs`, `badge`, `marquee`, `FadeUp`)
-- `components/layout/` — global chrome (Sidebar, Navbar, Footer, PageTransition, SmoothScroll, ThemeToggle, SoundToggle, LiveClock, TypewriterName, SidebarAmbient)
+- `app/` — routes only (`/`, `/works/[slug]`, `/api/weather`)
+- `components/ui/` — shadcn-style primitives (`badge`, `marquee`, `tooltip`, `FadeUp`). Add more with the shadcn MCP tools rather than hand-writing them.
+- `components/layout/` — global chrome (Sidebar, TopNav, PageTransition, SmoothScroll, ScrollbarOverlay, ThemeToggle, SoundToggle, LiveClock, TypewriterName)
 - `components/home/`, `components/works/` — page-specific composites
-- `components/{aceternity,contact,profile,resume,mdx,sections}/` exist but are currently empty placeholders
+- `components/music/` — music player, provider, and ambient falling-leaves overlay
 - `hooks/` — `useSound`, `useWeather` (the latter pairs with `app/api/weather/route.ts`)
 - `lib/utils.ts` — only the `cn()` helper (clsx + tailwind-merge)
 
 **Styling.** Tailwind v4 via `@tailwindcss/postcss`. All theme tokens live in `app/globals.css` (CSS variables — no `tailwind.config.*`). shadcn is configured (`components.json`) with style `radix-lyra`, base color `neutral`, icon library `phosphor`, and the standard `@/*` aliases. Use `cn()` from `@/lib/utils` for class composition.
 
-**Path alias.** `@/*` resolves from the repo root (see `tsconfig.json`), so imports look like `@/components/...`, `@/content/projects`, `@/lib/utils`.
+**Path alias.** `@/*` resolves from the repo root (see `tsconfig.json`), so imports look like `@/components/...`, `@/content/works`, `@/lib/utils`.
 
 **MCP / shadcn.** `.mcp.json` registers the shadcn MCP server — when adding new shadcn components, prefer the shadcn MCP tools over hand-writing primitives.
 

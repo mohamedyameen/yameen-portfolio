@@ -25,8 +25,11 @@ export type BodyProps = { preview?: boolean }
 type BodyLoader = () => Promise<{ default: ComponentType<BodyProps> }>
 
 export const bodyLoaders: Record<string, BodyLoader> = {
-  'facilio-atom': () => import('./facilio-atom'),
-  'palette-shift': () => import('./palette-shift'),
+  'facilio-helpdesk-ai': () => import('./facilio-helpdesk-ai'),
+  'facilio-dispatcher-agent': () => import('./facilio-dispatcher-agent'),
+  mellow: () => import('./mellow'),
+  blubees: () => import('./blubees'),
+  'iot-automation': () => import('./iot-automation'),
 }
 
 /**

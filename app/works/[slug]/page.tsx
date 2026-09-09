@@ -1,14 +1,20 @@
 import { notFound } from 'next/navigation'
+import Image from 'next/image'
 import type { Metadata } from 'next'
-import { Badge } from '@/components/ui/badge'
-import { FadeUp } from '@/components/ui/FadeUp'
 import { works } from '@/content/works'
 import { bodyLoaders } from '@/content/works/bodies'
+import { WorkHero } from '@/components/works/WorkHero'
+import { siteUrl, siteAuthor, siteName } from '@/lib/site'
 
 type Params = { slug: string }
 
 export function generateStaticParams() {
   return works.map(({ slug }) => ({ slug }))
+}
+
+function coverFor(work: (typeof works)[number]): string | undefined {
+  if (work.type === 'image' && work.media?.src) return work.media.src
+  return work.cover
 }
 
 export async function generateMetadata(
@@ -17,9 +23,37 @@ export async function generateMetadata(
   const { slug } = await params
   const work = works.find(w => w.slug === slug)
   if (!work) return {}
+
+  const url = `${siteUrl}/works/${work.slug}`
+  const title = work.name
+  const description = work.summary ?? `${work.name} — ${work.category}`
+  const cover = coverFor(work)
+  // Absolute URL only if the cover looks like a path under /public.
+  // Otherwise (remote URL or undefined), let Next's per-route opengraph-image
+  // fall through automatically.
+  const ogImages = cover && cover.startsWith('/')
+    ? [{ url: cover, alt: work.name }]
+    : undefined
+
   return {
-    title: work.name,
-    description: work.summary ?? undefined,
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      type: 'article',
+      title,
+      description,
+      url,
+      siteName,
+      images: ogImages,
+      tags: work.tags,
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
+      images: ogImages?.map(i => i.url),
+    },
   }
 }
 
@@ -35,79 +69,62 @@ export default async function WorkPage({
   const loadBody = bodyLoaders[slug]
   const Body = loadBody ? (await loadBody()).default : null
 
+  const url = `${siteUrl}/works/${work.slug}`
+  const cover = coverFor(work)
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: work.name,
+    headline: work.name,
+    description: work.summary ?? undefined,
+    url,
+    image: cover && cover.startsWith('/') ? `${siteUrl}${cover}` : cover,
+    keywords: work.tags.join(', '),
+    genre: work.category,
+    dateCreated: work.year,
+    author: {
+      '@type': 'Person',
+      name: siteAuthor,
+      url: siteUrl,
+    },
+    creator: {
+      '@type': 'Person',
+      name: siteAuthor,
+      url: siteUrl,
+    },
+    ...(work.client && { sourceOrganization: { '@type': 'Organization', name: work.client } }),
+  }
+
   return (
-    <article className="mx-auto w-full max-w-3xl px-5 md:px-10 py-10 md:py-16 flex flex-col gap-8">
-      <FadeUp>
-        <header className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 flex-wrap">
-            {work.tags.map(tag => (
-              <Badge key={tag} variant="secondary" className="text-xs">
-                {tag}
-              </Badge>
-            ))}
-          </div>
-          <h1 className="text-2xl md:text-3xl font-semibold tracking-tight text-foreground">
-            {work.name}
-          </h1>
-          {work.summary && (
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-[65ch]">
-              {work.summary}
-            </p>
-          )}
-
-          <dl className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4 border-t border-border text-xs">
-            {work.client && (
-              <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Client</dt>
-                <dd className="text-foreground">{work.client}</dd>
-              </div>
-            )}
-            {work.role && (
-              <div className="flex flex-col gap-1">
-                <dt className="text-muted-foreground">Role</dt>
-                <dd className="text-foreground">{work.role}</dd>
-              </div>
-            )}
-            <div className="flex flex-col gap-1">
-              <dt className="text-muted-foreground">Year</dt>
-              <dd className="text-foreground">{work.year}</dd>
-            </div>
-            <div className="flex flex-col gap-1">
-              <dt className="text-muted-foreground">Type</dt>
-              <dd className="text-foreground capitalize">{work.kind ?? 'work'}</dd>
-            </div>
-          </dl>
-        </header>
-      </FadeUp>
-
-      <FadeUp delay={0.1}>
-        {work.type === 'image' && work.media ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={work.media.src}
-            alt={work.name}
-            className="w-full rounded-md border border-border"
-          />
-        ) : work.type === 'video' && work.media ? (
-          <video
-            src={work.media.src}
-            poster={work.media.poster}
-            controls
-            playsInline
-            className="w-full rounded-md border border-border bg-black"
-          />
-        ) : (
-          <div className={`w-full bg-gradient-to-br ${work.accent} rounded-md aspect-[16/9]`} />
-        )}
-      </FadeUp>
-
-      {Body && (
-        <FadeUp delay={0.2}>
-          <div className="flex flex-col gap-6">
-            <Body />
-          </div>
-        </FadeUp>
+    <article className="mx-auto w-full max-w-3xl px-4 sm:px-5 md:px-10 py-8 sm:py-10 md:py-16 flex flex-col gap-10 sm:gap-12 md:gap-14">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
+      {work.type === 'image' && work.media ? (
+        <Image
+          src={work.media.src}
+          alt={work.name}
+          width={1600}
+          height={1000}
+          priority
+          sizes="(max-width: 768px) 100vw, 768px"
+          className="w-full h-auto rounded-2xl ring-1 ring-border"
+        />
+      ) : work.type === 'video' && work.media ? (
+        <video
+          src={work.media.src}
+          poster={work.media.poster}
+          controls
+          playsInline
+          className="w-full rounded-2xl ring-1 ring-border bg-black"
+          aria-label={work.name}
+        />
+      ) : (
+        <WorkHero work={work} />
       )}
+
+      {Body && <Body />}
     </article>
   )
 }

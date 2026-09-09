@@ -3,7 +3,6 @@ import { useEffect } from 'react'
 import Lenis from 'lenis'
 
 declare global {
-  // eslint-disable-next-line no-var
   var lenis: InstanceType<typeof Lenis> | undefined
 }
 

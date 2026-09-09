@@ -1,20 +1,21 @@
 'use client'
-import { Volume2, VolumeX } from 'lucide-react'
+import { SpeakerHighIcon, SpeakerSlashIcon } from '@phosphor-icons/react'
 import { useSound } from '@/hooks/useSound'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
 
 export default function SoundToggle() {
-  const { enabled, toggle } = useSound()
+  const { enabled, toggle, playHover } = useSound()
   const label = enabled ? 'Mute UI sounds' : 'Unmute UI sounds'
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <button
+          onMouseEnter={playHover}
           onClick={toggle}
           aria-label={label}
-          className="inline-flex items-center justify-center leading-none text-muted-foreground hover:text-foreground transition-colors"
+          className="grid size-9 place-items-center rounded-full text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
         >
-          {enabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
+          {enabled ? <SpeakerHighIcon size={20} /> : <SpeakerSlashIcon size={20} />}
         </button>
       </TooltipTrigger>
       <TooltipContent side="bottom">{label}</TooltipContent>

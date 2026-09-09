@@ -1,11 +1,14 @@
 'use client'
 import { useTheme } from 'next-themes'
-import { Moon, Sun } from 'lucide-react'
+import { flushSync } from 'react-dom'
+import { MoonIcon, SunIcon } from '@phosphor-icons/react'
 import { useEffect, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip'
+import { useSound } from '@/hooks/useSound'
 
 export default function ThemeToggle() {
   const { setTheme } = useTheme()
+  const { playHover, playClick } = useSound()
   const [isDark, setIsDark] = useState<boolean | null>(null)
 
   useEffect(() => {
@@ -26,11 +29,51 @@ export default function ThemeToggle() {
     <Tooltip>
       <TooltipTrigger asChild>
         <button
-          onClick={() => setTheme(isDark ? 'light' : 'dark')}
+          onMouseEnter={playHover}
+          onClick={() => {
+            playClick()
+            const next = isDark ? 'light' : 'dark'
+            const doc = document as Document & {
+              startViewTransition?: (cb: () => void) => { ready: Promise<void> }
+            }
+            const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+            // No View Transitions support (or reduced motion) → plain swap.
+            if (!doc.startViewTransition || reduce) {
+              setTheme(next)
+              return
+            }
+            const transition = doc.startViewTransition(() => {
+              // flushSync forces next-themes to apply the class synchronously
+              // so the transition captures the new theme's snapshot.
+              flushSync(() => setTheme(next))
+            })
+            transition.ready.then(() => {
+              // Symmetric crossfade: the old theme fades out while the new one
+              // fades in, on the same curve — so light→dark and dark→light feel
+              // identical (a plain fade-in over an opaque snapshot reads faster
+              // going to a lighter theme).
+              const timing: KeyframeAnimationOptions = {
+                duration: 700,
+                // Symmetric ease-in-out (easeInOutCubic): slow start keeps the
+                // lighter theme from popping in early, so both directions read
+                // at the same, even pace.
+                easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+              }
+              const root = document.documentElement
+              root.animate(
+                { opacity: [1, 0] },
+                { ...timing, pseudoElement: '::view-transition-old(root)' },
+              )
+              root.animate(
+                { opacity: [0, 1] },
+                { ...timing, pseudoElement: '::view-transition-new(root)' },
+              )
+            })
+          }}
           aria-label={label}
-          className="inline-flex items-center justify-center leading-none text-muted-foreground hover:text-foreground transition-colors"
+          className="grid size-9 place-items-center rounded-full text-foreground/80 transition-colors hover:bg-accent hover:text-foreground"
         >
-          {isDark ? <Sun size={16} /> : <Moon size={16} />}
+          {isDark ? <SunIcon size={20} /> : <MoonIcon size={20} />}
         </button>
       </TooltipTrigger>
       <TooltipContent side="bottom">{label}</TooltipContent>

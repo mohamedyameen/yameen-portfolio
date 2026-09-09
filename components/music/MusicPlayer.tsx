@@ -1,8 +1,7 @@
 'use client'
 
 import { motion, AnimatePresence } from 'framer-motion'
-import { Pause, Play, X } from 'lucide-react'
-import { usePathname } from 'next/navigation'
+import { PauseIcon, PlayIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useRef } from 'react'
 import { TRACK, useMusicPlayer } from './MusicPlayerProvider'
 
@@ -32,9 +31,9 @@ function PlayPauseButton() {
       className="relative grid size-8 flex-shrink-0 place-items-center rounded-full text-foreground hover:bg-accent transition-colors"
     >
       {isPlaying ? (
-        <Pause size={14} fill="currentColor" />
+        <PauseIcon size={14} weight="fill" />
       ) : (
-        <Play size={14} fill="currentColor" className="translate-x-[1px]" />
+        <PlayIcon size={14} weight="fill" className="translate-x-[1px]" />
       )}
     </button>
   )
@@ -59,7 +58,7 @@ function PlayerBody({ withClose = false }: { withClose?: boolean }) {
           aria-label="Close player"
           className="relative grid size-8 flex-shrink-0 place-items-center rounded-full text-muted-foreground hover:bg-accent hover:text-foreground transition-colors"
         >
-          <X size={14} />
+          <XIcon size={14} />
         </button>
       )}
     </>
@@ -101,9 +100,9 @@ export function InlineMusicPlayer() {
         className="grid size-5 place-items-center rounded-full bg-foreground text-background hover:bg-amber-500 hover:text-white transition-colors"
       >
         {isPlaying ? (
-          <Pause size={9} fill="currentColor" />
+          <PauseIcon size={9} weight="fill" />
         ) : (
-          <Play size={9} fill="currentColor" className="translate-x-[0.5px]" />
+          <PlayIcon size={9} weight="fill" className="translate-x-[0.5px]" />
         )}
       </button>
     </span>
@@ -111,23 +110,17 @@ export function InlineMusicPlayer() {
 }
 
 export function FloatingMusicPlayer() {
-  const pathname = usePathname()
   const { hasStarted, dismissed, inlineInView } = useMusicPlayer()
-  const visible =
-    hasStarted && !dismissed && (pathname !== '/about' || !inlineInView)
-  const onAbout = pathname === '/about'
+  const visible = hasStarted && !dismissed && !inlineInView
 
   return (
     <AnimatePresence>
       {visible && (
         <motion.div
           key="floating-player"
-          // Only share the morph id off-/about. On /about the trigger is scroll,
-          // not a route change — slide it up from the bottom instead of morphing
-          // from the inline pill's offscreen rect.
-          layoutId={onAbout ? undefined : 'music-player'}
+          layoutId="music-player"
           transition={MORPH}
-          initial={onAbout ? { opacity: 0, y: 24 } : false}
+          initial={false}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 24, transition: { duration: 0.22, ease: 'easeOut' } }}
           // Centering via motion x so it doesn't conflict with framer's transform during layoutId animations.

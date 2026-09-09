@@ -1,67 +1,27 @@
 'use client'
-import { Suspense, useState, useCallback, useRef, useEffect } from 'react'
+import { Suspense, useState, useCallback, useEffect } from 'react'
 import Link from 'next/link'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion } from 'framer-motion'
 import type { Work } from '@/content/works'
 import { useSound } from '@/hooks/useSound'
+import { cn } from '@/lib/utils'
 import { WorkModal } from '@/components/works/WorkModal'
 import { WorkSheet } from '@/components/works/WorkSheet'
 import { bodyLoaders, lazyBodies } from '@/content/works/bodies'
+import { PhoneFrame } from '@/components/works/PhoneScene'
 
-// Apple-ish smooth ease-out — used for card→overlay morph + backdrop fade.
-const OPEN_TRANSITION = { duration: 0.5, ease: [0.16, 1, 0.3, 1] as const }
-
-const previewImages: Record<string, string[]> = {
-  'facilio-atom':   [
-    'https://picsum.photos/seed/atom1/480/320',
-    'https://picsum.photos/seed/atom2/480/320',
-    'https://picsum.photos/seed/atom3/480/320',
-  ],
-  'design-system':  [
-    'https://picsum.photos/seed/ds1/480/320',
-    'https://picsum.photos/seed/ds2/480/320',
-    'https://picsum.photos/seed/ds3/480/320',
-  ],
-  'fsm':            [
-    'https://picsum.photos/seed/fsm1/480/320',
-    'https://picsum.photos/seed/fsm2/480/320',
-    'https://picsum.photos/seed/fsm3/480/320',
-  ],
-  'iot-automation': [
-    'https://picsum.photos/seed/iot1/480/320',
-    'https://picsum.photos/seed/iot2/480/320',
-    'https://picsum.photos/seed/iot3/480/320',
-  ],
-  'mellow':         [
-    'https://picsum.photos/seed/mel1/480/320',
-    'https://picsum.photos/seed/mel2/480/320',
-    'https://picsum.photos/seed/mel3/480/320',
-  ],
-  'blue-whistle':   [
-    'https://picsum.photos/seed/bw1/480/320',
-    'https://picsum.photos/seed/bw2/480/320',
-    'https://picsum.photos/seed/bw3/480/320',
-  ],
-  'blubees':        [
-    'https://picsum.photos/seed/bb1/480/320',
-    'https://picsum.photos/seed/bb2/480/320',
-    'https://picsum.photos/seed/bb3/480/320',
-  ],
+/** Card-size iPhone frame used by the heroScene preview. */
+function ScenePhone({ src }: { src: string }) {
+  return <PhoneFrame src={src} alt="" sizes="(max-width: 768px) 40vw, 220px" />
 }
 
 function ProjectCard({
   project,
   index,
-  hasHover,
-  onEnter,
-  onLeave,
   onOpen,
 }: {
   project: Work
   index: number
-  hasHover: boolean
-  onEnter: (slug: string) => void
-  onLeave: () => void
   onOpen: (project: Work) => void
 }) {
   const { playHover, playClick } = useSound()
@@ -75,13 +35,11 @@ function ProjectCard({
       viewport={{ once: true, margin: '0px 0px -40px 0px' }}
       transition={{ duration: 0.4, delay: (index % 3) * 0.07, ease: [0.25, 0.1, 0.25, 1] }}
       className="w-full"
-      onMouseEnter={hasHover ? () => {
+      onMouseEnter={() => {
         playHover()
-        onEnter(project.slug)
         // Warm the body chunk so the modal opens with content already there.
         bodyLoaders[project.slug]?.()
-      } : undefined}
-      onMouseLeave={hasHover ? onLeave : undefined}
+      }}
     >
       <Link
         href={`/works/${project.slug}`}
@@ -93,13 +51,90 @@ function ProjectCard({
         }}
         className="group block w-full"
       >
-        <motion.div
-          layoutId={`work-card-${project.slug}`}
-          transition={OPEN_TRANSITION}
+        <div
           style={{ aspectRatio: aspect }}
-          className="relative w-full overflow-hidden rounded-2xl"
+          className="relative w-full overflow-hidden rounded-2xl border border-black/15 transition-colors duration-300 group-hover:border-black/60 dark:border-white/15 dark:group-hover:border-white/60"
         >
-            {project.type === 'image' && project.media?.src ? (
+          <div className="absolute inset-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-[1.06]">
+            {project.heroScene ? (
+              // Multi-phone preview: app screens in device frames floating
+              // over a backdrop — the card-size echo of the PhoneScene look.
+              <div className="absolute inset-0">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={project.heroScene.bg}
+                  alt=""
+                  className={cn(
+                    'absolute inset-0 size-full object-cover',
+                    // Soften only IoT's busy photographic thumbnail; Blubees
+                    // stays crisp.
+                    project.slug === 'iot-automation' && 'scale-105 blur-[2px]',
+                  )}
+                />
+                {/* Gradient wash so the floating phone reads over the busy
+                    photographic backdrop. Scoped to IoT so Blubees' clean
+                    thumbnail is untouched. */}
+                {project.slug === 'iot-automation' && (
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-black/10" />
+                )}
+                {project.heroScene.screens.length === 1 ? (
+                  // Single hero phone — upright, centered, cropped by the
+                  // card's bottom edge like a product still.
+                  <div className="absolute left-1/2 top-[12%] w-[70%] -translate-x-1/2">
+                    <ScenePhone src={project.heroScene.screens[0]} />
+                  </div>
+                ) : (
+                  project.heroScene.screens.slice(0, 2).map((src, i) => (
+                    <div
+                      key={src}
+                      className={cn(
+                        'absolute',
+                        i === 0
+                          ? 'left-[7%] top-[8%] w-[55%] rotate-[-6deg]'
+                          : 'right-[6%] top-[36%] w-[58%] rotate-[4deg]',
+                      )}
+                    >
+                      <ScenePhone src={src} />
+                    </div>
+                  ))
+                )}
+              </div>
+            ) : project.heroPreview ? (
+              // Composed preview: a product screenshot framed in the card.
+              // With a `bg` it floats over that backdrop, anchored to one side
+              // and bleeding off the opposite edge; without one it fills the card.
+              <div className="absolute inset-0 bg-white">
+                {project.heroPreview.bg && (
+                  <>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={project.heroPreview.bg}
+                      alt=""
+                      className="absolute inset-0 size-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/5" />
+                  </>
+                )}
+                <div
+                  className={cn(
+                    'absolute overflow-hidden bg-white ring-1 ring-black/10',
+                    project.heroPreview.bg
+                      ? project.heroPreview.anchor === 'right'
+                        ? 'bottom-0 left-0 right-[7%] top-[8%] rounded-tr-xl shadow-2xl shadow-black/40'
+                        : 'bottom-0 left-[7%] right-0 top-[8%] rounded-tl-xl shadow-2xl shadow-black/40'
+                      : 'inset-0',
+                  )}
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={project.heroPreview.src}
+                    alt=""
+                    style={{ objectPosition: project.heroPreview.focus ?? 'left top' }}
+                    className="absolute inset-0 size-full object-cover"
+                  />
+                </div>
+              </div>
+            ) : project.type === 'image' && project.media?.src ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={project.media.src}
@@ -122,24 +157,41 @@ function ProjectCard({
                   <Body preview />
                 </Suspense>
               </div>
+            ) : project.cover ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={project.cover}
+                alt=""
+                style={{ objectPosition: project.coverPosition }}
+                className="absolute inset-0 size-full object-cover"
+              />
             ) : (
               <div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />
             )}
-            {(project.type === 'case-study' || project.type === 'component') && project.tags[0] && (
-              <span className="absolute right-2 top-2 rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/85 backdrop-blur-sm">
-                {project.tags[0]}
-              </span>
-            )}
-        </motion.div>
-        <div className="flex flex-col gap-0.5 px-1 pt-2">
-          <span className="text-xs font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
+          </div>
+            <div className="absolute right-2 top-2 flex items-center gap-1.5">
+              {(project.type === 'case-study' || project.type === 'component') && project.tags[0] && (
+                <span className="rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/85 backdrop-blur-sm">
+                  {project.tags[0]}
+                </span>
+              )}
+              {(project.disciplines ?? ['Design']).map((d) => (
+                <span
+                  key={d}
+                  className="rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/85 backdrop-blur-sm"
+                >
+                  {d}
+                </span>
+              ))}
+            </div>
+        </div>
+        <div className="flex flex-col gap-1 px-1 pt-2">
+          <span className="text-sm font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
             {project.name}
           </span>
-          {project.summary && (
-            <p className="hidden sm:line-clamp-2 text-[10px] text-muted-foreground leading-relaxed">
-              {project.summary}
-            </p>
-          )}
+          <span className="text-xs leading-snug text-muted-foreground line-clamp-2">
+            {project.tagline ?? project.summary ?? project.category}
+          </span>
         </div>
       </Link>
     </motion.div>
@@ -172,21 +224,17 @@ function useColumnCount() {
   const [cols, setCols] = useState(2)
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
-    const sm   = window.matchMedia('(min-width: 640px)')
-    const lg   = window.matchMedia('(min-width: 1024px)')
     const xxl  = window.matchMedia('(min-width: 1920px)')
     const qhd  = window.matchMedia('(min-width: 2560px)')
     const uhd  = window.matchMedia('(min-width: 3440px)')
     const update = () =>
       setCols(
-        uhd.matches ? 7 :
-        qhd.matches ? 6 :
-        xxl.matches ? 5 :
-        lg.matches  ? 4 :
-        sm.matches  ? 3 : 2
+        uhd.matches ? 5 :
+        qhd.matches ? 4 :
+        xxl.matches ? 3 : 2
       )
     update()
-    const queries = [sm, lg, xxl, qhd, uhd]
+    const queries = [xxl, qhd, uhd]
     queries.forEach(q => q.addEventListener('change', update))
     return () => queries.forEach(q => q.removeEventListener('change', update))
   }, [])
@@ -196,64 +244,9 @@ function useColumnCount() {
 export function MasonryGrid({ projects }: { projects: Work[] }) {
   const numCols = useColumnCount()
   const columns = distributeIntoColumns(projects, numCols)
-  const [hoveredSlug, setHoveredSlug] = useState<string | null>(null)
-  const [activeSlug, setActiveSlug]   = useState<string | null>(null)
-  const [imgIndex, setImgIndex]       = useState(0)
-  const [pos, setPos]                 = useState({ x: 0, y: 0 })
-  const [hasHover, setHasHover]       = useState(false)
-  const [openWork, setOpenWork]       = useState<Work | null>(null)
-  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const slideTimer = useRef<ReturnType<typeof setInterval> | null>(null)
-
-  useEffect(() => {
-    if (typeof window === 'undefined' || !window.matchMedia) return
-    const mq = window.matchMedia('(hover: hover) and (pointer: fine)')
-    setHasHover(mq.matches)
-    const update = (e: MediaQueryListEvent) => setHasHover(e.matches)
-    mq.addEventListener('change', update)
-    return () => mq.removeEventListener('change', update)
-  }, [])
-
-  const handleEnter = useCallback((slug: string) => {
-    if (leaveTimer.current) clearTimeout(leaveTimer.current)
-
-    // Preload images to avoid lag
-    const imgs = previewImages[slug] ?? []
-    imgs.forEach(src => { const img = new Image(); img.src = src })
-
-    setHoveredSlug(slug)
-    setActiveSlug(slug)
-    setImgIndex(0)
-
-    if (slideTimer.current) clearInterval(slideTimer.current)
-    if (imgs.length > 1) {
-      slideTimer.current = setInterval(() => {
-        setImgIndex(i => (i + 1) % imgs.length)
-      }, 1400)
-    }
-  }, [])
-
-  const handleLeave = useCallback(() => {
-    leaveTimer.current = setTimeout(() => {
-      setHoveredSlug(null)
-      if (slideTimer.current) clearInterval(slideTimer.current)
-    }, 120)
-  }, [])
-
-  const handleMouseMove = useCallback((e: React.MouseEvent) => {
-    setPos({ x: e.clientX, y: e.clientY })
-  }, [])
-
-  useEffect(() => () => {
-    if (slideTimer.current) clearInterval(slideTimer.current)
-  }, [])
-
-  const images = activeSlug ? (previewImages[activeSlug] ?? []) : []
-  const currentSrc = images[imgIndex] ?? ''
+  const [openWork, setOpenWork] = useState<Work | null>(null)
 
   const handleOpen = useCallback((project: Work) => {
-    if (slideTimer.current) clearInterval(slideTimer.current)
-    setHoveredSlug(null)
     setOpenWork(project)
   }, [])
 
@@ -262,10 +255,7 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
   }, [])
 
   return (
-    <div
-      className="p-5"
-      onMouseMove={hasHover ? handleMouseMove : undefined}
-    >
+    <div className="p-5">
       <div className="flex gap-5">
         {columns.map((col, ci) => (
           <div key={ci} className="flex-1 min-w-0 flex flex-col gap-5">
@@ -274,9 +264,6 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
                 key={project.slug}
                 project={project}
                 index={ci * columns.length + i}
-                hasHover={hasHover}
-                onEnter={handleEnter}
-                onLeave={handleLeave}
                 onOpen={handleOpen}
               />
             ))}
@@ -292,32 +279,6 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
         work={openWork && openWork.type !== 'case-study' ? openWork : null}
         onClose={handleClose}
       />
-
-      <AnimatePresence>
-        {hasHover && hoveredSlug && currentSrc && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.88, y: 14 }}
-            animate={{ opacity: 1, scale: 1,    y: 0  }}
-            exit={{    opacity: 0, scale: 0.88, y: 14 }}
-            transition={{ duration: 0.2, ease: [0.25, 0.1, 0.25, 1] }}
-            className="fixed z-50 pointer-events-none w-72 h-48 rounded-2xl overflow-hidden border border-border shadow-2xl"
-            style={{ left: pos.x, top: pos.y, translateX: '-50%', translateY: '-110%' }}
-          >
-            <AnimatePresence initial={false} mode="popLayout">
-              <motion.img
-                key={currentSrc}
-                src={currentSrc}
-                alt=""
-                initial={{ x: '100%' }}
-                animate={{ x: '0%' }}
-                exit={{    x: '-100%' }}
-                transition={{ duration: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
-                className="absolute inset-0 w-full h-full object-cover"
-              />
-            </AnimatePresence>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }
