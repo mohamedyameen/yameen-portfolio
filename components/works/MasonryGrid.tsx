@@ -194,7 +194,7 @@ function ProjectCard({
               <div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />
             )}
           </div>
-            <div className="absolute left-2 right-2 top-2 flex flex-wrap items-center justify-end gap-1.5">
+            <div className="absolute left-3 right-3 top-3 flex flex-wrap items-center justify-end gap-1.5">
               {(project.type === 'case-study' || project.type === 'component') && project.tags[0] && (
                 <span className="rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/85 backdrop-blur-sm">
                   {project.tags[0]}
@@ -210,7 +210,7 @@ function ProjectCard({
               ))}
             </div>
         </div>
-        <div className="flex flex-col gap-1 px-1 pt-2">
+        <div className="flex flex-col gap-1.5 px-1.5 pt-3">
           <span className="text-sm font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
             {project.name}
           </span>
@@ -282,10 +282,10 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
   }, [])
 
   return (
-    <div className="p-4 sm:p-5">
-      <div className="flex gap-4 sm:gap-5">
+    <div className="p-5 sm:p-6 xl:p-8">
+      <div className="flex gap-5 sm:gap-6 xl:gap-7">
         {columns.map((col, ci) => (
-          <div key={ci} className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
+          <div key={ci} className="flex-1 min-w-0 flex flex-col gap-6 sm:gap-7 xl:gap-8">
             {col.map((project, i) => (
               <ProjectCard
                 key={project.slug}

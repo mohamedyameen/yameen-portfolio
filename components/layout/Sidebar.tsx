@@ -120,7 +120,7 @@ function SidebarIntro({
         ease: PANEL_EASE,
         opacity: { duration: PANEL_DURATION * 0.75, ease: PANEL_EASE },
       }}
-      className="flex flex-col gap-5"
+      className="flex flex-col gap-6"
     >
       <motion.h1
         {...rise}
@@ -279,7 +279,7 @@ function SidebarSocials() {
 function SidebarFooter() {
   const { condition, temperature } = useWeather()
   return (
-    <div className="flex items-end justify-between gap-3 pb-6">
+    <div className="flex items-end justify-between gap-4 pb-7 xl:pb-8">
       <div className="flex flex-col gap-1 [&_span]:!text-foreground/75">
         <LiveClock />
         <div className="text-xs tracking-wide text-foreground/60">
@@ -312,7 +312,7 @@ function SidebarContent({
   }, [showAbout, onAboutChange])
 
   return (
-    <div className="flex shrink-0 flex-col gap-8">
+    <div className="flex shrink-0 flex-col gap-10">
       {!hideName && (
         <div className="flex items-center gap-3 leading-none">
           <Link
@@ -468,7 +468,7 @@ export default function Sidebar() {
       >
         <AmbientBackdrop veiled={aboutOpen} media="(min-width: 1024px)" />
 
-        <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pt-6">
+        <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-7 pt-7 xl:px-8 xl:pt-8">
           <SidebarContent onAboutChange={setAboutOpen} controls={<Controls />} />
 
           <div className="flex min-h-0 flex-1 flex-col justify-end">
@@ -483,7 +483,7 @@ export default function Sidebar() {
       {isHome ? (
         <section className="dark relative isolate flex min-h-[88svh] flex-col overflow-hidden border-b border-border bg-background text-foreground lg:hidden">
           <AmbientBackdrop veiled={heroAboutOpen} media="(max-width: 1023px)" />
-          <div className="relative z-10 flex flex-1 flex-col px-5 pt-5 sm:px-8 sm:pt-6">
+          <div className="relative z-10 flex flex-1 flex-col px-6 pt-6 sm:px-8 sm:pt-7">
             <SidebarContent onAboutChange={setHeroAboutOpen} controls={<Controls />} />
             <div className="flex flex-1 flex-col justify-end pt-12">
               <SidebarFooter />
@@ -534,7 +534,7 @@ export default function Sidebar() {
       {/* ── Mobile drawer ── */}
       <aside
         className={cn(
-          'fixed bottom-0 left-0 top-[72px] z-50 flex w-80 flex-col overflow-y-auto border-r border-border bg-background px-5 py-6 transition-transform duration-200 md:top-14 lg:hidden',
+          'fixed bottom-0 left-0 top-[72px] z-50 flex w-80 flex-col overflow-y-auto border-r border-border bg-background px-6 py-7 transition-transform duration-200 md:top-14 lg:hidden',
           open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
