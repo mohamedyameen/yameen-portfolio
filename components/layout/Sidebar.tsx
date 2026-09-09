@@ -1,7 +1,7 @@
 'use client'
-import { useState, useEffect, type ReactNode } from 'react'
+import { useState, useEffect, useRef, type ReactNode } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
+import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
 import {
@@ -297,13 +297,19 @@ function SidebarContent({
   onClose,
   controls,
   hideName,
+  onAboutChange,
 }: {
   onClose?: () => void
   controls?: ReactNode
   hideName?: boolean
+  /** Fires when the intro ⇄ about view flips (desktop uses it to blur the backdrop). */
+  onAboutChange?: (open: boolean) => void
 }) {
   const { playHover, playClick } = useSound()
   const [showAbout, setShowAbout] = useState(false)
+  useEffect(() => {
+    onAboutChange?.(showAbout)
+  }, [showAbout, onAboutChange])
 
   return (
     <div className="flex shrink-0 flex-col gap-8">
@@ -341,8 +347,101 @@ function SidebarContent({
   )
 }
 
+/**
+ * Ambient video stack shared by the desktop panel and the mobile hero.
+ *
+ * The clip is 512×768 (2:3) while both containers are much taller than that,
+ * so stretching it edge-to-edge upscales and crops it badly. Instead a heavily
+ * blurred, oversized copy fills the container as a slowly drifting colour
+ * glow, and the sharp clip sits at its true ratio at the bottom, edges masked
+ * into that glow. Same footage in both layers, so the join is seamless.
+ *
+ * `media` gates the <source> so only the visible variant downloads the file
+ * (desktop panel ≥ lg, mobile hero < lg). `veiled` frosts the whole surface
+ * while the "more about me" view is open.
+ */
+function AmbientBackdrop({ veiled, media }: { veiled: boolean; media: string }) {
+  const ref = useRef<HTMLDivElement>(null)
+  // Honour prefers-reduced-motion: leave the poster frames, don't play.
+  useEffect(() => {
+    const root = ref.current
+    if (!root || !window.matchMedia) return
+    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
+    const apply = () => {
+      root.querySelectorAll('video').forEach((v) => {
+        if (mq.matches) v.pause()
+        else void v.play().catch(() => {})
+      })
+    }
+    apply()
+    mq.addEventListener('change', apply)
+    return () => mq.removeEventListener('change', apply)
+  }, [])
+
+  return (
+    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        disablePictureInPicture
+        poster="/bg/sidebar-ambient.jpg"
+        className="sidebar-glow absolute inset-0 size-full object-cover opacity-80 blur-3xl saturate-[1.4]"
+      >
+        <source src="/bg/sidebar-ambient.mp4" type="video/mp4" media={media} />
+      </video>
+      <div
+        className="absolute inset-x-0 bottom-0 aspect-[2/3] w-full"
+        style={{
+          maskImage:
+            'linear-gradient(to bottom, transparent 0%, black 30%, black 82%, transparent 100%)',
+          WebkitMaskImage:
+            'linear-gradient(to bottom, transparent 0%, black 30%, black 82%, transparent 100%)',
+        }}
+      >
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          disablePictureInPicture
+          poster="/bg/sidebar-ambient.jpg"
+          className="size-full object-cover"
+        >
+          <source src="/bg/sidebar-ambient.mp4" type="video/mp4" media={media} />
+        </video>
+      </div>
+      {/* Grain + vignette: one cinematic surface over both video layers. */}
+      <div className="film-grain absolute inset-0 opacity-[0.08] mix-blend-overlay" />
+      <div className="absolute inset-0 shadow-[inset_0_0_140px_rgba(0,0,0,0.55)]" />
+      {/* Scrims behind the copy (top) and footer (bottom), fading to clear. */}
+      <div className="absolute inset-x-0 top-0 h-[58%] bg-gradient-to-b from-background/85 via-background/40 to-transparent" />
+      <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-background/90 via-background/45 to-transparent" />
+      {/* Reading veil — frosts everything while the about view is open. */}
+      <motion.div
+        initial={false}
+        animate={{ opacity: veiled ? 1 : 0 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+        className="absolute inset-0 bg-background/70 backdrop-blur-2xl"
+      />
+    </div>
+  )
+}
+
+const Controls = () => (
+  <div className="flex items-center gap-1">
+    <SoundToggle />
+    <ThemeToggle />
+  </div>
+)
+
 export default function Sidebar() {
+  const pathname = usePathname()
+  const isHome = pathname === '/'
   const [open, setOpen] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
+  const [heroAboutOpen, setHeroAboutOpen] = useState(false)
 
   useEffect(() => {
     const onResize = () => {
@@ -363,34 +462,14 @@ export default function Sidebar() {
     <>
       {/* ── Desktop sidebar ── */}
       <aside
-        className="fixed left-0 top-0 z-30 hidden h-screen w-[26rem] flex-col overflow-hidden border-r border-border bg-background lg:flex"
+        // `dark` pins this panel to the dark palette in both themes: the
+        // footage is a night scene, and light-mode fades washed it out.
+        className="dark fixed left-0 top-0 z-30 hidden h-screen w-[28rem] flex-col overflow-hidden border-r border-border bg-background text-foreground lg:flex"
       >
-        {/* Ambient sky — fades into the panel background so it blends
-            seamlessly in both light and dark (gradient ends on --background). */}
-        <div aria-hidden className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%]">
-          <Image
-            src="/works/mellow/bg-sky.jpg"
-            alt=""
-            fill
-            sizes="416px"
-            className="object-cover opacity-80 dark:opacity-55"
-            draggable={false}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background/0 via-background/40 to-background" />
-          {/* Bottom scrim — keeps the footer text + social icons legible over
-              the bright sky, in both light and dark (fades to --background). */}
-          <div className="absolute inset-x-0 bottom-0 h-2/5 bg-gradient-to-t from-background via-background/85 to-transparent" />
-        </div>
+        <AmbientBackdrop veiled={aboutOpen} media="(min-width: 1024px)" />
 
         <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-6 pt-6">
-          <SidebarContent
-            controls={
-              <div className="flex items-center gap-1">
-                <SoundToggle />
-                <ThemeToggle />
-              </div>
-            }
-          />
+          <SidebarContent onAboutChange={setAboutOpen} controls={<Controls />} />
 
           <div className="flex min-h-0 flex-1 flex-col justify-end">
             <SidebarFooter />
@@ -398,6 +477,23 @@ export default function Sidebar() {
         </div>
       </aside>
 
+      {/* ── Mobile / tablet: on the home route the panel becomes the page's
+          hero section (in flow, above the grid) instead of hiding behind a
+          hamburger. Inner pages keep the compact header + drawer below. ── */}
+      {isHome ? (
+        <section className="dark relative isolate flex min-h-[88svh] flex-col overflow-hidden border-b border-border bg-background text-foreground lg:hidden">
+          <AmbientBackdrop veiled={heroAboutOpen} media="(max-width: 1023px)" />
+          <div className="relative z-10 flex flex-1 flex-col px-5 pt-5 sm:px-8 sm:pt-6">
+            <SidebarContent onAboutChange={setHeroAboutOpen} controls={<Controls />} />
+            <div className="flex flex-1 flex-col justify-end pt-12">
+              <SidebarFooter />
+            </div>
+          </div>
+        </section>
+      ) : (
+        <>
+          {/* In-flow spacer so page content clears the fixed header. */}
+          <div aria-hidden className="h-[72px] md:h-14 lg:hidden" />
       {/* ── Mobile / tablet top header ── */}
       <header
         className="fixed inset-x-0 top-0 z-50 border-b border-border bg-background lg:hidden"
@@ -442,8 +538,10 @@ export default function Sidebar() {
           open ? 'translate-x-0' : '-translate-x-full',
         )}
       >
-        <SidebarContent onClose={() => setOpen(false)} hideName />
-      </aside>
+            <SidebarContent onClose={() => setOpen(false)} hideName />
+          </aside>
+        </>
+      )}
     </>
   )
 }

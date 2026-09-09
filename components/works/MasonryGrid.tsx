@@ -10,6 +10,7 @@ import { WorkModal } from '@/components/works/WorkModal'
 import { WorkSheet } from '@/components/works/WorkSheet'
 import { bodyLoaders, lazyBodies } from '@/content/works/bodies'
 import { PhoneFrame } from '@/components/works/PhoneScene'
+import { blurProps } from '@/content/blur'
 
 /** Card-size iPhone frame used by the heroScene preview. */
 function ScenePhone({ src }: { src: string }) {
@@ -19,7 +20,7 @@ function ScenePhone({ src }: { src: string }) {
 // Rendered card width per column count (see useColumnCount). Lets next/image
 // pick a candidate close to the real card size instead of the full source.
 const CARD_SIZES =
-  '(min-width: 3440px) 20vw, (min-width: 2560px) 25vw, (min-width: 1920px) 33vw, 50vw'
+  '(max-width: 639px) 100vw, (min-width: 3440px) 20vw, (min-width: 2560px) 25vw, (min-width: 1920px) 33vw, 50vw'
 
 function ProjectCard({
   project,
@@ -73,6 +74,7 @@ function ProjectCard({
                   src={project.heroScene.bg}
                   alt=""
                   fill
+                  {...blurProps(project.heroScene.bg)}
                   sizes={CARD_SIZES}
                   priority={priority}
                   className={cn(
@@ -121,6 +123,7 @@ function ProjectCard({
                       src={project.heroPreview.bg}
                       alt=""
                       fill
+                      {...blurProps(project.heroPreview.bg)}
                       sizes={CARD_SIZES}
                       priority={priority}
                       className="object-cover"
@@ -142,6 +145,7 @@ function ProjectCard({
                     src={project.heroPreview.src}
                     alt=""
                     fill
+                    {...blurProps(project.heroPreview.src)}
                     sizes={CARD_SIZES}
                     priority={priority}
                     style={{ objectPosition: project.heroPreview.focus ?? 'left top' }}
@@ -154,6 +158,7 @@ function ProjectCard({
                 src={project.media.src}
                 alt=""
                 fill
+                {...blurProps(project.media.src)}
                 sizes={CARD_SIZES}
                 priority={priority}
                 className="object-cover"
@@ -179,6 +184,7 @@ function ProjectCard({
                 src={project.cover}
                 alt=""
                 fill
+                {...blurProps(project.cover)}
                 sizes={CARD_SIZES}
                 priority={priority}
                 style={{ objectPosition: project.coverPosition }}
@@ -188,7 +194,7 @@ function ProjectCard({
               <div className={`absolute inset-0 bg-gradient-to-br ${project.accent}`} />
             )}
           </div>
-            <div className="absolute right-2 top-2 flex items-center gap-1.5">
+            <div className="absolute left-2 right-2 top-2 flex flex-wrap items-center justify-end gap-1.5">
               {(project.type === 'case-study' || project.type === 'component') && project.tags[0] && (
                 <span className="rounded-full border border-white/15 bg-black/45 px-2 py-0.5 text-[10px] font-medium text-white/85 backdrop-blur-sm">
                   {project.tags[0]}
@@ -243,6 +249,7 @@ function useColumnCount() {
   const [cols, setCols] = useState(2)
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
+    const sm   = window.matchMedia('(min-width: 640px)')
     const xxl  = window.matchMedia('(min-width: 1920px)')
     const qhd  = window.matchMedia('(min-width: 2560px)')
     const uhd  = window.matchMedia('(min-width: 3440px)')
@@ -250,10 +257,11 @@ function useColumnCount() {
       setCols(
         uhd.matches ? 5 :
         qhd.matches ? 4 :
-        xxl.matches ? 3 : 2
+        xxl.matches ? 3 :
+        sm.matches  ? 2 : 1
       )
     update()
-    const queries = [xxl, qhd, uhd]
+    const queries = [sm, xxl, qhd, uhd]
     queries.forEach(q => q.addEventListener('change', update))
     return () => queries.forEach(q => q.removeEventListener('change', update))
   }, [])
@@ -274,10 +282,10 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
   }, [])
 
   return (
-    <div className="p-5">
-      <div className="flex gap-5">
+    <div className="p-4 sm:p-5">
+      <div className="flex gap-4 sm:gap-5">
         {columns.map((col, ci) => (
-          <div key={ci} className="flex-1 min-w-0 flex flex-col gap-5">
+          <div key={ci} className="flex-1 min-w-0 flex flex-col gap-4 sm:gap-5">
             {col.map((project, i) => (
               <ProjectCard
                 key={project.slug}

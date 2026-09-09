@@ -107,7 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <SmoothScroll />
                 <ScrollbarOverlay />
                 <Sidebar />
-                <main className="min-h-screen pt-[72px] md:pt-14 lg:pt-0 lg:pl-[26rem]">
+                <main className="min-h-screen lg:pl-[28rem]">
                   <PageTransition>{children}</PageTransition>
                 </main>
               </LayoutGroup>
