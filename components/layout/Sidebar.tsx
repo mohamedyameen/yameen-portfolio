@@ -189,7 +189,13 @@ function SidebarIntro({
         </em>{' '}
         that scale.
       </motion.h1>
-      <motion.p {...rise} transition={riseAt(1)} className="text-sm leading-relaxed text-foreground/80">
+      <motion.p
+        {...rise}
+        transition={riseAt(1)}
+        // Mobile reads this over the photograph, so it runs a step larger and
+        // brighter there; the desktop panel keeps the quieter setting.
+        className="text-[15px] leading-relaxed text-foreground/90 lg:text-sm lg:text-foreground/80"
+      >
         Think of this as my desk — products I&apos;ve shipped, prototypes
         I&apos;ve kept, and the experiments I started just to see what would
         happen. Some intentional, some impulsive, all worth keeping around.
@@ -203,7 +209,10 @@ function SidebarIntro({
           playClick()
           onOpenAbout()
         }}
-        className="group inline-flex items-center gap-1 self-start text-sm text-foreground/55 transition-colors hover:text-foreground"
+        // Below lg the link sits on the photo's brightest region, where a
+        // 55%-opacity text link disappears. A frosted pill holds its own
+        // there; on the desktop panel the plain link is enough.
+        className="group inline-flex items-center gap-1 self-start text-sm text-foreground/55 transition-colors hover:text-foreground max-lg:rounded-full max-lg:border max-lg:border-foreground/20 max-lg:bg-background/45 max-lg:px-4 max-lg:py-2 max-lg:text-foreground/90 max-lg:backdrop-blur-md"
       >
         more about me
         <ArrowUpRightIcon
@@ -408,14 +417,14 @@ function AmbientBackdrop({ veiled }: { veiled: boolean }) {
         className="sidebar-glow absolute inset-0 bg-cover bg-center opacity-80 blur-3xl saturate-[1.4]"
         style={{ backgroundImage: `url(${DESK_PHOTO})` }}
       />
+      {/* Below lg the hero is a tall, narrow phone screen: a full-width
+          square would start less than halfway down and put the window light
+          directly behind the paragraph. So the sharp copy is cropped to a
+          band across the lower half there (bg-cover keeps the desk), and
+          only the desktop panel — which has the height to spare — shows it
+          at its true 1:1. */}
       <div
-        className="absolute inset-x-0 bottom-0 aspect-square w-full"
-        style={{
-          maskImage:
-            'linear-gradient(to bottom, transparent 0%, black 30%, black 82%, transparent 100%)',
-          WebkitMaskImage:
-            'linear-gradient(to bottom, transparent 0%, black 30%, black 82%, transparent 100%)',
-        }}
+        className="absolute inset-x-0 bottom-0 h-[50%] w-full [mask-image:linear-gradient(to_bottom,transparent_0%,black_42%,black_82%,transparent_100%)] lg:h-auto lg:aspect-square lg:[mask-image:linear-gradient(to_bottom,transparent_0%,black_30%,black_82%,transparent_100%)]"
       >
         <div
           className="size-full bg-cover bg-center"
@@ -433,7 +442,7 @@ function AmbientBackdrop({ veiled }: { veiled: boolean }) {
           desktop panel, but the mobile hero is narrower, so the same copy
           wraps longer and needs the deeper cover. Below it the photograph is
           left to read on its own. */}
-      <div className="absolute inset-x-0 top-0 h-[58%] bg-gradient-to-b from-background/85 via-background/45 to-transparent lg:h-[46%]" />
+      <div className="absolute inset-x-0 top-0 h-[64%] bg-gradient-to-b from-background/95 via-background/65 to-transparent lg:h-[46%] lg:from-background/85 lg:via-background/45" />
       <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-background/88 via-background/40 to-transparent lg:h-[24%]" />
       {/* Reading veil — frosts everything while the about view is open. */}
       <motion.div

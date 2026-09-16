@@ -2,6 +2,8 @@ import {
   Text,
   Section,
   Prose,
+  Points,
+  Point,
   Callout,
 } from '@/components/works/body'
 import { SceneShot } from '@/components/works/SceneShot'
@@ -12,12 +14,12 @@ export default function Body() {
       <Section id="problem" label="The problem" tocLabel="The problem">
         <Prose>
           <Text>
-            Teams live in a chat app and a task tracker at once. Context leaks
-            through the seam — links pasted back and forth, status duplicated,
-            decisions buried in a DM.
+            Teams live in a chat app and a task tracker at once, and context
+            leaks through the seam — links pasted back and forth, decisions
+            buried in a DM.
           </Text>
           <Text>
-            The brief: collapse both into one surface, with neither feeling
+            <strong>The brief:</strong> one surface, with neither half feeling
             bolted on.
           </Text>
         </Prose>
@@ -25,31 +27,28 @@ export default function Body() {
 
       <Section id="approach" label="Three principles" tocLabel="Approach">
         <Prose>
-          <Text>
-            <strong>One surface, shared primitives.</strong> Any message can
-            become a task; any task keeps the thread that made it.
-          </Text>
-          <Text>
-            <strong>AI as triage, not a chatbot.</strong> It surfaces the few
-            things that need you and stays quiet otherwise.
-          </Text>
-          <Text>
-            <strong>Calm by default.</strong> Light surface, one accent, so
-            real signal reads as signal.
-          </Text>
+          <Points numbered>
+            <Point lead="One surface, shared primitives.">
+              Any message can become a task; any task keeps the thread that
+              made it.
+            </Point>
+            <Point lead="AI as triage, not a chatbot.">
+              It surfaces the few things that need you and stays quiet
+              otherwise.
+            </Point>
+            <Point lead="Calm by default.">
+              Light surface, one accent, so real signal reads as signal.
+            </Point>
+          </Points>
         </Prose>
       </Section>
 
       <Section id="onboarding" label="Getting in" tocLabel="Getting in">
         <Prose>
           <Text>
-            One decision per screen: sign in, verify a code, set up a profile —
-            with a live preview of the app alongside so the payoff is visible
-            before you commit.
-          </Text>
-          <Text>
-            Org setup then seeds sensible defaults, and the last step invites
-            the team with roles set up front.
+            One decision per screen — sign in, verify, set up a profile — with
+            a live preview alongside so the payoff shows before you commit. Org
+            setup seeds defaults; the last step invites the team with roles.
           </Text>
         </Prose>
         <SceneShot
@@ -79,12 +78,8 @@ export default function Body() {
         <Prose>
           <Text>
             Home opens on what the assistant judged worth your attention, plus
-            your mentions — not an unread-count firehose. Every card opens
-            straight into its thread.
-          </Text>
-          <Text>
-            My Tasks filters the same data down to just you, grouped by status
-            — so the morning starts with a plan, not a backlog.
+            your mentions — not an unread-count firehose. My Tasks filters the
+            same data down to just you, grouped by status.
           </Text>
         </Prose>
         <SceneShot
@@ -104,12 +99,9 @@ export default function Body() {
       <Section id="ai" label="Mellow AI" tocLabel="Mellow AI">
         <Prose>
           <Text>
-            One tap away, and it starts from prompts drawn from your actual
-            work — pending tasks, deadlines, unresolved threads.
-          </Text>
-          <Text>
-            Answers are grounded in your tasks and conversations, and every
-            chat is kept in Recents to pick up later.
+            One tap away, starting from prompts drawn from your actual work —
+            pending tasks, deadlines, unresolved threads. Answers are grounded
+            in your data, and every chat stays in Recents.
           </Text>
         </Prose>
         <SceneShot
@@ -130,12 +122,8 @@ export default function Body() {
         <Prose>
           <Text>
             A workspace is a team&apos;s space; inside it, conversation is
-            organised into Topics instead of one endless channel. Each topic
-            carries a Discussions tab and a Tasks tab side by side.
-          </Text>
-          <Text>
-            Creating a workspace and managing its people share one lightweight
-            modal — name, description, add people. No wizard.
+            organised into Topics, each with Discussions and Tasks side by
+            side. Creating one is a single modal — no wizard.
           </Text>
         </Prose>
         <SceneShot
@@ -156,8 +144,8 @@ export default function Body() {
         <Prose>
           <Text>
             Full messaging — mentions, quoted replies, reactions, attachments.
-            But because a topic is a container, this is also where a message
-            becomes a task, and a long thread condenses into an AI summary.
+            Because a topic is a container, a message here becomes a task, and
+            a long thread condenses into an AI summary.
           </Text>
         </Prose>
         <SceneShot
@@ -177,15 +165,14 @@ export default function Body() {
       <Section id="tasks" label="Tasks" tocLabel="Tasks">
         <Prose>
           <Text>
-            Tasks live in the same topic as the conversation that spawned them,
-            as a grouped List or a Kanban board. One shared control row — Group
-            By and Show Completed — so switching views never means relearning.
+            Tasks live in the topic that spawned them, as a List or a Kanban
+            board, with one shared control row so switching views never means
+            relearning.
           </Text>
         </Prose>
         <Callout>
-          Every task card reads the same everywhere — home, list, board, or
-          thread. That single anatomy is what makes &ldquo;one surface&rdquo;
-          feel like one surface.
+          Every task card reads the same everywhere — home, list, board,
+          thread. One anatomy is what makes one surface feel like one surface.
         </Callout>
         <SceneShot
           src="/works/mellow/tasks-list.jpg"
@@ -208,9 +195,9 @@ export default function Body() {
       <Section id="dm" label="Direct messages" tocLabel="Direct messages">
         <Prose>
           <Text>
-            DMs reuse the topic primitives — a message can still become a
-            task. Link previews unfurl, files render as inline cards, and the
-            empty state names who you&apos;re about to talk to.
+            DMs reuse the topic primitives — a message can still become a task.
+            Links unfurl, files render inline, and the empty state names who
+            you&apos;re about to talk to.
           </Text>
         </Prose>
         <SceneShot
@@ -234,14 +221,10 @@ export default function Body() {
       <Section id="close" label="What held it together" tocLabel="Reflection" className="lg:mt-40">
         <Prose>
           <Text>
-            The promise that chat and tasks are one thing only holds if the
-            shared pieces are genuinely shared: one card anatomy, one set of
-            controls, one way a message turns into work.
-          </Text>
-          <Text>
-            Shipping solo across 40+ screens, that system was the guardrail —
-            tokens, states, and reused primitives doing the work a larger team
-            would spread across reviews.
+            Chat and tasks are one thing only if the shared pieces are
+            genuinely shared: one card anatomy, one control row, one way a
+            message turns into work. Solo across 40+ screens, that system was
+            the guardrail.
           </Text>
         </Prose>
       </Section>

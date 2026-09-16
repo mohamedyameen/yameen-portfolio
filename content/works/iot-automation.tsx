@@ -2,6 +2,8 @@ import {
   Text,
   Section,
   Prose,
+  Points,
+  Point,
   Callout,
 } from '@/components/works/body'
 import { PhoneScene, PhoneWalkthrough } from '@/components/works/PhoneScene'
@@ -17,31 +19,31 @@ export default function Body() {
         <Prose>
           <Text>
             A smart thermostat is only smart while nothing changes. Leave
-            early, work from home, fly out for a fortnight — and most apps make
-            you either fight the automation with a manual hold or tear up the
-            schedule.
+            early, work from home, fly out — and most apps make you fight the
+            automation or tear up the schedule.
           </Text>
           <Text>
-            The goal: set the week once, drop in a one-off change when life
-            needs it, and trust the plan to resume on its own.
+            <strong>The goal:</strong> set the week once, drop in a one-off
+            change, and trust the plan to resume on its own.
           </Text>
         </Prose>
       </Section>
 
       <Section id="approach" label="The idea" tocLabel="Approach">
         <Prose>
-          <Text>
-            <strong>Profiles name the comfort.</strong> Home, Away, Vacation —
-            set the numbers once, refer to them by name everywhere.
-          </Text>
-          <Text>
-            <strong>The schedule places them in time.</strong> A day is just
-            blocks handing off to each other.
-          </Text>
-          <Text>
-            <strong>Exceptions sit on top, never instead.</strong> Every
-            override has an end date, and the routine stays visible beneath it.
-          </Text>
+          <Points numbered>
+            <Point lead="Profiles name the comfort.">
+              Home, Away, Vacation — set the numbers once, refer to them by
+              name.
+            </Point>
+            <Point lead="The schedule places them in time.">
+              A day is just blocks handing off to each other.
+            </Point>
+            <Point lead="Exceptions sit on top, never instead.">
+              Every override has an end date, and the routine stays visible
+              beneath it.
+            </Point>
+          </Points>
         </Prose>
       </Section>
 
@@ -49,13 +51,11 @@ export default function Body() {
         <Prose>
           <Text>
             Home answers three questions in order: what is it right now, is the
-            system on, can I change it. Indoor temperature and master power
-            lead; weather, humidity, and last sync sit underneath as context.
+            system on, can I change it.
           </Text>
           <Text>
-            Switch to Heat and the panel responds — the slider warms to amber
-            and a fan-speed card slides in. Only the controls for the current
-            mode appear.
+            Switch to Heat and the slider warms to amber and a fan-speed card
+            slides in. Only the current mode&apos;s controls appear.
           </Text>
         </Prose>
         <PhoneScene
@@ -75,7 +75,7 @@ export default function Body() {
               alt: 'Home control panel in Heat mode — 27°C set point on an amber slider with a fan-speed card at 80%',
             },
           ]}
-          caption="On, off, and heating — off greys out every control, so there's never a live-but-idle state."
+          caption="On, off, and heating — off greys out every control."
         />
         <PhoneWalkthrough
           bg={BG}
@@ -86,19 +86,19 @@ export default function Body() {
           notes={[
             {
               title: 'State before controls',
-              body: 'Indoor temperature and power lead; outdoor temp, humidity, and last sync are context, not controls.',
+              body: 'Indoor temperature and power lead; weather and last sync are context.',
             },
             {
               title: 'Occupancy is the big lever',
-              body: 'Auto, Home, Away, Vacation — switch the whole comfort target in one tap.',
+              body: 'Auto, Home, Away, Vacation — one tap switches the whole target.',
             },
             {
               title: 'Set point, colour-coded',
-              body: 'Blue for cooling, amber for heating — the mode reads at a glance.',
+              body: 'Blue for cooling, amber for heating.',
             },
             {
               title: 'Mode as chips',
-              body: 'Power, Auto, Heat, Cool in one row — a single, reversible choice.',
+              body: 'Power, Auto, Heat, Cool — one reversible choice.',
             },
           ]}
           caption="Top to bottom — status, occupancy, target, mode."
@@ -108,13 +108,10 @@ export default function Body() {
       <Section id="comfort" label="Comfort profiles" tocLabel="Comfort profiles">
         <Prose>
           <Text>
-            Three named presets — Home, Away, Vacation — each a bundle of
-            heating, cooling, and fan speed, described by intent rather than
-            numbers.
-          </Text>
-          <Text>
-            Vacation reframes the same editor as &ldquo;preference&rdquo; — a
-            small wording shift that says keep it safe, not comfortable.
+            Three named presets, each a bundle of heating, cooling and fan
+            speed, described by intent rather than numbers. Vacation reframes
+            the same editor as &ldquo;preference&rdquo; — keep it safe, not
+            comfortable.
           </Text>
         </Prose>
         <PhoneWalkthrough
@@ -126,11 +123,11 @@ export default function Body() {
           notes={[
             {
               title: 'Intent first',
-              body: '“Keep your home cozy when you’re there” — each profile leads with why it exists.',
+              body: '“Keep your home cozy when you’re there” — each profile leads with why.',
             },
             {
               title: 'Heating and cooling together',
-              body: 'Sun and snowflake on one line — a profile is a complete comfort stance.',
+              body: 'A profile is a complete comfort stance, on one line.',
             },
             {
               title: 'Fan carries the energy story',
@@ -155,20 +152,19 @@ export default function Body() {
               alt: 'Vacation comfort profile editor — Heat Preference and Cool Preference',
             },
           ]}
-          caption="Editing Home, Away, and Vacation — the same anatomy every time."
+          caption="Home, Away, Vacation — the same anatomy every time."
         />
         <Callout>
           Profiles are the single source of truth. Change &ldquo;Home&rdquo;
-          once and every schedule block and exception that points at it
-          updates — nobody re-enters the same three numbers twice.
+          once and every block and exception pointing at it updates.
         </Callout>
       </Section>
 
       <Section id="schedule" label="The schedule" tocLabel="Schedule">
         <Prose>
           <Text>
-            A week strip above a timeline of the day&apos;s comfort blocks — it
-            reads like a calendar, not a config screen.
+            A week strip over a timeline of comfort blocks — a calendar, not a
+            config screen.
           </Text>
           <Text>
             Adding a block asks three things: which profile, which days, what
@@ -191,7 +187,7 @@ export default function Body() {
               alt: 'Start-time wheel picker over the Add Activity sheet',
             },
           ]}
-          caption="Timeline, Add Activity, and the time picker — pick a profile, pick days, pick a time."
+          caption="Pick a profile, pick days, pick a time."
         />
         <PhoneScene
           bg={BG}
@@ -201,16 +197,16 @@ export default function Body() {
               alt: 'Schedule timeline with three blocks — Home, Away, and Home running until the next day',
             },
           ]}
-          caption="A fuller day — each block hands off to the next; the last one holds “Until Next Day.”"
+          caption="Each block hands off to the next; the last one holds “Until Next Day.”"
         />
       </Section>
 
       <Section id="exceptions" label="Exceptions" tocLabel="Exceptions">
         <Prose>
           <Text>
-            &ldquo;Today is different.&rdquo; The same Add Activity sheet has a
-            Type toggle — flip it to Exception and the day picker becomes a
-            start and end date-time. One form, two jobs.
+            &ldquo;Today is different.&rdquo; Flip the same sheet&apos;s Type
+            toggle to Exception and the day picker becomes a start and end.
+            One form, two jobs.
           </Text>
         </Prose>
         <PhoneScene
@@ -229,25 +225,20 @@ export default function Body() {
               alt: 'Schedule timeline with an orange Exception block overriding the struck-through Away block beneath it',
             },
           ]}
-          caption="On the timeline the exception lands as an orange block that overrides — not deletes — the schedule beneath."
+          caption="The exception lands as an orange block that overrides — not deletes — the schedule."
         />
         <Callout>
-          The override is honest. The replaced block stays{' '}
-          <em>struck through, right beneath it</em> — you see both the plan
-          and the interruption, and know the routine is waiting to resume.
+          The replaced block stays <em>struck through, right beneath it</em> —
+          you see both the plan and the interruption.
         </Callout>
       </Section>
 
       <Section id="vacation" label="Vacation mode" tocLabel="Vacation">
         <Prose>
           <Text>
-            A holiday is just a long exception. Pick the Vacation profile and
-            sweep a date range on the calendar — it lands as a purple block
-            running minimal-energy targets across the trip.
-          </Text>
-          <Text>
-            Because it has an end date, the normal week snaps back the moment
-            you&apos;re home. No stale holiday hold.
+            A holiday is just a long exception. Pick Vacation, sweep a date
+            range, and it lands as a purple block. Because it has an end date,
+            the normal week snaps back the moment you&apos;re home.
           </Text>
         </Prose>
         <PhoneScene
@@ -266,16 +257,16 @@ export default function Body() {
               alt: 'Schedule timeline for January — Home at 8:00 AM and a purple Vacation block until the next day',
             },
           ]}
-          caption="Pick the profile, sweep a date range, and vacation lands on the timeline as a distinct purple block."
+          caption="Pick the profile, sweep a range, done."
         />
       </Section>
 
       <Section id="settings" label="Settings" tocLabel="Settings">
         <Prose>
           <Text>
-            Deliberately shallow — profile, theme, help, sign-out. The one
-            thing that matters is the activity log: for a device that runs
-            itself, it answers &ldquo;why is it 27° right now?&rdquo;
+            Deliberately shallow. The one thing that matters is the activity
+            log — for a device that runs itself, it answers &ldquo;why is it
+            27° right now?&rdquo;
           </Text>
         </Prose>
         <PhoneScene
@@ -286,7 +277,7 @@ export default function Body() {
               alt: 'Settings — Profile, Theme, Activity Log, User Guide, and Log out',
             },
           ]}
-          caption="Settings — light on purpose, with the activity log as the trust anchor."
+          caption="Light on purpose, with the activity log as the trust anchor."
         />
       </Section>
 
@@ -295,12 +286,8 @@ export default function Body() {
           <Text>
             One form and one vocabulary doing double duty. Profiles name the
             comfort, the schedule places it in time, and a single Type toggle
-            turns the same sheet into either the routine or the override.
-          </Text>
-          <Text>
-            Every override is temporary by construction — it carries an end,
-            the plan stays visible beneath it, and the routine resumes on its
-            own.
+            turns the same sheet into either the routine or the override — and
+            every override ends on its own.
           </Text>
         </Prose>
       </Section>

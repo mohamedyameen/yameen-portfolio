@@ -2,6 +2,8 @@ import {
   Text,
   Section,
   Prose,
+  Points,
+  Point,
   Callout,
 } from '@/components/works/body'
 import { PhoneScene, PhoneWalkthrough } from '@/components/works/PhoneScene'
@@ -14,8 +16,8 @@ export default function Body() {
         <Prose>
           <Text>
             Medical hiring in India runs on WhatsApp groups and phone calls. A
-            hospital that needs a radiologist for tomorrow posts in a group,
-            waits for calls, and checks documents in person on joining day.
+            hospital that needs a radiologist tomorrow posts in a group and
+            waits.
           </Text>
           <Text>
             The sharpest pain is <strong>substitution</strong> — urgent cover
@@ -28,18 +30,17 @@ export default function Body() {
 
       <Section id="research" label="Research" tocLabel="Research">
         <Prose>
-          <Text>
-            <strong>Requirements.</strong> Sitting with the client set the
-            must-haves: verified credentials before anyone transacts, a way to
-            broadcast urgent openings, and in-app chat so negotiation is
-            traceable.
-          </Text>
-          <Text>
-            <strong>Market.</strong> Curaa, Docplexus, PlexusMD, and Among
-            Doctors are strong doctor communities — but none takes a hospital
-            from &ldquo;we need a radiologist tomorrow&rdquo; to a verified
-            hire. That gap became the positioning.
-          </Text>
+          <Points>
+            <Point lead="Requirements.">
+              Verified credentials before anyone transacts, a broadcast for
+              urgent openings, and in-app chat so negotiation is traceable.
+            </Point>
+            <Point lead="Market.">
+              Curaa, Docplexus, PlexusMD and Among Doctors are strong
+              communities — none takes a hospital from &ldquo;we need a
+              radiologist tomorrow&rdquo; to a verified hire.
+            </Point>
+          </Points>
         </Prose>
       </Section>
 
@@ -47,8 +48,7 @@ export default function Body() {
         <Prose>
           <Text>
             Nine flows mapped before any UI, covering both sides of the
-            marketplace — from onboarding and listing a job to feedback and
-            support.
+            marketplace.
           </Text>
         </Prose>
         <FlowGallery
@@ -63,21 +63,21 @@ export default function Body() {
             { src: '/works/blubees/flows/chat.jpg', title: 'Chatting with the provider' },
             { src: '/works/blubees/flows/support.jpg', title: 'Customer support' },
           ]}
-          caption="Nine user flows, one per core task — tap any diagram to read it full-screen."
+          caption="One flow per core task — tap any diagram to read it full-screen."
         />
         <Callout>
           Every flow branches on the same axis the business does:{' '}
           <strong>immediate</strong> versus <strong>long-term</strong> hiring.
-          Getting that split right here meant the UI only had to ask it once.
+          Get that split right and the UI only has to ask it once.
         </Callout>
       </Section>
 
       <Section id="onboarding" label="Onboarding & trust" tocLabel="Onboarding">
         <Prose>
           <Text>
-            Anyone can register and look around. A persistent banner then walks
-            each persona through uploading their registration documents —
-            applying stays locked until they&apos;re verified.
+            Anyone can register and look around. A persistent banner walks each
+            persona through uploading registration documents — applying stays
+            locked until they&apos;re verified.
           </Text>
         </Prose>
         <PhoneScene
@@ -95,7 +95,7 @@ export default function Body() {
               alt: 'Tell us about you — details form with a note to keep registration and ID proof ready',
             },
           ]}
-          caption="Welcome → pick your persona → tell us about you. Browse freely, transact once verified."
+          caption="Welcome → persona → details. Browse freely, transact once verified."
         />
       </Section>
 
@@ -103,13 +103,8 @@ export default function Body() {
         <Prose>
           <Text>
             Home leads with two actions: post a job, or browse professionals
-            nearby. Job creation is one screen — type, speciality, work type,
-            location, and the tags that drive matching.
-          </Text>
-          <Text>
-            The same form flexes: pick hygiene workers and a worker-count
-            stepper appears. Colleagues can be invited with per-action
-            permissions.
+            nearby. Job creation is one screen, and the form flexes — pick
+            hygiene workers and a worker-count stepper appears.
           </Text>
         </Prose>
         <PhoneScene
@@ -127,7 +122,7 @@ export default function Body() {
               alt: 'A posted job — application statistics for in-review, shortlisted, and rejected',
             },
           ]}
-          caption="Home, the job board, and a single posting with live application stats."
+          caption="Home, the job board, and a posting with live application stats."
         />
         <PhoneWalkthrough
           screen={{
@@ -141,15 +136,15 @@ export default function Body() {
             },
             {
               title: 'Persona chips pick the audience',
-              body: 'The chip decides which speciality and experience fields appear below.',
+              body: 'The chip decides which fields appear below.',
             },
             {
               title: 'Type of work = type of hire',
-              body: 'Part-time, night duties, full-time, freelancing — the immediate-versus-long-term split as one choice.',
+              body: 'Part-time, night duty, full-time, freelance — immediate versus long-term, as one choice.',
             },
             {
               title: 'Tags drive the matching',
-              body: 'Keywords feed location-based matching and job alerts on the seeker side.',
+              body: 'Keywords feed location matching and job alerts.',
             },
           ]}
           caption="One screen decides who sees the post and how fast."
@@ -177,9 +172,8 @@ export default function Body() {
         <Prose>
           <Text>
             Waiting for applicants doesn&apos;t work for substitution, so the
-            Network tab flips the direction — browse verified professionals
-            nearby with rating and availability up front, filter by experience
-            and distance, and chat instantly.
+            Network tab flips the direction: browse verified professionals
+            nearby with rating and availability up front, and chat instantly.
           </Text>
         </Prose>
         <PhoneScene
@@ -197,7 +191,7 @@ export default function Body() {
               alt: 'Filter the network — years of experience, distance, and speciality',
             },
           ]}
-          caption="Browse by persona, then filter by experience, distance, and speciality."
+          caption="Browse by persona, filter by experience, distance and speciality."
         />
         <PhoneWalkthrough
           screen={{
@@ -207,7 +201,7 @@ export default function Body() {
           notes={[
             {
               title: 'Verified identity first',
-              body: 'Registration number sits under the name — the credential a hospital checks first.',
+              body: 'Registration number under the name — the credential a hospital checks first.',
             },
             {
               title: 'Availability as a badge',
@@ -215,23 +209,23 @@ export default function Body() {
             },
             {
               title: 'Reputation from peers',
-              body: '“Known for” traits accumulate from post-job feedback, not self-description.',
+              body: '“Known for” traits come from post-job feedback, not self-description.',
             },
             {
               title: 'Two instant actions',
               body: 'Check availability or chat now — negotiation stays on-platform.',
             },
           ]}
-          caption="A profile built to be hired from — credentials, availability, reputation, then contact."
+          caption="A profile built to be hired from."
         />
       </Section>
 
       <Section id="reputation" label="Two-way reputation" tocLabel="Reputation">
         <Prose>
           <Text>
-            Institutions are profiles too — highlights, branches, a point of
-            contact — with a public rating from professionals after every job.
-            Accountability runs in both directions.
+            Institutions are profiles too, with a public rating from
+            professionals after every job. Accountability runs in both
+            directions.
           </Text>
         </Prose>
         <PhoneScene
@@ -245,21 +239,16 @@ export default function Body() {
               alt: 'Ratings and reviews — overall rating with a breakdown of experience, staff, management, and facilities',
             },
           ]}
-          caption="Hospitals get scored on experience, staff, management, and facilities."
+          caption="Hospitals get scored on experience, staff, management and facilities."
         />
       </Section>
 
       <Section id="business" label="Advertising & plans" tocLabel="Business">
         <Prose>
           <Text>
-            Hospitals can promote a speciality across the network, and pay
-            on-platform with UPI or a saved card — nothing spills back into
-            phone calls and bank transfers.
-          </Text>
-          <Text>
-            A free plan covers the core workflow; premium adds express posting,
-            richer support, and job-trend data. The marketplace works before
-            anyone pays.
+            Promote a speciality across the network and pay on-platform with
+            UPI or a saved card. A free plan covers the core workflow; premium
+            adds express posting and job-trend data.
           </Text>
         </Prose>
         <PhoneScene
@@ -277,21 +266,17 @@ export default function Body() {
               alt: 'Plan details — free current plan and a premium plan with an upgrade button',
             },
           ]}
-          caption="Advertise, pay, upgrade — all without leaving Blubees."
+          caption="Advertise, pay, upgrade — without leaving Blubees."
         />
       </Section>
 
       <Section id="seekers" label="For professionals" tocLabel="Professionals">
         <Prose>
           <Text>
-            Home opens on jobs hand-picked by speciality and location. A job
-            page answers everything a phone call used to — dates, address,
-            responsibilities — with apply, save, and refer one row away.
-          </Text>
-          <Text>
-            An availability calendar, or a single &ldquo;Available ASAP&rdquo;
-            switch, keeps matching pointed at substitution. Applications become
-            status chips, and even a rejection arrives with a written reason.
+            Home opens on jobs picked by speciality and location, and a single
+            &ldquo;Available ASAP&rdquo; switch keeps matching pointed at
+            substitution. Applications become status chips, and even a
+            rejection arrives with a written reason.
           </Text>
         </Prose>
         <PhoneScene
@@ -309,7 +294,7 @@ export default function Body() {
               alt: 'Job details with a register-and-verify-first dialog',
             },
           ]}
-          caption="Personalised home and the job page — applying gated behind a verified profile."
+          caption="A personalised home and the job page — applying gated behind verification."
         />
         <PhoneScene
           screens={[
@@ -326,7 +311,7 @@ export default function Body() {
               alt: 'Applications — under review, shortlisted, and rejected tabs',
             },
           ]}
-          caption="Mark the days you can work, refer a role onward, track every application as a status."
+          caption="Mark the days you can work, refer a role onward, track every application."
         />
         <PhoneScene
           screens={[
@@ -339,21 +324,16 @@ export default function Body() {
               alt: 'Reasons to reject sheet — a written explanation of why an application was not taken forward',
             },
           ]}
-          caption="Urgency reads in the tags; a rejection closes the loop with an actual reason."
+          caption="Urgency reads in the tags; a rejection closes the loop with a reason."
         />
       </Section>
 
       <Section id="agencies" label="For agencies" tocLabel="Agencies">
         <Prose>
           <Text>
-            Agencies bring a roster, not a résumé. Import workers from Excel or
-            add them one by one, then work against institution postings
-            directly — open &ldquo;Cleaning help required, min 20
-            workers&rdquo; and commit the contract in one tap.
-          </Text>
-          <Text>
-            Placements are tracked as contracts, and the agency carries its
-            own verified profile — registration number, certificate, services.
+            Agencies bring a roster, not a résumé. Import workers from Excel,
+            open a bulk posting like &ldquo;Cleaning help, min 20
+            workers,&rdquo; and commit the contract in one tap.
           </Text>
         </Prose>
         <PhoneScene
@@ -371,7 +351,7 @@ export default function Body() {
               alt: 'Agency repository — searchable worker profiles with tenure, distance, and ratings',
             },
           ]}
-          caption="Import a roster or add workers one by one — each lands in a searchable repository."
+          caption="Import a roster or add workers one by one."
         />
         <PhoneScene
           screens={[
@@ -388,21 +368,16 @@ export default function Body() {
               alt: 'Agency details — team size, registration number, certificate, and services provided',
             },
           ]}
-          caption="Commit a contract, track placements, and carry a verified agency profile."
+          caption="Commit a contract, track placements, carry a verified agency profile."
         />
       </Section>
 
       <Section id="support" label="Support workers" tocLabel="Support workers">
         <Prose>
           <Text>
-            Cleaners, drivers, hygiene staff get the lightest path. No email or
-            password — a phone number, an OTP, and only what matching needs:
-            name, pincode, services. A &ldquo;request a call&rdquo; fallback
-            covers anyone who gets stuck.
-          </Text>
-          <Text>
-            Home meets them where hiring already happens — WhatsApp job groups
-            — and verification asks only for a photo ID.
+            Cleaners, drivers and hygiene staff get the lightest path: a phone
+            number, an OTP, and only what matching needs. Home meets them in
+            WhatsApp job groups, and verification asks for one photo ID.
           </Text>
         </Prose>
         <PhoneScene
@@ -439,18 +414,16 @@ export default function Body() {
 
       <Section id="close" label="What held it together" tocLabel="Reflection" className="lg:mt-40">
         <Prose>
-          <Text>
-            <strong>Symmetry.</strong> Four personas, one marketplace, every
-            flow existing twice. Shared anatomy — same board, same status chips,
-            same profile card — kept a three-sided product from feeling like
-            three products.
-          </Text>
-          <Text>
-            <strong>Trust.</strong> Verification, two-way feedback, and ratings
-            on both sides aren&apos;t features on top of the marketplace.
-            They&apos;re what lets a hospital hand tomorrow&apos;s shift to
-            someone it has never met.
-          </Text>
+          <Points>
+            <Point lead="Symmetry.">
+              Four personas, one marketplace, every flow twice. Shared anatomy
+              kept a three-sided product from feeling like three products.
+            </Point>
+            <Point lead="Trust.">
+              Verification and two-way ratings are what let a hospital hand
+              tomorrow&apos;s shift to someone it has never met.
+            </Point>
+          </Points>
         </Prose>
       </Section>
     </>

@@ -97,7 +97,63 @@ export function Section({
 }
 
 export function Prose({ children }: { children: React.ReactNode }) {
-  return <div className="flex flex-col gap-0.5 sm:gap-1">{children}</div>
+  // Real paragraph spacing. At the old gap-0.5 two Texts fused into one
+  // block, which is most of why the studies read as a wall of text.
+  return <div className="flex flex-col gap-3 sm:gap-3.5">{children}</div>
+}
+
+/**
+ * A scannable list for the "principles" / "what's in it" beats — the place
+ * bodies used to stack three bolded paragraphs. Each Point is one line of
+ * lead + one line of detail. `numbered` swaps the dot for a mono 01/02/03.
+ */
+export function Points({
+  children,
+  numbered,
+}: {
+  children: React.ReactNode
+  numbered?: boolean
+}) {
+  return (
+    <ul className="flex flex-col gap-2.5 sm:gap-3">
+      {Children.map(children, (child, i) =>
+        isValidElement(child) ? (
+          <li className="grid grid-cols-[auto_1fr] gap-x-3">
+            {numbered ? (
+              <span
+                aria-hidden
+                className="mt-[0.35em] font-mono text-[10px] tracking-[0.18em] text-foreground/40"
+              >
+                {String(i + 1).padStart(2, '0')}
+              </span>
+            ) : (
+              <span
+                aria-hidden
+                className="mt-[0.6em] size-1.5 rounded-full bg-foreground/35"
+              />
+            )}
+            {child}
+          </li>
+        ) : null,
+      )}
+    </ul>
+  )
+}
+
+export function Point({
+  lead,
+  children,
+}: {
+  /** Bolded opener, kept to a few words. */
+  lead?: string
+  children: React.ReactNode
+}) {
+  return (
+    <p className="text-[13px] leading-5 text-foreground/75 sm:text-sm sm:leading-6">
+      {lead && <strong className="font-semibold text-foreground">{lead} </strong>}
+      {children}
+    </p>
+  )
 }
 
 export function Heading({ children }: { children: React.ReactNode }) {
@@ -110,7 +166,7 @@ export function Heading({ children }: { children: React.ReactNode }) {
 
 export function Text({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-[12px] sm:text-[13px] md:text-sm text-foreground/75 leading-5 sm:leading-6 md:leading-6">
+    <p className="text-[13px] leading-5 text-foreground/75 sm:text-sm sm:leading-6">
       {children}
     </p>
   )
@@ -229,7 +285,7 @@ export function Callout({ children }: { children: React.ReactNode }) {
 /*  FlowGallery, …) — they're visual, and they belong in the right column. */
 /* ────────────────────────────────────────────────────────────────────── */
 
-const PROSE_TYPES = new Set<unknown>([Prose, Text, Heading, Callout])
+const PROSE_TYPES = new Set<unknown>([Prose, Text, Heading, Callout, Points])
 
 function isProseChild(child: React.ReactNode): boolean {
   // Bare strings and numbers have no type to match; keep them with the prose.
