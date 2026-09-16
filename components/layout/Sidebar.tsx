@@ -209,15 +209,27 @@ function SidebarIntro({
           playClick()
           onOpenAbout()
         }}
-        // Below lg the link sits on the photo's brightest region, where a
-        // 55%-opacity text link disappears. A frosted pill holds its own
-        // there; on the desktop panel the plain link is enough.
-        className="group inline-flex items-center gap-1 self-start text-sm text-foreground/55 transition-colors hover:text-foreground max-lg:rounded-full max-lg:border max-lg:border-foreground/20 max-lg:bg-background/45 max-lg:px-4 max-lg:py-2 max-lg:text-foreground/90 max-lg:backdrop-blur-md"
+        // Glass secondary button. It sits on the photograph on every
+        // breakpoint (and on the brightest part of it on phones), so it
+        // carries its own surface: frosted fill, hairline border, a top
+        // gloss so it reads as a lit pane, and a light sweep on hover. No
+        // drop shadow — the user asked for a flat glass pane.
+        className="group relative inline-flex items-center gap-1.5 self-start overflow-hidden rounded-full border border-foreground/15 bg-foreground/[0.08] px-4 py-2 text-sm text-foreground/90 backdrop-blur-xl transition-[background-color,border-color,color,transform] duration-300 ease-out hover:border-foreground/30 hover:bg-foreground/[0.14] hover:text-foreground active:scale-[0.98]"
       >
-        more about me
+        {/* Top gloss — the highlight that makes glass read as glass. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 top-0 h-1/2 rounded-full bg-gradient-to-b from-foreground/20 to-transparent"
+        />
+        {/* Hover sheen — one diagonal band of light sweeping left to right. */}
+        <span
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 -left-1/2 w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-foreground/25 to-transparent opacity-0 transition-[transform,opacity] duration-700 ease-out group-hover:translate-x-[300%] group-hover:opacity-100"
+        />
+        <span className="relative">more about me</span>
         <ArrowUpRightIcon
           size={14}
-          className="transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+          className="relative transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
         />
       </motion.button>
     </motion.div>
