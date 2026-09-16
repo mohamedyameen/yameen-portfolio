@@ -11,8 +11,8 @@ import { cn } from '@/lib/utils'
  * screen sits above it. Clicking it opens the full screenshot in a
  * full-screen lightbox overlay.
  *
- * Marked `__wide` (like body's Img/Video/TwoCol) so it spans both columns
- * when dropped directly into a labeled <Section>.
+ * Dropped directly into a labeled <Section>, this fills the right column:
+ * Section treats everything that isn't a prose primitive as media.
  */
 
 type SceneAspect = '3/2' | '16/10' | '4/3' | '16/9' | '3/4' | '1/1'
@@ -205,4 +205,3 @@ export function Lightbox({
 }
 
 // Span both columns inside labeled <Section> layouts, matching body's Img.
-;(SceneShot as unknown as { __wide?: boolean }).__wide = true

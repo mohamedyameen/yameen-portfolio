@@ -53,7 +53,6 @@ export function smoothScrollToWorks(onDone?: () => void) {
 
 export function smoothScrollToTop(onDone?: () => void) {
   const lenis = globalThis.lenis
-  console.log('[scroll] toTop', { lenis: !!lenis, scrollY: window.scrollY, lenisStopped: lenis?.isStopped })
   if (lenis) {
     lenis.start()
     lenis.scrollTo(0, { duration: 1.2, easing: easeOutCubic, force: true, onComplete: () => onDone?.() })

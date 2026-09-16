@@ -4,7 +4,9 @@
 export const blurMap: Record<string, string> = {
   "/works/blubees/bg-showcase.png": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAADQAQCdASoMAAcAA4BaJYgCdAEOO/JoAAD++Lmr0OizAv2rJqUAJYW6U5UydwUnh/0AAA==",
   "/works/blubees/inst-home.jpg": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAABwAgCdASoGAAwAA4BaJbACdGuAt/8D0N30AGAAAPzZeGHTgJk7ZOQMAqJxX/uqCmzvMbJj9yv6TKVK7gkyfcw+sO5yW2jwjN4yL/56mWgKAAAA",
-  "/works/facilio-helpdesk-ai/hero.jpg": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAADQAQCdASoMAAcAA4BaJbACdAC9WdBugADN8T1K58bk7HHOLPPLMcRqjFXN/JvZGb6mz2fvraorAAedhgAAAA==",
+  "/works/facilio-dispatcher-agent/policies.png": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoMAAgAA4BaJaQAA3AA/vSANrWGqR86IJaveQgA",
+  "/works/facilio-helpdesk-ai/home.png": "data:image/webp;base64,UklGRiYAAABXRUJQVlA4IBoAAAAwAQCdASoMAAgABIBaJaQAA3AA/vS2gp4AAA==",
+  "/works/facilio-helpdesk-ai/surface.jpg": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADwAQCdASoMAAcAA4BaJagCdAD6mJFxvVAA/vSdXz65LjiiVBuMIZ222FZ6Eln98UYLMAiKUZGs0EmvcbMYqDKGNEvJyTJxuq2iwAAA",
   "/works/iot-automation/bg-atrium.jpg": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAACQAQCdASoMAAcAA4BaJbACdADYCUAA/uWgRPrwu3omEXpVIpBBNDG0snQ+Pem7Z2rY/Ct9uO45Q7GVccAAAA==",
   "/works/iot-automation/home-on.jpg": "data:image/webp;base64,UklGRkgAAABXRUJQVlA4IDwAAAAQAgCdASoGAAwAA4BaJYwCdH8AGBvh//QAAP7wSN9Mrab9Mc7LV+fs1VCtTMQou5Qsy1L86ljPXGVAAAA=",
   "/works/mellow/bg-sky.jpg": "data:image/webp;base64,UklGRlYAAABXRUJQVlA4IEoAAACwAQCdASoMAAkAA4BaJbACdADaLpTAAP5JwiHoezCaR4XrvRgP7bMfLq13wVCk99nSFHJyrSa4eEn429UtIUSP/o83mBXxZOAAAA==",

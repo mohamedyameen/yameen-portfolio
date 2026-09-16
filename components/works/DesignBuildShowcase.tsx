@@ -3,6 +3,7 @@
 import Image from 'next/image'
 import { useState } from 'react'
 import { Lightbox } from '@/components/works/SceneShot'
+import { blurProps } from '@/content/blur'
 
 /**
  * The "design → build" pairing for the case study: a Figma canvas and the
@@ -33,6 +34,7 @@ export function DesignBuildShowcase() {
           fill
           sizes="(max-width: 768px) 100vw, 960px"
           className="scale-105 object-cover blur-[2px]"
+          {...blurProps('/works/facilio-helpdesk-ai/hero.jpg')}
         />
 
         {/* Back window — Figma (design) */}

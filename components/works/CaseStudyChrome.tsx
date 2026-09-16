@@ -3,16 +3,76 @@
 import { useEffect, useRef, useState } from 'react'
 import { motion, useReducedMotion } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { smoothScrollToTop } from '@/lib/scrollIntent'
 import type { Work } from '@/content/works'
 
 /* ────────────────────────────────────────────────────────────────────── */
+/*  Scroll shim                                                           */
+/*                                                                        */
+/*  Case studies used to live in a bottom sheet, so every control below   */
+/*  was written against a div scroll container. On the /works/[slug]      */
+/*  route the scroller is the document instead. Passing no `scrollRef`    */
+/*  selects window mode; everything else is shared.                       */
+/* ────────────────────────────────────────────────────────────────────── */
+
+type ScrollRef = React.RefObject<HTMLElement | null>
+
+function readScrollMetrics(el: HTMLElement | null) {
+  if (el) return { offset: el.scrollTop, max: el.scrollHeight - el.clientHeight }
+  return {
+    offset: window.scrollY,
+    max: document.documentElement.scrollHeight - window.innerHeight,
+  }
+}
+
+/**
+ * Scroll position of `scrollRef` (or the window when omitted) as a 0–1
+ * fraction of its scrollable distance, plus whether it has passed
+ * `showAfter` pixels.
+ */
+function useScrollProgress(scrollRef?: ScrollRef, showAfter = 0) {
+  const [progress, setProgress] = useState(0)
+  const [scrolled, setScrolled] = useState(false)
+  const rafRef = useRef(0)
+
+  useEffect(() => {
+    const el = scrollRef?.current ?? null
+    // A ref that hasn't attached yet means the container isn't mounted —
+    // bail. No ref at all is window mode, which is always ready.
+    if (scrollRef && !el) return
+    const target: HTMLElement | Window = el ?? window
+
+    const update = () => {
+      const { offset, max } = readScrollMetrics(el)
+      setProgress(max > 0 ? Math.min(1, Math.max(0, offset / max)) : 0)
+      setScrolled(offset > showAfter)
+    }
+    update()
+
+    const onScroll = () => {
+      cancelAnimationFrame(rafRef.current)
+      rafRef.current = requestAnimationFrame(update)
+    }
+    target.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', update)
+    return () => {
+      cancelAnimationFrame(rafRef.current)
+      target.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', update)
+    }
+  }, [scrollRef, showAfter])
+
+  return { progress, scrolled }
+}
+
+/* ────────────────────────────────────────────────────────────────────── */
 /*  Title block — the big serif title + a supporting line of subtext,     */
-/*  rendered at the very top of the sheet (above the hero). Replaces the   */
+/*  rendered at the very top of the page (above the hero). Replaces the    */
 /*  old "Overview" section: the title leads, the summary sits beneath it.  */
 /*                                                                        */
-/*  On open the title fades + rises in as the sheet settles, the subtext   */
-/*  just after — a dedicated entrance (not the scroll observer). The        */
-/*  cs-title-block marker keeps the wrapper out of WorkSheet's cascade.     */
+/*  The title fades + rises in on mount, the subtext just after — a         */
+/*  dedicated entrance, not the scroll reveal. The cs-title-block marker    */
+/*  keeps the wrapper out of CaseStudyLayout's reveal cascade.              */
 /* ────────────────────────────────────────────────────────────────────── */
 
 export function CaseStudyTitle({ work }: { work: Work }) {
@@ -20,9 +80,9 @@ export function CaseStudyTitle({ work }: { work: Work }) {
   const subtext = work.summary && work.summary !== title ? work.summary : null
   const reduce = useReducedMotion()
 
-  // Entrance tied to the sheet opening: the title fades + rises in as the
-  // bottom sheet settles, the subtext a beat later. Plays once on mount, so
-  // it re-runs every time the sheet is opened.
+  // Entrance tied to the route landing: the title fades + rises in, the
+  // subtext a beat later. Plays once on mount, so it re-runs on every
+  // navigation into a case study.
   const rise = reduce
     ? {}
     : { initial: { opacity: 0, y: 24 }, animate: { opacity: 1, y: 0 } }
@@ -101,9 +161,8 @@ export function CaseStudyTOC({
 }) {
   const [items, setItems] = useState<TocItem[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
-  // 0..1 — overall scroll progress through the case study.
-  const [progress, setProgress] = useState(0)
-  const rafRef = useRef(0)
+  // 0..1 — overall scroll progress through the case study, driving the rail fill.
+  const { progress } = useScrollProgress(scrollRef)
 
   useEffect(() => {
     const root = scrollRef.current
@@ -150,31 +209,6 @@ export function CaseStudyTOC({
       cancelled = true
       cancelAnimationFrame(raf)
       observer.disconnect()
-    }
-  }, [scrollRef, bodyKey])
-
-  // Track overall scroll progress so the vertical rail can fill in real time.
-  useEffect(() => {
-    const root = scrollRef.current
-    if (!root) return
-
-    const update = () => {
-      const max = root.scrollHeight - root.clientHeight
-      const p = max > 0 ? Math.min(1, Math.max(0, root.scrollTop / max)) : 0
-      setProgress(p)
-    }
-    update()
-
-    const onScroll = () => {
-      cancelAnimationFrame(rafRef.current)
-      rafRef.current = requestAnimationFrame(update)
-    }
-    root.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      root.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', update)
     }
   }, [scrollRef, bodyKey])
 
@@ -279,35 +313,11 @@ export function CaseStudyScrollProgress({
   scrollRef,
   ticks = 16,
 }: {
-  scrollRef: React.RefObject<HTMLElement | null>
+  /** Scroll container. Omit to track the window. */
+  scrollRef?: ScrollRef
   ticks?: number
 }) {
-  const [progress, setProgress] = useState(0)
-  const rafRef = useRef(0)
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-
-    const update = () => {
-      const max = el.scrollHeight - el.clientHeight
-      const p = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0
-      setProgress(p)
-    }
-    update()
-
-    const onScroll = () => {
-      cancelAnimationFrame(rafRef.current)
-      rafRef.current = requestAnimationFrame(update)
-    }
-    el.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      el.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', update)
-    }
-  }, [scrollRef])
+  const { progress } = useScrollProgress(scrollRef)
 
   const activeIndex = Math.round(progress * (ticks - 1))
 
@@ -333,46 +343,20 @@ export function CaseStudyScrollProgress({
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
-/*  ScrollTop — floating control pinned bottom-right of the sheet.        */
+/*  ScrollTop — floating control pinned to the bottom-right of the read.  */
 /*                                                                        */
 /*  A circular button wrapped in a progress ring that tracks how far the  */
 /*  reader is through the case study. Fades in once scrolled past the     */
-/*  hero; clicking eases the scroll container back to the top.            */
+/*  hero; clicking eases the scroller back to the top.                    */
 /* ────────────────────────────────────────────────────────────────────── */
 
 export function CaseStudyScrollTop({
   scrollRef,
 }: {
-  scrollRef: React.RefObject<HTMLElement | null>
+  /** Scroll container. Omit to track the window — pins the button `fixed`. */
+  scrollRef?: ScrollRef
 }) {
-  const [progress, setProgress] = useState(0)
-  const [show, setShow] = useState(false)
-  const rafRef = useRef(0)
-
-  useEffect(() => {
-    const el = scrollRef.current
-    if (!el) return
-
-    const update = () => {
-      const max = el.scrollHeight - el.clientHeight
-      const p = max > 0 ? Math.min(1, Math.max(0, el.scrollTop / max)) : 0
-      setProgress(p)
-      setShow(el.scrollTop > 360)
-    }
-    update()
-
-    const onScroll = () => {
-      cancelAnimationFrame(rafRef.current)
-      rafRef.current = requestAnimationFrame(update)
-    }
-    el.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('resize', update)
-    return () => {
-      cancelAnimationFrame(rafRef.current)
-      el.removeEventListener('scroll', onScroll)
-      window.removeEventListener('resize', update)
-    }
-  }, [scrollRef])
+  const { progress, scrolled: show } = useScrollProgress(scrollRef, 360)
 
   // Progress ring geometry (r = 17 → circumference ≈ 106.8).
   const C = 2 * Math.PI * 17
@@ -381,9 +365,17 @@ export function CaseStudyScrollTop({
     <button
       type="button"
       aria-label="Back to top"
-      onClick={() => scrollRef.current?.scrollTo({ top: 0, behavior: 'smooth' })}
+      onClick={() => {
+        const el = scrollRef?.current
+        // Window mode goes through the shared helper so the scroll is handed
+        // to Lenis rather than fighting it.
+        if (el) el.scrollTo({ top: 0, behavior: 'smooth' })
+        else smoothScrollToTop()
+      }}
       className={cn(
-        'absolute bottom-4 right-4 z-20 inline-flex size-11 items-center justify-center rounded-full border border-border bg-background/80 text-foreground/80 shadow-lg backdrop-blur transition-all duration-300 hover:text-foreground sm:bottom-6 sm:right-6',
+        'z-20 inline-flex size-11 items-center justify-center rounded-full border border-border bg-background/80 text-foreground/80 shadow-lg backdrop-blur transition-all duration-300 hover:text-foreground',
+        scrollRef ? 'absolute' : 'fixed',
+        'bottom-4 right-4 sm:bottom-6 sm:right-6',
         show
           ? 'pointer-events-auto translate-y-0 opacity-100'
           : 'pointer-events-none translate-y-2 opacity-0',

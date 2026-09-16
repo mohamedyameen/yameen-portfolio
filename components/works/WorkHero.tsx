@@ -4,6 +4,8 @@ import Image from 'next/image'
 import { motion } from 'framer-motion'
 import type { Work } from '@/content/works'
 import { PhoneFrame, SHOWCASE_BG, bgStyle } from '@/components/works/PhoneScene'
+import { DemoWindow } from '@/components/works/DemoFrame'
+import { demos } from '@/content/demos'
 
 /* ────────────────────────────────────────────────────────────────────── */
 /*  WorkHero                                                               */
@@ -18,7 +20,9 @@ export function WorkHero({ work }: { work: Work }) {
   if (work.slug === 'mellow') return <MellowShowcase />
   if (work.slug === 'blubees') return <BlubeesShowcase />
   if (work.slug === 'iot-automation') return <IotShowcase />
-  if (work.slug === 'facilio-helpdesk-ai') return <HelpdeskShowcase />
+  // Works with a live console demo (see content/demos.ts) get the product
+  // itself running in the hero rather than a picture of it.
+  if (demos[work.slug]) return <LiveConsoleShowcase slug={work.slug} />
 
   return (
     <div
@@ -30,25 +34,47 @@ export function WorkHero({ work }: { work: Work }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
-/*  Facilio Helpdesk — a full-bleed cinematic backdrop, brand lockup on    */
-/*  top. No device frames: this is a web product, so the hero is the       */
-/*  atmosphere rather than floating screens.                               */
+/*  Facilio Helpdesk / Dispatcher — the cinematic backdrop with the REAL    */
+/*  product running inside a window over it. The console is the demo build */
+/*  in public/helpdesk (sample data, no backend); `path` picks which        */
+/*  product it boots as — the same bundle serves both, keyed off the first  */
+/*  URL segment. The window takes 92% of the stage; a 3/2 stage is the     */
+/*  shortest that fits its 16/10 console plus chrome with a margin. Below  */
+/*  `md` the window shows an open-in-new-tab card on a 4/3 stage.         */
 /* ────────────────────────────────────────────────────────────────────── */
 
-function HelpdeskShowcase() {
+function LiveConsoleShowcase({ slug }: { slug: string }) {
+  const { views, title, alt, favicon } = demos[slug]
   return (
     <div className="relative w-full overflow-hidden rounded-2xl ring-1 ring-black/10">
-      <div className="relative aspect-[16/9]">
-        <Image
-          src="/works/facilio-helpdesk-ai/hero.jpg"
-          alt="Facilio Helpdesk"
-          fill
-          sizes="(max-width: 1152px) 100vw, 1152px"
-          className="object-cover"
-          priority
-        />
-        {/* Gentle wash to seat the image in the page. */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/25 via-transparent to-black/10" />
+      <div className="relative aspect-[4/3] sm:aspect-[3/2]">
+        <motion.div
+          className="absolute inset-0"
+          initial={{ scale: 1.08 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+        >
+          <Image
+            src="/works/facilio-helpdesk-ai/hero.jpg"
+            alt={alt}
+            fill
+            sizes="(max-width: 1152px) 100vw, 1152px"
+            className="object-cover"
+            priority
+          />
+        </motion.div>
+        {/* Grounding wash so the window sits in the scene rather than on it. */}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-black/10 to-black/10" />
+
+        {/* The live console, centred, rising in like the other showcases. */}
+        <motion.div
+          className="absolute inset-x-[4%] top-[8%] sm:top-[4%]"
+          initial={{ opacity: 0, y: 48 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1], delay: 0.25 }}
+        >
+          <DemoWindow views={views} title={title} favicon={favicon} />
+        </motion.div>
       </div>
     </div>
   )

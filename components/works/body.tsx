@@ -44,8 +44,8 @@ export function Section({
   // SceneShot — marked __wide) stack in the right column. Sections with no
   // media collapse to a single readable text column.
   const childArray = Children.toArray(children)
-  const prose = childArray.filter((child) => !isWideChild(child))
-  const media = childArray.filter((child) => isWideChild(child))
+  const prose = childArray.filter(isProseChild)
+  const media = childArray.filter((child) => !isProseChild(child))
   const hasMedia = media.length > 0
 
   return (
@@ -68,7 +68,10 @@ export function Section({
       <div
         className={cn(
           'flex flex-col gap-4 sm:gap-5',
-          hasMedia && 'lg:sticky lg:top-10 lg:self-start',
+          // top-24 parks the stuck rail clear of the case-study route's
+          // sticky "Back to work" bar (68px: 2×py-6 plus a 20px line). At
+          // the old top-10 the heading slid under the bar's blurred backdrop.
+          hasMedia && 'lg:sticky lg:top-24 lg:self-start',
         )}
       >
         <h2
@@ -205,18 +208,31 @@ export function Callout({ children }: { children: React.ReactNode }) {
 }
 
 /* ────────────────────────────────────────────────────────────────────── */
-/*  Internal helper for Section to identify "wide" children that should   */
-/*  break out of the label column and span the full grid.                 */
+/*  Internal helper for Section: split children into the prose that sits   */
+/*  under the heading in the left rail, and the media that fills the       */
+/*  right column.                                                         */
+/*                                                                        */
+/*  This tests for prose rather than for media, which looks backwards but  */
+/*  is the only version that survives the server/client boundary. The      */
+/*  media components aren't all in this module — SceneShot and PhoneScene  */
+/*  are 'use client', so a server render of a body sees client-reference   */
+/*  proxies that carry none of their own static properties. Tagging them   */
+/*  with a `__wide` flag and reading it back therefore worked only while   */
+/*  bodies rendered entirely on the client (the old lazy-loaded sheet);    */
+/*  on the /works/[slug] route it read undefined and dropped every scene   */
+/*  into the prose column, above the media instead of beside it.           */
+/*                                                                        */
+/*  The prose primitives, by contrast, all live here in this server        */
+/*  module, so identity checks against them hold in both render modes.     */
+/*  Treating everything else as media also does the right thing for the    */
+/*  bespoke demo components bodies import directly (HelpdeskBento,         */
+/*  FlowGallery, …) — they're visual, and they belong in the right column. */
 /* ────────────────────────────────────────────────────────────────────── */
 
-type WideTag = { __wide?: boolean }
+const PROSE_TYPES = new Set<unknown>([Prose, Text, Heading, Callout])
 
-;(Img as unknown as WideTag).__wide = true
-;(Video as unknown as WideTag).__wide = true
-;(TwoCol as unknown as WideTag).__wide = true
-
-function isWideChild(child: React.ReactNode): boolean {
-  if (!isValidElement(child)) return false
-  const t = (child as ReactElement).type as unknown as WideTag | string
-  return typeof t !== 'string' && Boolean(t?.__wide)
+function isProseChild(child: React.ReactNode): boolean {
+  // Bare strings and numbers have no type to match; keep them with the prose.
+  if (!isValidElement(child)) return true
+  return PROSE_TYPES.has((child as ReactElement).type)
 }

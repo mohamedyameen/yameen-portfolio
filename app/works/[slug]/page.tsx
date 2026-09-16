@@ -4,6 +4,7 @@ import type { Metadata } from 'next'
 import { works } from '@/content/works'
 import { bodyLoaders } from '@/content/works/bodies'
 import { WorkHero } from '@/components/works/WorkHero'
+import { CaseStudyLayout } from '@/components/works/CaseStudyLayout'
 import { siteUrl, siteAuthor, siteName } from '@/lib/site'
 
 type Params = { slug: string }
@@ -95,12 +96,28 @@ export default async function WorkPage({
     ...(work.client && { sourceOrganization: { '@type': 'Organization', name: work.client } }),
   }
 
+  const ld = (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+    />
+  )
+
+  // Case studies get the full reading frame — title, hero, meta strip, then
+  // the body, with the scroll-linked reveal. Everything else stays a plain
+  // narrow article around its single piece of media.
+  if (work.type === 'case-study') {
+    return (
+      <article className="mx-auto w-full max-w-[90rem] px-5 pb-4 sm:px-6 sm:pb-6 lg:px-5 md:pb-10">
+        {ld}
+        <CaseStudyLayout work={work}>{Body && <Body />}</CaseStudyLayout>
+      </article>
+    )
+  }
+
   return (
     <article className="mx-auto w-full max-w-3xl px-4 sm:px-5 md:px-10 py-8 sm:py-10 md:py-16 flex flex-col gap-10 sm:gap-12 md:gap-14">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      {ld}
       {work.type === 'image' && work.media ? (
         <Image
           src={work.media.src}

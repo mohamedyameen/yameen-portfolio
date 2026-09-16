@@ -7,7 +7,6 @@ import type { Work } from '@/content/works'
 import { useSound } from '@/hooks/useSound'
 import { cn } from '@/lib/utils'
 import { WorkModal } from '@/components/works/WorkModal'
-import { WorkSheet } from '@/components/works/WorkSheet'
 import { bodyLoaders, lazyBodies } from '@/content/works/bodies'
 import { PhoneFrame } from '@/components/works/PhoneScene'
 import { blurProps } from '@/content/blur'
@@ -48,22 +47,27 @@ function ProjectCard({
       onMouseEnter={() => {
         playHover()
         // Warm the body chunk so the modal opens with content already there.
-        bodyLoaders[project.slug]?.()
+        // Case studies skip this — their body ships with the route's HTML,
+        // and the <Link> prefetch already covers it.
+        if (project.type !== 'case-study') bodyLoaders[project.slug]?.()
       }}
     >
       <Link
         href={`/works/${project.slug}`}
         onClick={(e) => {
           if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return
-          e.preventDefault()
           playClick()
+          // Case studies are full pages — let the link navigate. Everything
+          // else (image / video / demo) still opens in place.
+          if (project.type === 'case-study') return
+          e.preventDefault()
           onOpen(project)
         }}
         className="group block w-full"
       >
         <div
           style={{ aspectRatio: aspect }}
-          className="relative w-full overflow-hidden rounded-2xl border border-black/15 transition-colors duration-300 group-hover:border-black/60 dark:border-white/15 dark:group-hover:border-white/60"
+          className="relative w-full overflow-hidden rounded-2xl border border-black/30 transition-colors duration-300 group-hover:border-black/70 dark:border-white/40 dark:group-hover:border-white/75"
         >
           <div className="absolute inset-0 transition-transform duration-[600ms] ease-[cubic-bezier(0.25,0.1,0.25,1)] group-hover:scale-[1.06]">
             {project.heroScene ? (
@@ -209,14 +213,41 @@ function ProjectCard({
                 </span>
               ))}
             </div>
-        </div>
-        <div className="flex flex-col gap-1.5 px-1.5 pt-3">
-          <span className="text-sm font-medium text-foreground leading-snug line-clamp-1 sm:line-clamp-none">
-            {project.name}
-          </span>
-          <span className="text-xs leading-snug text-muted-foreground line-clamp-2">
-            {project.tagline ?? project.summary ?? project.category}
-          </span>
+
+            {/* Title over the artwork — a sibling of the media wrapper rather
+                than a child, so it stays put while the image scales on hover. */}
+            <div className="absolute inset-x-0 bottom-0 flex flex-col gap-1 px-4 pb-4 pt-14">
+              {/* Frost + darkening, masked so both fade out upward. Without the
+                  mask, backdrop-blur would cut a hard horizontal line across
+                  the image at this element's top edge.
+
+                  The radius has to live here, not on the card: an element with
+                  backdrop-filter escapes an ancestor's overflow-hidden +
+                  border-radius clipping in Chromium/WebKit, so the card's
+                  rounded-2xl never reaches this layer. Verified by forcing the
+                  card to a 60px radius — its top corners followed, its bottom
+                  ones didn't.
+
+                  15px, not 16px: this element sits on the card's PADDING box
+                  (inset-0 inside a relative card), whose corner radius is the
+                  card's rounded-2xl (16px) minus its 1px border. At 16px the
+                  scrim's corner is carved slightly deeper than the card's inner
+                  curve and the artwork shows through as a light arc. */}
+              <div
+                aria-hidden
+                className="absolute inset-0 rounded-b-[15px] bg-gradient-to-t from-black/95 via-black/65 to-transparent backdrop-blur-md"
+                style={{
+                  maskImage: 'linear-gradient(to top, black 45%, transparent 100%)',
+                  WebkitMaskImage: 'linear-gradient(to top, black 45%, transparent 100%)',
+                }}
+              />
+              <span className="relative text-sm font-medium leading-snug text-white line-clamp-1">
+                {project.name}
+              </span>
+              <span className="relative text-xs leading-snug text-white/75 line-clamp-2">
+                {project.tagline ?? project.summary ?? project.category}
+              </span>
+            </div>
         </div>
       </Link>
     </motion.div>
@@ -299,14 +330,7 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
         ))}
       </div>
 
-      <WorkSheet
-        work={openWork?.type === 'case-study' ? openWork : null}
-        onClose={handleClose}
-      />
-      <WorkModal
-        work={openWork && openWork.type !== 'case-study' ? openWork : null}
-        onClose={handleClose}
-      />
+      <WorkModal work={openWork} onClose={handleClose} />
     </div>
   )
 }

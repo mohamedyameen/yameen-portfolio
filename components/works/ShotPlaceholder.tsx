@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import { cn } from '@/lib/utils'
+import { blurProps } from '@/content/blur'
 
 /**
  * A labeled placeholder that reserves the spot where a real screenshot,
@@ -52,6 +53,7 @@ export function ShotPlaceholder({
           fill
           sizes="(max-width: 768px) 100vw, 960px"
           className="object-cover"
+          {...blurProps(bg)}
         />
         <div className="absolute inset-0 bg-black/70" />
         {/* faint grid wash so the empty frame still reads as a "surface" */}

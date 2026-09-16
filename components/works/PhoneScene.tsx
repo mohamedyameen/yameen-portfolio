@@ -36,8 +36,8 @@ export function bgStyle(url?: string) {
  * multiple app screens float as iPhone mockups over a shared backdrop.
  * Clicking a phone opens that screen full-size in the lightbox.
  *
- * Marked `__wide` (like body's Img/Video/TwoCol) so it spans both columns
- * when dropped directly into a labeled <Section>.
+ * Dropped directly into a labeled <Section>, this fills the right column:
+ * Section treats everything that isn't a prose primitive as media.
  */
 
 export type PhoneScreen = { src: string; alt: string }
@@ -245,5 +245,3 @@ export function PhoneWalkthrough({
 }
 
 // Span both columns inside labeled <Section> layouts, matching body's Img.
-;(PhoneScene as unknown as { __wide?: boolean }).__wide = true
-;(PhoneWalkthrough as unknown as { __wide?: boolean }).__wide = true

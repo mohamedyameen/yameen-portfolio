@@ -3,8 +3,7 @@ import localFont from 'next/font/local'
 import { Playfair_Display } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
 import { LayoutGroup } from 'framer-motion'
-import Sidebar from '@/components/layout/Sidebar'
-import PageTransition from '@/components/layout/PageTransition'
+import AppShell from '@/components/layout/AppShell'
 import SmoothScroll from '@/components/layout/SmoothScroll'
 import ScrollbarOverlay from '@/components/layout/ScrollbarOverlay'
 import { TooltipProvider } from '@/components/ui/tooltip'
@@ -106,10 +105,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
               <LayoutGroup>
                 <SmoothScroll />
                 <ScrollbarOverlay />
-                <Sidebar />
-                <main className="min-h-screen lg:pl-[28rem]">
-                  <PageTransition>{children}</PageTransition>
-                </main>
+                <AppShell>{children}</AppShell>
               </LayoutGroup>
             </MusicPlayerProvider>
           </TooltipProvider>

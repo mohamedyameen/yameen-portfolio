@@ -2,15 +2,14 @@ import Image from 'next/image'
 import { cn } from '@/lib/utils'
 
 /**
- * A pinwheel bento of the Helpdesk product, shown after the overview. Four
- * cells map to what the case study covers: the three configurable agents
- * (Intake → Dispatch → Feedback) plus the one operational surface the humans
- * work in.
+ * A bento of the Helpdesk product, shown after the overview. Three cells map
+ * to what the case study covers: the two configurable agents (Intake →
+ * Dispatch) plus the one operational surface the humans work in.
  *
- * Layout: two tall cells and two short cells interlocked (tall+short on the
- * left, short+tall on the right) so the sizes genuinely vary — a real bento,
- * not a uniform grid. The tall cells take the portrait-friendly frames; the
- * short cells take the wide ones.
+ * Layout: Intake takes a single full-height cell on the left, with Dispatch
+ * and the operational surface stacked in the right column — so the sizes
+ * genuinely vary rather than reading as a uniform grid. The tall cell takes
+ * the portrait-friendly frame; the short ones take the wide frames.
  *
  * Each cell is a full-bleed cinematic image with a gradient scrim and the
  * title (Playfair) + subtext overlaid — so the cards read the same in light
@@ -22,10 +21,10 @@ import { cn } from '@/lib/utils'
 
 export function HelpdeskBento() {
   return (
-    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-5 sm:gap-4 sm:min-h-[59rem]">
-      {/* Intake — tall, top-left */}
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:grid-rows-2 sm:gap-4 sm:min-h-[46rem]">
+      {/* Intake — full-height, left column */}
       <Cell
-        className="aspect-[4/3] sm:aspect-auto sm:col-start-1 sm:row-start-1 sm:row-span-3"
+        className="aspect-[4/3] sm:aspect-auto sm:col-start-1 sm:row-start-1 sm:row-span-2"
         src="/works/facilio-helpdesk-ai/intake.jpg"
         focus="object-[center_32%]"
         title={<>Answers every channel, in the <em>caller’s own words</em></>}
@@ -35,25 +34,16 @@ export function HelpdeskBento() {
 
       {/* Dispatch — short, top-right */}
       <Cell
-        className="aspect-[4/3] sm:aspect-auto sm:col-start-2 sm:row-start-1 sm:row-span-2"
+        className="aspect-[4/3] sm:aspect-auto sm:col-start-2 sm:row-start-1"
         src="/works/facilio-helpdesk-ai/dispatch.jpg"
         focus="object-[center_55%]"
         title={<>The right technician, with the <em>reasoning shown</em></>}
         body="Matched against policies you wrote in plain English — score, runners-up, and every step on the surface."
       />
 
-      {/* Feedback — short, bottom-left */}
+      {/* Operational surface — short, bottom-right */}
       <Cell
-        className="aspect-[4/3] sm:aspect-auto sm:col-start-1 sm:row-start-4 sm:row-span-2"
-        src="/works/facilio-helpdesk-ai/surface.jpg"
-        focus="object-[center_55%]"
-        title={<>Closes <em>the loop</em> after the fix</>}
-        body="You author the survey and the escalation rule that turns a poor rating back into an open ticket."
-      />
-
-      {/* Operational surface — tall, bottom-right */}
-      <Cell
-        className="aspect-[4/3] sm:aspect-auto sm:col-start-2 sm:row-start-3 sm:row-span-3"
+        className="aspect-[4/3] sm:aspect-auto sm:col-start-2 sm:row-start-2"
         src="/works/facilio-helpdesk-ai/feedback.jpg"
         focus="object-[30%_45%]"
         title={<>Where the humans <em>watch it all</em> and take over</>}

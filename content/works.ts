@@ -98,9 +98,9 @@ export const works: Work[] = [
     tags: ['AI', 'Facilities'],
     category: 'AI · Facilities Ops',
     summary:
-      'A helpdesk for facilities teams run by three AI agents you configure, not three teams you staff — Intake answers the phone, chat, and email and raises the ticket; Dispatch matches the right technician against policies you wrote in plain English; Feedback closes the loop after the fix.',
+      'A helpdesk for facilities teams run by two AI agents you configure, not two teams you staff — Intake answers every channel, Dispatch picks the technician.',
     tagline:
-      'A facilities helpdesk run by three configurable AI agents — Intake, Dispatch, and Feedback.',
+      'A facilities helpdesk run by two configurable AI agents — Intake and Dispatch.',
     year: '2025',
     role: 'Lead Product Designer',
     time: '2025 – Present',
@@ -110,9 +110,17 @@ export const works: Work[] = [
     contribution:
       'Led design, copy, and frontend across all 11 modules — onboarding, the agents, and the operational surface.',
     accent: 'from-indigo-950 via-indigo-900 to-slate-950',
-    aspect: '4/5',
-    cover: '/works/facilio-helpdesk-ai/hero.jpg',
-    coverPosition: 'center',
+    // Square, not portrait: the card frames a wide desktop console with
+    // object-cover, so height and horizontal reach trade off — at 1/1 the
+    // console is large enough to read and the right rail bleeds off the edge;
+    // going taller zooms in and starts clipping the tiles themselves.
+    aspect: '1/1',
+    heroPreview: {
+      src: '/works/facilio-helpdesk-ai/home.png',
+      bg: '/works/facilio-helpdesk-ai/surface.jpg',
+      anchor: 'left',
+      focus: 'left top',
+    },
   },
   {
     slug: 'facilio-dispatcher-agent',
@@ -121,35 +129,29 @@ export const works: Work[] = [
     tags: ['AI', 'Operations'],
     category: 'AI · Operations',
     summary:
-      'An AI dispatch agent for field service teams — it auto-assigns the right technician to each work order based on skills, location, and current load, keeping the day routed without a dispatcher touching every ticket.',
+      'An AI dispatch agent for field teams — write the assignment policy in plain English, test it on a real ticket, and get every recommendation with its score and reasoning on the surface.',
     tagline:
-      'An AI dispatch agent that auto-assigns field techs by skills, location, and current load.',
+      'Plain-English dispatch policies, explainable technician recommendations.',
     year: '2025',
     role: 'Lead Product Designer',
     time: '2025 – Present',
     client: 'Facilio',
     kind: 'work',
     disciplines: ['Design', 'Dev'],
+    contribution:
+      'Led design, copy, and frontend — policy authoring, the recommendation card, technicians, and data sources.',
     accent: 'from-sky-950 via-blue-900 to-slate-950',
+    // Stays 4/3 where Helpdesk is 1/1: the policy prompt box is the subject and
+    // it sits centre-right, so a taller (more cropped) frame would clip it.
     aspect: '4/3',
-  },
-  {
-    slug: 'fsm',
-    name: 'Field Service Management',
-    type: 'case-study',
-    tags: ['Operations', 'B2B'],
-    category: 'Operations · B2B',
-    summary:
-      'A dispatch console for field service teams that pairs a live map of technicians with drag-to-schedule work orders and inline status updates — built to make dispatchers 25% faster at routing the day.',
-    tagline:
-      'A dispatch console for field service teams — live map, drag-to-schedule, inline status.',
-    year: '2023',
-    role: 'Lead Product Designer',
-    time: '2023',
-    client: 'Facilio',
-    kind: 'work',
-    accent: 'from-emerald-950 via-teal-900 to-slate-900',
-    aspect: '3/4',
+    heroPreview: {
+      // Same backdrop as Helpdesk on purpose: one bundle, two products, so the
+      // pair should read as a set rather than two unrelated photo edges.
+      src: '/works/facilio-dispatcher-agent/policies.png',
+      bg: '/works/facilio-helpdesk-ai/surface.jpg',
+      anchor: 'left',
+      focus: 'left top',
+    },
   },
   {
     slug: 'iot-automation',
@@ -158,7 +160,7 @@ export const works: Work[] = [
     tags: ['IoT', 'Mobile'],
     category: 'IoT · Facilio',
     summary:
-      'A mobile smart-thermostat app for connected buildings — a live control panel for temperature, humidity, and fan, backed by comfort profiles, a day schedule, and one-off exceptions that keep climate on autopilot without fighting the automation.',
+      'A smart-thermostat app for connected buildings — set the week once, drop in a one-off exception when life changes, and trust the routine to resume on its own.',
     tagline:
       'A mobile control panel for connected climate — set points, comfort profiles, schedules, and exceptions.',
     year: '2022',
@@ -182,7 +184,7 @@ export const works: Work[] = [
     tags: ['AI', 'Productivity'],
     category: 'AI · Freelance',
     summary:
-      'A chat-first project tool that collapses team conversation and task tracking into a single surface, paired with an AI assistant that reads recent activity and surfaces what needs your attention before you ask.',
+      'A chat-first project tool that collapses conversation and tasks into one surface, with an AI assistant that surfaces what needs your attention before you ask.',
     tagline:
       'A chat-first project tool with an AI assistant that prioritises what needs your attention.',
     year: 'Feb 2024',
@@ -209,7 +211,7 @@ export const works: Work[] = [
     tags: ['Healthcare', 'Recruitment'],
     category: 'Healthcare · Freelance',
     summary:
-      'A three-sided hiring portal connecting hospitals, recruitment agencies, and medical professionals — running vetting, shortlisting, and onboarding inside a single workflow instead of scattered email threads.',
+      'A hiring marketplace for hospitals, agencies, and medical professionals — verified profiles, urgent substitution cover, and hiring that completes in one place.',
     tagline:
       'A three-sided hiring portal for hospitals, agencies, and medical professionals.',
     year: 'Jul 2023',

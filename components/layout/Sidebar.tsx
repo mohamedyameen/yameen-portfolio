@@ -1,5 +1,5 @@
 'use client'
-import { useState, useEffect, useRef, type ReactNode } from 'react'
+import { useState, useEffect, type ReactNode } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -19,6 +19,8 @@ import TypewriterName from './TypewriterName'
 import { useSound } from '@/hooks/useSound'
 import { useWeather, type WeatherCondition } from '@/hooks/useWeather'
 import { InlineMusicPlayer } from '@/components/music/MusicPlayer'
+
+const DESK_PHOTO = '/bg/sidebar-desk.jpg'
 
 const CONDITION_LABEL: Record<WeatherCondition, string> = {
   clear: 'Clear', clouds: 'Cloudy', fog: 'Foggy',
@@ -348,51 +350,26 @@ function SidebarContent({
 }
 
 /**
- * Ambient video stack shared by the desktop panel and the mobile hero.
+ * Ambient photograph shared by the desktop panel and the mobile hero.
  *
- * The clip is 512×768 (2:3) while both containers are much taller than that,
- * so stretching it edge-to-edge upscales and crops it badly. Instead a heavily
- * blurred, oversized copy fills the container as a slowly drifting colour
- * glow, and the sharp clip sits at its true ratio at the bottom, edges masked
- * into that glow. Same footage in both layers, so the join is seamless.
+ * The still is 1:1 while both containers are much taller than that, so a
+ * single edge-to-edge copy would crop away either the window light or the
+ * plant. Instead a heavily blurred copy fills the container as a slowly
+ * drifting colour glow, and the sharp frame sits at its true ratio at
+ * the bottom, edges masked into that glow. Same photo in both layers, so the
+ * join is seamless.
  *
- * `media` gates the <source> so only the visible variant downloads the file
- * (desktop panel ≥ lg, mobile hero < lg). `veiled` frosts the whole surface
- * while the "more about me" view is open.
+ * `veiled` frosts the whole surface while the "more about me" view is open.
  */
-function AmbientBackdrop({ veiled, media }: { veiled: boolean; media: string }) {
-  const ref = useRef<HTMLDivElement>(null)
-  // Honour prefers-reduced-motion: leave the poster frames, don't play.
-  useEffect(() => {
-    const root = ref.current
-    if (!root || !window.matchMedia) return
-    const mq = window.matchMedia('(prefers-reduced-motion: reduce)')
-    const apply = () => {
-      root.querySelectorAll('video').forEach((v) => {
-        if (mq.matches) v.pause()
-        else void v.play().catch(() => {})
-      })
-    }
-    apply()
-    mq.addEventListener('change', apply)
-    return () => mq.removeEventListener('change', apply)
-  }, [])
-
+function AmbientBackdrop({ veiled }: { veiled: boolean }) {
   return (
-    <div ref={ref} aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-      <video
-        autoPlay
-        muted
-        loop
-        playsInline
-        disablePictureInPicture
-        poster="/bg/sidebar-ambient.jpg"
-        className="sidebar-glow absolute inset-0 size-full object-cover opacity-80 blur-3xl saturate-[1.4]"
-      >
-        <source src="/bg/sidebar-ambient.mp4" type="video/mp4" media={media} />
-      </video>
+    <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
       <div
-        className="absolute inset-x-0 bottom-0 aspect-[2/3] w-full"
+        className="sidebar-glow absolute inset-0 bg-cover bg-center opacity-80 blur-3xl saturate-[1.4]"
+        style={{ backgroundImage: `url(${DESK_PHOTO})` }}
+      />
+      <div
+        className="absolute inset-x-0 bottom-0 aspect-square w-full"
         style={{
           maskImage:
             'linear-gradient(to bottom, transparent 0%, black 30%, black 82%, transparent 100%)',
@@ -400,24 +377,24 @@ function AmbientBackdrop({ veiled, media }: { veiled: boolean; media: string }) 
             'linear-gradient(to bottom, transparent 0%, black 30%, black 82%, transparent 100%)',
         }}
       >
-        <video
-          autoPlay
-          muted
-          loop
-          playsInline
-          disablePictureInPicture
-          poster="/bg/sidebar-ambient.jpg"
-          className="size-full object-cover"
-        >
-          <source src="/bg/sidebar-ambient.mp4" type="video/mp4" media={media} />
-        </video>
+        <div
+          className="size-full bg-cover bg-center"
+          style={{ backgroundImage: `url(${DESK_PHOTO})` }}
+        />
       </div>
-      {/* Grain + vignette: one cinematic surface over both video layers. */}
+      {/* The photo is a bright golden-hour scene and this panel is pinned dark;
+          this tint pulls it back to the night-room mood the copy sits on. */}
+      <div className="absolute inset-0 bg-background/10" />
+      {/* Grain + vignette: one cinematic surface over both image layers. */}
       <div className="film-grain absolute inset-0 opacity-[0.08] mix-blend-overlay" />
-      <div className="absolute inset-0 shadow-[inset_0_0_140px_rgba(0,0,0,0.55)]" />
-      {/* Scrims behind the copy (top) and footer (bottom), fading to clear. */}
-      <div className="absolute inset-x-0 top-0 h-[58%] bg-gradient-to-b from-background/85 via-background/40 to-transparent" />
-      <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-background/90 via-background/45 to-transparent" />
+      <div className="absolute inset-0 shadow-[inset_0_0_140px_rgba(0,0,0,0.45)]" />
+      {/* Scrims behind the copy (top) and footer (bottom), fading to clear.
+          The top one has to cover the copy block: that ends around 45% of the
+          desktop panel, but the mobile hero is narrower, so the same copy
+          wraps longer and needs the deeper cover. Below it the photograph is
+          left to read on its own. */}
+      <div className="absolute inset-x-0 top-0 h-[58%] bg-gradient-to-b from-background/85 via-background/45 to-transparent lg:h-[46%]" />
+      <div className="absolute inset-x-0 bottom-0 h-[30%] bg-gradient-to-t from-background/88 via-background/40 to-transparent lg:h-[24%]" />
       {/* Reading veil — frosts everything while the about view is open. */}
       <motion.div
         initial={false}
@@ -463,10 +440,11 @@ export default function Sidebar() {
       {/* ── Desktop sidebar ── */}
       <aside
         // `dark` pins this panel to the dark palette in both themes: the
-        // footage is a night scene, and light-mode fades washed it out.
+        // photograph is a dim room lit by one window, and light-mode fades
+        // washed it out.
         className="dark fixed left-0 top-0 z-30 hidden h-screen w-[28rem] flex-col overflow-hidden border-r border-border bg-background text-foreground lg:flex"
       >
-        <AmbientBackdrop veiled={aboutOpen} media="(min-width: 1024px)" />
+        <AmbientBackdrop veiled={aboutOpen} />
 
         <div className="relative z-10 flex min-h-0 flex-1 flex-col overflow-y-auto px-7 pt-7 xl:px-8 xl:pt-8">
           <SidebarContent onAboutChange={setAboutOpen} controls={<Controls />} />
@@ -482,7 +460,7 @@ export default function Sidebar() {
           hamburger. Inner pages keep the compact header + drawer below. ── */}
       {isHome ? (
         <section className="dark relative isolate flex min-h-[88svh] flex-col overflow-hidden border-b border-border bg-background text-foreground lg:hidden">
-          <AmbientBackdrop veiled={heroAboutOpen} media="(max-width: 1023px)" />
+          <AmbientBackdrop veiled={heroAboutOpen} />
           <div className="relative z-10 flex flex-1 flex-col px-6 pt-6 sm:px-8 sm:pt-7">
             <SidebarContent onAboutChange={setHeroAboutOpen} controls={<Controls />} />
             <div className="flex flex-1 flex-col justify-end pt-12">
