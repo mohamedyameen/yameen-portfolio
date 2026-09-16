@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { PauseIcon, PlayIcon, XIcon } from '@phosphor-icons/react'
 import { useEffect, useRef } from 'react'
 import { TRACK, useMusicPlayer } from './MusicPlayerProvider'
+import { staticImage } from '@/lib/static-image'
 
 const MORPH = {
   type: 'spring' as const,
@@ -17,7 +18,8 @@ function ArtBlur() {
     <div
       aria-hidden
       className="pointer-events-none absolute inset-0 scale-110 bg-cover bg-center opacity-[0.12] dark:opacity-[0.18]"
-      style={{ backgroundImage: `url(${TRACK.art})`, filter: 'blur(40px)' }}
+      // 256px is indistinguishable from the 1.6 MB source under a 40px blur.
+      style={{ backgroundImage: `url(${staticImage(TRACK.art, 256)})`, filter: 'blur(40px)' }}
     />
   )
 }

@@ -1,8 +1,8 @@
 import { ImageResponse } from 'next/og'
-import { siteAuthor, siteDescription } from '@/lib/site'
+import { siteAuthor, siteDescription, siteTitle } from '@/lib/site'
 
 export const runtime = 'nodejs'
-export const alt = 'Yameen · Lead Product Designer'
+export const alt = siteTitle
 export const size = { width: 1200, height: 630 }
 export const contentType = 'image/png'
 
@@ -46,7 +46,7 @@ export default async function Image() {
               letterSpacing: -2,
             }}
           >
-            Lead Product Designer
+            Design × Dev
           </div>
           <div
             style={{

@@ -6,8 +6,6 @@ import {
   Callout,
   Video,
 } from '@/components/works/body'
-// Parked with the Verify & call me slot below — restore both together.
-// import { ShotPlaceholder } from '@/components/works/ShotPlaceholder'
 import { SceneShot } from '@/components/works/SceneShot'
 import { HelpdeskBento } from '@/components/works/HelpdeskBento'
 import { DesignBuildShowcase } from '@/components/works/DesignBuildShowcase'
@@ -16,8 +14,6 @@ import { DesignBuildShowcase } from '@/components/works/DesignBuildShowcase'
  * Story order follows the customer's journey through the product:
  * arrive → set up in minutes → hear the agent → teach it → watch it work
  * (Inbox → Tickets → Contacts → Ask AI) → how it was built.
- *
- * ShotPlaceholder labels double as the recording brief for each slot.
  */
 export default function Body() {
   return (
@@ -101,29 +97,6 @@ export default function Body() {
           src="/works/facilio-helpdesk-ai/onboarding.mp4"
           caption="URL in, agent out — the crawl reads the site, “Here’s What We Found” comes back pre-filled, and Looks Good lands you in a live helpdesk."
         />
-      </Section>
-
-      <Section id="hear-it" label="Hear it before you trust it" tocLabel="Verify & call me">
-        <Prose>
-          <Text>
-            The first thing after setup isn&apos;t a feature tour. It&apos;s an
-            offer to hear the agent you just built. Verify your number and it
-            calls you — six OTP cells, one button: <strong>&ldquo;Verify &amp;
-            call me.&rdquo;</strong>
-          </Text>
-          <Text>
-            Thirty seconds, skippable, and the highest-conviction moment in the
-            product.
-          </Text>
-        </Prose>
-        {/* Hidden until the shot is recorded — uncomment with the import above.
-            Recording: the Get Started card on Home -> phone number -> OTP ->
-            "Verify & call me" -> the calling state, ideally with the phone
-            ringing on camera or the WhatsApp QR variant.
-        <ShotPlaceholder
-          label='Recording: the Get Started card on Home → phone number → OTP → "Verify & call me" → the calling state, ideally with the phone ringing on camera or the WhatsApp QR variant'
-          aspect="16/10"
-        /> */}
       </Section>
 
       <Section id="intake" label="Teaching the agent" tocLabel="Intake agent">

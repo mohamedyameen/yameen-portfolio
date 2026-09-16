@@ -5,15 +5,21 @@ import { getImageProps } from 'next/image'
 import { cn } from '@/lib/utils'
 import { Lightbox } from '@/components/works/SceneShot'
 import { Iphone17Pro } from '@/components/ui/iphone-17-pro'
+import { staticImage } from '@/lib/static-image'
 
 /**
  * Light backdrop for the phone showcases — a near-white field with a vivid
  * royal-blue streak in the top-right, so the dark iPhone frames read as the
  * hero object over an airy, on-brand blue. Driven by a static image so the look
  * stays identical to the source art regardless of the site's dark theme.
+ *
+ * CSS backgrounds bypass next/image, so these resolve the build-time WebP
+ * variant by hand — 1440px covers the widest the scenes render at 2× DPR.
  */
+const BG_WIDTH = 1440
+
 export const SHOWCASE_BG = {
-  backgroundImage: 'url(/works/blubees/bg-showcase.png)',
+  backgroundImage: `url(${staticImage('/works/blubees/bg-showcase.png', BG_WIDTH)})`,
   backgroundSize: 'cover',
   backgroundPosition: 'center',
   backgroundRepeat: 'no-repeat',
@@ -24,7 +30,7 @@ export const SHOWCASE_BG = {
 export function bgStyle(url?: string) {
   if (!url) return SHOWCASE_BG
   return {
-    backgroundImage: `url(${url})`,
+    backgroundImage: `url(${staticImage(url, BG_WIDTH)})`,
     backgroundSize: 'cover',
     backgroundPosition: 'center',
     backgroundRepeat: 'no-repeat',

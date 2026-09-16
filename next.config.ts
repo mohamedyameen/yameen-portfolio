@@ -2,12 +2,26 @@ import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
   images: {
-    // AVIF first (smaller), WebP as the fallback; served per the browser's Accept header.
-    formats: ['image/avif', 'image/webp'],
-    // Everything under public/ is versioned in git, so hold optimized variants
-    // for a week instead of the 4h default. Rename a file (or wait a week) when
-    // you replace an image with the same filename.
-    minimumCacheTTL: 60 * 60 * 24 * 7,
+    // Every <Image> resolves to a WebP rendered at build time by
+    // scripts/optimize-images.mjs and served as an immutable static file
+    // (see headers() below) — no on-demand /_next/image transforms, which on
+    // Vercel cost 400–1800 ms per cold variant and were never browser-cached.
+    loader: 'custom',
+    loaderFile: './lib/image-loader.ts',
+    // srcset candidates. Must be a subset of IMAGE_WIDTHS in lib/static-image.ts
+    // so every candidate maps to a rendered file.
+    deviceSizes: [640, 828, 1080, 1440, 1920],
+    imageSizes: [256, 384, 480],
+  },
+  async headers() {
+    return [
+      {
+        // Build-time image variants live under a content-hash folder, so
+        // they can be cached forever; a changed image gets a new folder.
+        source: '/_opt/:path*',
+        headers: [{ key: 'Cache-Control', value: 'public, max-age=31536000, immutable' }],
+      },
+    ]
   },
   async rewrites() {
     return {

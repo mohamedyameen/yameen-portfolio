@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { motion, AnimatePresence } from 'framer-motion'
 import { cn } from '@/lib/utils'
+import { staticImage } from '@/lib/static-image'
 import {
   ArrowLeftIcon,
   ArrowUpRightIcon,
@@ -20,7 +21,10 @@ import { useSound } from '@/hooks/useSound'
 import { useWeather, type WeatherCondition } from '@/hooks/useWeather'
 import { InlineMusicPlayer } from '@/components/music/MusicPlayer'
 
-const DESK_PHOTO = '/bg/sidebar-desk.jpg'
+// Pre-rendered WebP (CSS backgrounds bypass next/image). The panel is at most
+// 36rem wide, so 640px is plenty for a blurred/dimmed backdrop at 1×; 1080
+// keeps the unblurred bottom copy crisp at 2×.
+const DESK_PHOTO = staticImage('/bg/sidebar-desk.jpg', 1080)
 
 const CONDITION_LABEL: Record<WeatherCondition, string> = {
   clear: 'Clear', clouds: 'Cloudy', fog: 'Foggy',
