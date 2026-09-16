@@ -6,7 +6,7 @@ import {
   Callout,
   Video,
 } from '@/components/works/body'
-import { ShotPlaceholder } from '@/components/works/ShotPlaceholder'
+import { SceneShot } from '@/components/works/SceneShot'
 
 /** Backdrop for recording slots — the dispatch frame from the shared set. */
 const BG = '/works/facilio-helpdesk-ai/dispatch.jpg'
@@ -16,7 +16,6 @@ const BG = '/works/facilio-helpdesk-ai/dispatch.jpg'
  * structure → test it on a real ticket → watch it recommend → assign or
  * override → the data underneath (technicians, data sources) → how it's built.
  *
- * ShotPlaceholder labels double as the recording brief for each slot.
  */
 export default function Body() {
   return (
@@ -90,10 +89,11 @@ export default function Body() {
             updates.
           </Text>
         </Prose>
-        <ShotPlaceholder
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/policy-canvas.png"
           bg={BG}
-          label='Recording: Dispatcher → policies canvas — type "Emergency HVAC tickets go to certified techs within 15 km, prefer lowest workload", Enter, the builder drafts, then refine once via the chat rail'
-          aspect="16/10"
+          alt="The dispatch policies canvas — a plain-language prompt box above the four existing policies, each with its urgency tier and creation date"
+          caption="A blank canvas and a prompt box: the rule goes in as a sentence, not a form."
         />
       </Section>
 
@@ -112,10 +112,11 @@ export default function Body() {
             thing worth teaching, and the layout teaches it without docs.
           </Text>
         </Prose>
-        <ShotPlaceholder
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/policy-breakdown.png"
           bg={BG}
-          label="Recording: scroll the policy breakdown — the stat pills, Trigger rows, Eligibility chips, the Ranking weight bar with its factor rows, Assignment, then expand the AI assumptions card"
-          aspect="16/10"
+          alt="A policy breakdown — eligibility as chip clusters, the ranking weight bar split across five factors, assignment, and the fine print"
+          caption="Eligibility is a hard filter; ranking is one bar that splits to 100%. “How the AI interpreted your prompt” sits at the bottom, in writing."
         />
         <Callout>
           The weight bar deliberately avoids red and orange. They read as
@@ -132,10 +133,11 @@ export default function Body() {
             against reality before the rule goes live.
           </Text>
         </Prose>
-        <ShotPlaceholder
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/playground-rankings.png"
           bg={BG}
-          label="Recording: Test rule → the modal morphs to the ticket picker → choose a ticket → back to the playground with ranked technicians and the Top match badge"
-          aspect="16/10"
+          alt="The playground with a real ticket loaded and five technicians ranked by score, the highest carrying a Top match badge"
+          caption="A real ticket from the queue, run through the policy — ranked names, scores, a Top match badge, and nothing saved."
         />
       </Section>
 
@@ -162,10 +164,11 @@ export default function Body() {
           src="/works/facilio-helpdesk-ai/ticket-module.mp4"
           caption="A ticket’s detail — the recommendation card with its match score, and the reasoning behind it."
         />
-        <ShotPlaceholder
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/ticket-recommendation.png"
           bg={BG}
-          label='Recording: open a recommended ticket → the card with "96% match" → Other matches popover → expand "How Atom decided" → assign a runner-up (override) → the card flips to Assigned'
-          aspect="16/10"
+          alt="A ticket detail panel — the card reads Auto-assigned by Atom with the technician, the reason, the applied policy, Other matches, and How Atom decided"
+          caption="The card leads with its own state — Auto-assigned — then the reason, the policy it applied, and the runners-up."
         />
       </Section>
 
@@ -178,10 +181,11 @@ export default function Body() {
             its data speak the same vocabulary.
           </Text>
         </Prose>
-        <ShotPlaceholder
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/technician-profile.png"
           bg={BG}
-          label="Recording: Technicians card grid → search → open a profile modal → skills with ratings, certifications, the breaks timeline, familiar zones, then the job history"
-          aspect="16/10"
+          alt="A technician profile — the day’s availability timeline with breaks, skills rated out of five, certifications, applicable territories, and van inventory"
+          caption="Exactly what the engine ranks on: skills rated 1–5, certifications, territories, and the day’s breaks."
         />
       </Section>
 
@@ -195,10 +199,17 @@ export default function Body() {
             what the engine will and won&apos;t know about.
           </Text>
         </Prose>
-        <ShotPlaceholder
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/data-sources.png"
           bg={BG}
-          label="Recording: Settings → Data Sources — connected systems, the datasets list with its field coverage and review counts, then one dataset's source-to-destination field mapping"
-          aspect="16/10"
+          alt="Settings → Data Sources — Facilio listed under connected systems, and four datasets each showing how many of its fields are mapped"
+          caption="Connected systems up top, then every dataset with the part that matters: how much of it is actually mapped."
+        />
+        <SceneShot
+          src="/works/facilio-dispatcher-agent/dataset-field-mapping.png"
+          bg={BG}
+          alt="The Add Dataset dialog mapping a Facilio module onto technician fields — breaks, certifications, familiar zones, inventory, contractor flag and skills — with unmapped fields counted"
+          caption="One dataset's mapping, with the consequence written out: four of ten technician fields filled, the other six left empty on purpose."
         />
       </Section>
 
@@ -234,23 +245,6 @@ export default function Body() {
           detail pane — vocabularies reconciled by hand so the two counts of
           &ldquo;open work&rdquo; can never disagree.
         </Callout>
-      </Section>
-
-      <Section id="close" label="What held it together" tocLabel="Reflection" className="lg:mt-40">
-        <Prose>
-          <Text>
-            <strong>Explainability is an interface problem, not a model
-            problem.</strong> The score, the runners-up, and the reasoning steps
-            were design decisions. Auditable is the only version of AI
-            automation that gets adopted.
-          </Text>
-          <Text>
-            <strong>Prose in → structure out → test</strong> is the pattern
-            I&apos;d most want to reuse: natural language for input, structured
-            rendering so the interpretation is inspectable, a dry-run before
-            it&apos;s live.
-          </Text>
-        </Prose>
       </Section>
     </>
   )

@@ -24,7 +24,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
   return (
     <>
       {!fullBleed && <Sidebar />}
-      <main className={cn('min-h-screen', !fullBleed && 'lg:pl-[28rem]')}>
+      {/* Inset must track Sidebar's width at every breakpoint (w-[28rem]
+          2xl:w-[32rem] min-[1920px]:w-[36rem]) — the sidebar is fixed, so
+          any mismatch either overlaps the content or leaves a gap. */}
+      <main
+        className={cn(
+          'min-h-screen',
+          !fullBleed && 'lg:pl-[28rem] 2xl:pl-[32rem] min-[1920px]:pl-[36rem]',
+        )}
+      >
         <PageTransition>{children}</PageTransition>
       </main>
     </>

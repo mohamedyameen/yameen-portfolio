@@ -45,15 +45,18 @@ export default function InfoPanel() {
       >
         <div className="flex flex-col gap-4">
           <p className="text-sm leading-relaxed text-white/80 sm:text-base">
-            Product Designer focused on AI-native B2B tools — workflow surfaces,
-            data-dense dashboards, and Ask AI that holds up in production. I
-            lead design at Facilio, where I spend most days turning messy
-            facilities-management problems into interfaces that feel obvious.
+            Product designer who ships the frontend too. Currently Lead
+            Product Designer at Facilio, where I designed and built the home
+            for its AI agents, and where most days now go into cooking the next
+            ones. The brief hasn&apos;t changed: turn the mess of running
+            buildings into interfaces that feel obvious.
           </p>
           <p className="text-sm leading-relaxed text-white/65">
             Came up through computer science. Drifted into design when I
             realised I cared more about how things felt than how cleanly they
-            compiled. Slow work, but slow work is how the good stuff gets made.
+            compiled. Then the tooling caught up: I build what I design now,
+            Claude Code doing most of the typing, the browser doing the
+            judging. The degree wasn&apos;t a detour — it was the other half.
           </p>
         </div>
 

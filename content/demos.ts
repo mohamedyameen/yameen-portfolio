@@ -28,7 +28,7 @@ export const demos: Record<string, Demo> = {
     alt: 'Facilio Helpdesk',
     favicon: '/helpdesk/favicon-dark.png',
     views: [
-      { label: 'Product', path: '/helpdesk/home' },
+      { label: 'Home', path: '/helpdesk/home' },
       // Boots the console as a fresh account so the first-run flow can be
       // walked: URL → crawl → "Here's What We Found" → agent → Ask AI.
       { label: 'Onboarding', path: '/helpdesk/onboarding?demo=onboarding' },

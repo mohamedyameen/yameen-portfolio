@@ -145,10 +145,10 @@ export const works: Work[] = [
     // it sits centre-right, so a taller (more cropped) frame would clip it.
     aspect: '4/3',
     heroPreview: {
-      // Same backdrop as Helpdesk on purpose: one bundle, two products, so the
-      // pair should read as a set rather than two unrelated photo edges.
+      // The Dispatch scene from the Helpdesk bento — the supervisor briefing
+      // technicians — so the card says "dispatch" before the screenshot does.
       src: '/works/facilio-dispatcher-agent/policies.png',
-      bg: '/works/facilio-helpdesk-ai/surface.jpg',
+      bg: '/works/facilio-helpdesk-ai/dispatch.jpg',
       anchor: 'left',
       focus: 'left top',
     },
@@ -195,7 +195,12 @@ export const works: Work[] = [
       'Owned flows, interaction model, and visual system across 40+ screens — onboarding to shipped UI.',
     kind: 'freelance',
     accent: 'from-violet-950 via-purple-900 to-slate-900',
-    aspect: '4/3',
+    // Square, matching Helpdesk. The heroPreview frame is object-cover, so
+    // visible width = frame-aspect x image-height (1100px): 1/1 shows 1112px
+    // of the 1760px source. The message text runs to x=1339, so the last lines
+    // bleed off the right edge — deliberate, the same way the screen bleeds
+    // off the card. 5/4 (1390px) is the largest size that clears the text.
+    aspect: '1/1',
     cover: '/works/mellow/hero-cover.jpg',
     heroPreview: {
       src: '/works/mellow/home-attention.jpg',

@@ -16,10 +16,13 @@ function ScenePhone({ src }: { src: string }) {
   return <PhoneFrame src={src} alt="" imgWidth={240} />
 }
 
-// Rendered card width per column count (see useColumnCount). Lets next/image
-// pick a candidate close to the real card size instead of the full source.
+// Rendered card width, so next/image picks a candidate close to the real card
+// size instead of the full source. Two columns inside a 90rem cap means the
+// card stops growing at ~675px; the cap engages once the grid area (viewport
+// minus the sidebar, which is 28-36rem depending on breakpoint) reaches 90rem.
+// 675px is an upper bound from there up, so a candidate is never undersized.
 const CARD_SIZES =
-  '(max-width: 639px) 100vw, (min-width: 3440px) 20vw, (min-width: 2560px) 25vw, (min-width: 1920px) 33vw, 50vw'
+  '(max-width: 639px) 100vw, (min-width: 1888px) 675px, 50vw'
 
 function ProjectCard({
   project,
@@ -275,26 +278,20 @@ function distributeIntoColumns(works: Work[], numCols: number): Work[][] {
   return cols
 }
 
+// Two columns is the ceiling, at every width above mobile. Wider screens make
+// the cards bigger rather than adding a third column — past two, each card gets
+// too small to read the product inside it, and the grid runs out of works and
+// leaves dead space at the bottom.
 function useColumnCount() {
   // SSR default matches the smallest viewport.
   const [cols, setCols] = useState(2)
   useEffect(() => {
     if (typeof window === 'undefined' || !window.matchMedia) return
-    const sm   = window.matchMedia('(min-width: 640px)')
-    const xxl  = window.matchMedia('(min-width: 1920px)')
-    const qhd  = window.matchMedia('(min-width: 2560px)')
-    const uhd  = window.matchMedia('(min-width: 3440px)')
-    const update = () =>
-      setCols(
-        uhd.matches ? 5 :
-        qhd.matches ? 4 :
-        xxl.matches ? 3 :
-        sm.matches  ? 2 : 1
-      )
+    const sm = window.matchMedia('(min-width: 640px)')
+    const update = () => setCols(sm.matches ? 2 : 1)
     update()
-    const queries = [sm, xxl, qhd, uhd]
-    queries.forEach(q => q.addEventListener('change', update))
-    return () => queries.forEach(q => q.removeEventListener('change', update))
+    sm.addEventListener('change', update)
+    return () => sm.removeEventListener('change', update)
   }, [])
   return cols
 }
@@ -313,7 +310,9 @@ export function MasonryGrid({ projects }: { projects: Work[] }) {
   }, [])
 
   return (
-    <div className="p-5 sm:p-6 xl:p-8">
+    // Capped and centred so two columns stop growing without limit on wide
+    // screens — 90rem matches the case-study article's wide container.
+    <div className="mx-auto w-full max-w-[90rem] p-5 sm:p-6 xl:p-8">
       <div className="flex gap-5 sm:gap-6 xl:gap-7">
         {columns.map((col, ci) => (
           <div key={ci} className="flex-1 min-w-0 flex flex-col gap-6 sm:gap-7 xl:gap-8">

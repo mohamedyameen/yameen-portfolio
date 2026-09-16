@@ -35,24 +35,53 @@ const livingWords = [
   { text: 'vibe',   shine: 'shine-violet',  emoji: '✨', tilt: 12 },
 ]
 
+// The verb cycles too, so the headline says both halves of the job. Every one
+// of these has to read in "I ___ things for a living."
+const craftWords = ['design', 'code', 'build']
+
+// One tick drives both words, but they advance on alternate ticks — each word
+// still changes every 2 x TICK_MS (the original 2200ms), and only one of them
+// is ever mid-animation, so the line never churns in two places at once.
+const TICK_MS = 1100
+
 function AnimatedHeadline() {
-  const [wordIdx, setWordIdx] = useState(0)
+  const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    const id = setInterval(() => {
-      setWordIdx((i) => (i + 1) % livingWords.length)
-    }, 2200)
+    const cycle = 2 * livingWords.length * craftWords.length
+    const id = setInterval(() => setTick((t) => (t + 1) % cycle), TICK_MS)
     return () => clearInterval(id)
   }, [])
 
+  const wordIdx = (tick >> 1) % livingWords.length
+  const craftIdx = ((tick + 1) >> 1) % craftWords.length
+  const craft = craftWords[craftIdx]
+
   return (
-    <h1 className="text-[26px] font-medium leading-[1.2] tracking-tight text-foreground">
-      <span className="block">Hey, I&apos;m Yameen.</span>
-      <span className="block text-foreground/55">
+    <h1
+      className="text-[26px] font-medium leading-[1.2] tracking-tight text-foreground"
+      // The two words swap on a timer; without this a screen reader re-reads
+      // the heading every rotation.
+      aria-label={`Hey, I'm Yameen. I ${craftWords.join(', ')} things for a living.`}
+    >
+      <span className="block" aria-hidden>Hey, I&apos;m Yameen.</span>
+      <span className="block text-foreground/55" aria-hidden>
         I{' '}
-        <em style={{ fontFamily: 'var(--font-playfair)' }} className="italic font-bold text-foreground">
-          design
-        </em>{' '}
+        <span className="relative inline-block align-bottom" style={{ clipPath: 'inset(0)', lineHeight: 1.2 }}>
+          <AnimatePresence mode="wait" initial={false}>
+            <motion.em
+              key={craft}
+              initial={{ y: '100%', opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: '-100%', opacity: 0 }}
+              transition={{ duration: 0.4, ease: [0.65, 0, 0.35, 1] }}
+              style={{ fontFamily: 'var(--font-playfair)' }}
+              className="inline-block whitespace-nowrap italic font-bold text-foreground"
+            >
+              {craft}
+            </motion.em>
+          </AnimatePresence>
+        </span>{' '}
         things for a{' '}
         <span className="relative inline-block" style={{ marginLeft: '0.15em' }}>
           <span className="inline-block" style={{ clipPath: 'inset(0)', lineHeight: 1.2 }}>
@@ -217,18 +246,25 @@ function SidebarAbout({ onBack }: { onBack: () => void }) {
 
       <div className="flex flex-col gap-4">
         <p className="text-sm leading-relaxed text-foreground/80">
-          Product Designer focused on AI-native B2B tools — workflow surfaces,
-          data-dense dashboards, and Ask AI that holds up in production. I
-          lead design at Facilio, where I spend most days turning messy
-          facilities-management problems into interfaces that feel obvious.
+          Product designer who ships the frontend too. Currently Lead
+          Product Designer at Facilio, where I designed and built the home for
+          its AI agents, and where most days now go into cooking the next ones.
+          The brief hasn&apos;t changed: turn the mess of running buildings into
+          interfaces that feel obvious.
         </p>
         <p className="text-sm leading-relaxed text-foreground/80">
           I came up through computer science engineering, expecting to ship
           systems and write features. Somewhere along the way I noticed I
           cared less about how cleanly things compiled and more about how they
           felt to use — the small frictions, the tiny delights, the way a
-          button can feel honest or sneaky. So I drifted, slowly, into design,
-          and never really came back.
+          button can feel honest or sneaky. So I drifted, slowly, into design.
+        </p>
+        <p className="text-sm leading-relaxed text-foreground/80">
+          Then the tooling caught up. Now I design and build the same screen:
+          rough structure in Figma, the real thing in code with Claude Code
+          doing most of the typing, judged in the browser instead of a mockup.
+          Turns out the engineering degree wasn&apos;t a detour. It was the
+          other half.
         </p>
       </div>
 
@@ -442,7 +478,7 @@ export default function Sidebar() {
         // `dark` pins this panel to the dark palette in both themes: the
         // photograph is a dim room lit by one window, and light-mode fades
         // washed it out.
-        className="dark fixed left-0 top-0 z-30 hidden h-screen w-[28rem] flex-col overflow-hidden border-r border-border bg-background text-foreground lg:flex"
+        className="dark fixed left-0 top-0 z-30 hidden h-screen w-[28rem] flex-col overflow-hidden border-r border-border bg-background text-foreground lg:flex 2xl:w-[32rem] min-[1920px]:w-[36rem]"
       >
         <AmbientBackdrop veiled={aboutOpen} />
 

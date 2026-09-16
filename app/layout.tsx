@@ -9,6 +9,7 @@ import ScrollbarOverlay from '@/components/layout/ScrollbarOverlay'
 import { TooltipProvider } from '@/components/ui/tooltip'
 import { MusicPlayerProvider } from '@/components/music/MusicPlayerProvider'
 import { GlobalFallingLeaves } from '@/components/music/FallingLeaves'
+import { Analytics } from '@vercel/analytics/next'
 import {
   siteUrl,
   siteName,
@@ -46,6 +47,8 @@ export const metadata: Metadata = {
     'Mohamed Yameen',
     'Product Designer',
     'Lead Product Designer',
+    'Design Engineer',
+    'Frontend Developer',
     'UX Designer',
     'UI Designer',
     'AI Product Design',
@@ -110,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             </MusicPlayerProvider>
           </TooltipProvider>
         </ThemeProvider>
+        <Analytics />
       </body>
     </html>
   )

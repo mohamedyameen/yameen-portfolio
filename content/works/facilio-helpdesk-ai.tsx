@@ -6,7 +6,9 @@ import {
   Callout,
   Video,
 } from '@/components/works/body'
-import { ShotPlaceholder } from '@/components/works/ShotPlaceholder'
+// Parked with the Verify & call me slot below — restore both together.
+// import { ShotPlaceholder } from '@/components/works/ShotPlaceholder'
+import { SceneShot } from '@/components/works/SceneShot'
 import { HelpdeskBento } from '@/components/works/HelpdeskBento'
 import { DesignBuildShowcase } from '@/components/works/DesignBuildShowcase'
 
@@ -95,9 +97,9 @@ export default function Body() {
             form.
           </Text>
         </Prose>
-        <ShotPlaceholder
-          label='Recording: onboarding end to end — paste a website URL, the crawl status lines, then "Here’s What We Found" with pre-filled chips, edit one, hit Looks Good, land in the product'
-          aspect="16/10"
+        <Video
+          src="/works/facilio-helpdesk-ai/onboarding.mp4"
+          caption="URL in, agent out — the crawl reads the site, “Here’s What We Found” comes back pre-filled, and Looks Good lands you in a live helpdesk."
         />
       </Section>
 
@@ -114,10 +116,14 @@ export default function Body() {
             product.
           </Text>
         </Prose>
+        {/* Hidden until the shot is recorded — uncomment with the import above.
+            Recording: the Get Started card on Home -> phone number -> OTP ->
+            "Verify & call me" -> the calling state, ideally with the phone
+            ringing on camera or the WhatsApp QR variant.
         <ShotPlaceholder
           label='Recording: the Get Started card on Home → phone number → OTP → "Verify & call me" → the calling state, ideally with the phone ringing on camera or the WhatsApp QR variant'
           aspect="16/10"
-        />
+        /> */}
       </Section>
 
       <Section id="intake" label="Teaching the agent" tocLabel="Intake agent">
@@ -135,13 +141,17 @@ export default function Body() {
             Web Widget, Email — gets its own tab and its own prompt.
           </Text>
         </Prose>
-        <ShotPlaceholder
-          label="Recording: scroll the Intake General tab — pick a voice, then hover along the Greeting and Behaviour chips so each hover-card shows the prompt behind the label, the Scope of Work rules, then the Calls, WhatsApp, Web Widget and Email tabs"
-          aspect="16/10"
+        <SceneShot
+          src="/works/facilio-helpdesk-ai/intake-scope-of-work.png"
+          bg="/works/facilio-helpdesk-ai/hero.jpg"
+          alt="The Intake agent's General tab — Scope of Work listing five plain-English rules, the Scenarios list beneath it, and the Playground panel on the right"
+          caption="Scope of Work is the agent's policy in plain English, not a settings screen — and the Playground sits beside it the whole time."
         />
-        <ShotPlaceholder
-          label='Recording: Add Scenario — type "There’s a strong smell of gas near the basement parking", write the response, Add, see it in the list, then Save And Publish'
-          aspect="16/10"
+        <SceneShot
+          src="/works/facilio-helpdesk-ai/intake-add-scenario.png"
+          bg="/works/facilio-helpdesk-ai/hero.jpg"
+          alt="The Add Scenario dialog — a field for what a user might ask and a field for how the agent should respond"
+          caption="A scenario is two fields: what someone might ask, and how the agent should answer it."
         />
       </Section>
 
@@ -158,9 +168,11 @@ export default function Body() {
             call → hope</em> to <em>edit → save → talk</em>.
           </Text>
         </Prose>
-        <ShotPlaceholder
-          label="Recording: the Playground — start a call from the phone mock, speak a maintenance request, watch the live transcript, then switch to the WhatsApp preview and raise a ticket through chat"
-          aspect="16/10"
+        <SceneShot
+          src="/works/facilio-helpdesk-ai/playground-calls.png"
+          bg="/works/facilio-helpdesk-ai/hero.jpg"
+          alt="The Intake agent's Calls tab — purchased phone numbers on the left, and on the right the Playground's phone showing the agent Ava with a call button"
+          caption="The Calls tab, with the Playground alongside it — Ava on the handset, one tap from a real call."
         />
       </Section>
 
@@ -177,9 +189,11 @@ export default function Body() {
             directions.
           </Text>
         </Prose>
-        <ShotPlaceholder
-          label="Recording: Inbox → Calls — open a call, the Atom analysis with its detected tone, the summary, then the timestamped transcript end to end"
-          aspect="16/10"
+        <SceneShot
+          src="/works/facilio-helpdesk-ai/inbox-call-analysis.png"
+          bg="/works/facilio-helpdesk-ai/hero.jpg"
+          alt="A call open in Inbox — Analyzed by Atom with a Concerned tone read, a one-line summary, and the timestamped transcript below"
+          caption="Every call lands here analysed — the tone read and summary up top, so nobody triages from a five-minute transcript."
         />
       </Section>
 
@@ -253,36 +267,6 @@ export default function Body() {
           data, not JSX, so a module can be parked or gated per product in one
           line.
         </Callout>
-      </Section>
-
-      <Section id="voice" label="Words as interface" tocLabel="Voice & tone">
-        <Prose>
-          <Text>
-            I wrote the copy as part of the UI, with rules that carry a reason.
-            Never name the state, name what to do about it. Empty states teach
-            the model. Borrow each channel&apos;s vocabulary — a call has a
-            duration, an email thread was closed in three days. And the people
-            calling a facilities desk are occupants and requesters, never
-            &ldquo;customers.&rdquo;
-          </Text>
-        </Prose>
-      </Section>
-
-      <Section id="close" label="What I'd take to the next thing" tocLabel="Reflection" className="lg:mt-40">
-        <Prose>
-          <Text>
-            <strong>Draft, don&apos;t demand.</strong> First-run setup should be
-            correcting a good guess.
-          </Text>
-          <Text>
-            <strong>Prove it before asking for trust.</strong> An agent that
-            phones you beats any welcome tour.
-          </Text>
-          <Text>
-            <strong>Perceived speed is design material</strong> — the part that
-            most needs the designer&apos;s hands on the code.
-          </Text>
-        </Prose>
       </Section>
     </>
   )

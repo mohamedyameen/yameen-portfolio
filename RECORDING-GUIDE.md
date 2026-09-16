@@ -96,9 +96,9 @@ right of every tab.
 
 1. **Identity** — *"How the agent sounds when interacting with users."* Agent Name,
    Language (English), Dialect (British (UK)).
-2. **Voice** — Female / Male toggle, then three cards: **Amelia** *British English ·
-   warm*, **Beatrice** *· measured*, **Imogen** *· bright*. Switch the selection
-   between them.
+2. **Voice** — Female / Male toggle, then three cards: **Amelia** *warm*,
+   **Beatrice** *measured*, **Imogen** *bright* — each with a one-line description
+   of how it sounds. Switch the selection between them.
 
    ⚠️ Each card shows a **play button**, but it produces **no sound in the demo** —
    it fetches `/api/assistant/channel/voices/stream/…`, which the mock doesn't

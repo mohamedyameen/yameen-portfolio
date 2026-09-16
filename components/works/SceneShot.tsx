@@ -13,6 +13,11 @@ import { cn } from '@/lib/utils'
  *
  * Dropped directly into a labeled <Section>, this fills the right column:
  * Section treats everything that isn't a prose primitive as media.
+ *
+ * Corner radii are literals, not `rounded-lg`/`rounded-xl`: globals.css sets
+ * `--radius: 0rem`, which collapses those to 0px/4px and made the floating
+ * window read as a hard rectangle inside its own 16px (`rounded-2xl`) frame.
+ * 12px nests concentrically inside that 16px without inheriting the token.
  */
 
 type SceneAspect = '3/2' | '16/10' | '4/3' | '16/9' | '3/4' | '1/1'
@@ -97,8 +102,8 @@ export function SceneShot({
             className={cn(
               'absolute bottom-0 top-[7%] overflow-hidden bg-white shadow-2xl shadow-black/40 ring-1 ring-black/10',
               anchor === 'right'
-                ? 'left-0 right-[6%] rounded-tr-lg sm:rounded-tr-xl'
-                : 'right-0 left-[6%] rounded-tl-lg sm:rounded-tl-xl',
+                ? 'left-0 right-[6%] rounded-tr-[10px] sm:rounded-tr-[12px]'
+                : 'right-0 left-[6%] rounded-tl-[10px] sm:rounded-tl-[12px]',
             )}
           >
             <Image
@@ -112,7 +117,7 @@ export function SceneShot({
           </div>
         ) : (
           <div className="absolute inset-0 flex items-center justify-center p-[2%] sm:p-[3.5%]">
-            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-lg bg-white shadow-2xl shadow-black/40 ring-1 ring-black/10 sm:rounded-xl">
+            <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[10px] bg-white shadow-2xl shadow-black/40 ring-1 ring-black/10 sm:rounded-[12px]">
               <Image
                 src={src}
                 alt={alt}
@@ -186,7 +191,7 @@ export function Lightbox({
         src={src}
         alt={alt}
         onClick={(e) => e.stopPropagation()}
-        className="max-h-[92vh] w-auto max-w-[min(100%,1400px)] rounded-xl object-contain shadow-2xl ring-1 ring-white/15"
+        className="max-h-[92vh] w-auto max-w-[min(100%,1400px)] rounded-[12px] object-contain shadow-2xl ring-1 ring-white/15"
       />
       <button
         type="button"

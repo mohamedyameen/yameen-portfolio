@@ -5,6 +5,7 @@ export const blurMap: Record<string, string> = {
   "/works/blubees/bg-showcase.png": "data:image/webp;base64,UklGRj4AAABXRUJQVlA4IDIAAADQAQCdASoMAAcAA4BaJYgCdAEOO/JoAAD++Lmr0OizAv2rJqUAJYW6U5UydwUnh/0AAA==",
   "/works/blubees/inst-home.jpg": "data:image/webp;base64,UklGRl4AAABXRUJQVlA4IFIAAABwAgCdASoGAAwAA4BaJbACdGuAt/8D0N30AGAAAPzZeGHTgJk7ZOQMAqJxX/uqCmzvMbJj9yv6TKVK7gkyfcw+sO5yW2jwjN4yL/56mWgKAAAA",
   "/works/facilio-dispatcher-agent/policies.png": "data:image/webp;base64,UklGRi4AAABXRUJQVlA4ICIAAAAwAQCdASoMAAgAA4BaJaQAA3AA/vSANrWGqR86IJaveQgA",
+  "/works/facilio-helpdesk-ai/dispatch.jpg": "data:image/webp;base64,UklGRjwAAABXRUJQVlA4IDAAAADwAQCdASoMAAcAA4BaJZQC7ADc+skUVvAA/u0aqD5Aa+J53AGkAYF2qeFTfT0mAAA=",
   "/works/facilio-helpdesk-ai/home.png": "data:image/webp;base64,UklGRiYAAABXRUJQVlA4IBoAAAAwAQCdASoMAAgABIBaJaQAA3AA/vS2gp4AAA==",
   "/works/facilio-helpdesk-ai/surface.jpg": "data:image/webp;base64,UklGRlgAAABXRUJQVlA4IEwAAADwAQCdASoMAAcAA4BaJagCdAD6mJFxvVAA/vSdXz65LjiiVBuMIZ222FZ6Eln98UYLMAiKUZGs0EmvcbMYqDKGNEvJyTJxuq2iwAAA",
   "/works/iot-automation/bg-atrium.jpg": "data:image/webp;base64,UklGRkoAAABXRUJQVlA4ID4AAACQAQCdASoMAAcAA4BaJbACdADYCUAA/uWgRPrwu3omEXpVIpBBNDG0snQ+Pem7Z2rY/Ct9uO45Q7GVccAAAA==",
