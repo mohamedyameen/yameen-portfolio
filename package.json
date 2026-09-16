@@ -30,6 +30,11 @@
   "overrides": {
     "node-domexception": "file:./shims/node-domexception"
   },
+  "allowScripts": {
+    "sharp": true,
+    "unrs-resolver": true,
+    "msw": false
+  },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
