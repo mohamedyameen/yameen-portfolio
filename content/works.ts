@@ -209,28 +209,4 @@ export const works: Work[] = [
       focus: 'left top',
     },
   },
-  {
-    slug: 'blubees',
-    name: 'Blubees',
-    type: 'case-study',
-    tags: ['Healthcare', 'Recruitment'],
-    category: 'Healthcare · Freelance',
-    summary:
-      'A hiring marketplace for hospitals, agencies, and medical professionals — verified profiles, urgent substitution cover, and hiring that completes in one place.',
-    tagline:
-      'A three-sided hiring portal for hospitals, agencies, and medical professionals.',
-    year: 'Jul 2023',
-    role: 'Product Designer',
-    time: 'Jul 2023 – Sep 2023',
-    client: 'Blubees',
-    kind: 'freelance',
-    accent: 'from-rose-950 via-pink-900 to-slate-900',
-    aspect: '1/1',
-    cover: '/works/blubees/inst-home.jpg',
-    coverPosition: 'top',
-    heroScene: {
-      bg: '/works/blubees/bg-showcase.png',
-      screens: ['/works/blubees/inst-home.jpg'],
-    },
-  },
 ]
